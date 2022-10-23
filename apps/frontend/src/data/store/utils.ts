@@ -11,7 +11,7 @@ export const loadState = () => {
 
     const parsedState = JSON.parse(serializedState);
 
-    return omit(['documents, sessions'], parsedState);
+    return omit([], parsedState);
   } catch (_) {
     return {};
   }
@@ -21,12 +21,6 @@ export const saveState = (state: RootState) => {
   try {
     const stateCopy: Omit<RootState, 'api'> = {
       ...omit(['api'], state),
-      login: { ...state.login, isAuthenticated: false },
-      documents: {
-        files: [],
-        reports: [],
-      },
-      sessions: [],
     };
 
     const serializedState = JSON.stringify(stateCopy);
