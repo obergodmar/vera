@@ -2,16 +2,44 @@
  * This is not a production server yet!
  * This is only a minimal backend to get started.
  */
+import {
+  INestApplication,
+  Logger,
+  NestApplicationOptions,
+} from '@nestjs/common';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-import { Logger } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
+import * as fs from 'fs';
 
 import { AppModule } from './app/app.module';
+import { AllExceptionsFilter } from './filters/http-exception.filter';
+
+const httpsOptions: NestApplicationOptions['httpsOptions'] = {};
+
+try {
+  httpsOptions.key = fs.readFileSync('./privkey.pem');
+
+  httpsOptions.cert = fs.readFileSync('./fullchain.pem');
+} catch (e) {
+  console.error(e);
+}
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { httpsOptions });
+
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
+
+  app.enableCors({
+    origin: ['localhost', /https?:\/\/vera\.example\.com/],
+  });
+
+  const httpAdapter = app.get(HttpAdapterHost);
+  app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
+
+  setupOpenApi(app);
+
   const port = process.env.PORT || 3333;
   await app.listen(port);
   Logger.log(
@@ -20,3 +48,13 @@ async function bootstrap() {
 }
 
 bootstrap();
+
+function setupOpenApi(app: INestApplication) {
+  const config = new DocumentBuilder()
+    .setTitle('API Documentation')
+    .setVersion('1.0')
+    .addTag('api')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+}
