@@ -10,3 +10,9 @@
 Коллекции
 - `greetings`: Приветствия для чатов
 - todo...
+
+
+[Собранный фронт](https://vera.example.com/)
+
+
+[Swagger](https://vera.example.com:3333/api)
