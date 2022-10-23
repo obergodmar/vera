@@ -35,7 +35,7 @@ deploy_application:
   script:
     # FRONTEND
     - ssh $FRONTEND "$FRONTEND_CLEAR"
-    - scp -r dist/apps/pw-places/* $FRONTEND_DESTINATION
+    - scp -r dist/apps/frontend/* $FRONTEND_DESTINATION
 
     # BACKEND
     - ssh $BACKEND "$BACKEND_CLEAR"
