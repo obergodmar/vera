@@ -7,7 +7,6 @@ cache:
 stages:
   - build
   - deploy
-  - pages
 
 build_application:
   stage: build
@@ -34,19 +33,13 @@ deploy_application:
     - chmod 0600 ~/.ssh/id_rsa
     - ssh-add ~/.ssh/id_rsa
   script:
+    # FRONTEND
+    - ssh $FRONTEND "$FRONTEND_CLEAR"
+    - scp -r dist/apps/pw-places/* $FRONTEND_DESTINATION
+
     # BACKEND
     - ssh $BACKEND "$BACKEND_CLEAR"
     - scp -r dist/apps/backend/* $BACKEND_DESTINATION
     - ssh $BACKEND "$BACKEND_RESTART"
-  only:
-    - master
-
-pages:
-  stage: pages
-  script:
-    - cp -R dist/apps/frontend/* ./public/.
-  artifacts:
-    paths:
-      - public
   only:
     - master
