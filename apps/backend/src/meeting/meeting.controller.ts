@@ -16,4 +16,17 @@ export class MeetingController {
   public async getMeetingsByPeerId(@Param('peerId') peerId: number) {
     return this.meetingsService.getMeetingsByPeerId(peerId);
   }
+
+  @Post('update/:peerId/:meetingId')
+  public async updateMeetingByPeerIdAndMeetingId(
+    @Param('peerId') peerId: number,
+    @Param('meetingId') meetingId: string,
+    @Body() createThreadDto: CreateNewMeetingDto
+  ) {
+    return this.meetingsService.updateMeetingByPeerIdAndMeetingId(
+      peerId,
+      meetingId,
+      createThreadDto
+    );
+  }
 }

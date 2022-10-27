@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
+import { ObjectId } from 'mongodb';
 import { Model } from 'mongoose';
 
 import { CreateNewMeetingDto } from './dto/create-new-meeting.dto';
@@ -42,6 +43,39 @@ export class MeetingService {
       }
 
       return existingChat.meetings;
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+  }
+
+  public async updateMeetingByPeerIdAndMeetingId(
+    peerId: number,
+    meetingId: string,
+    createThreadDto: CreateNewMeetingDto
+  ) {
+    const _id = new ObjectId(meetingId);
+
+    try {
+      const meetingMatch = await this.meetingModel
+        .findOne(
+          {
+            peerId,
+          },
+          {
+            meetings: {
+              $elemMatch: { _id },
+            },
+          }
+        )
+        .exec();
+
+      if (!meetingMatch || !meetingMatch.meetings?.length) {
+        return new NotFoundException('Встреча не найдена');
+      }
+
+      Object.assign(meetingMatch.meetings[0], createThreadDto);
+      await meetingMatch.save();
     } catch (e) {
       console.error(e);
     }

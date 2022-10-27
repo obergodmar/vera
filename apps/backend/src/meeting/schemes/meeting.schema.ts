@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 import { ParticipantsDto, WhenDto } from '../dto/create-new-meeting.dto';
 
-export type MeetingDocument = Chat;
+export type MeetingDocument = Chat & Document;
 
 @Schema()
 export class Meeting {
