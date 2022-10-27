@@ -6,6 +6,7 @@ import {
   INestApplication,
   Logger,
   NestApplicationOptions,
+  ValidationPipe,
 } from '@nestjs/common';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -15,7 +16,7 @@ import * as fs from 'fs';
 import { AppModule } from './app/app.module';
 import { AllExceptionsFilter } from './filters/http-exception.filter';
 
-const httpsOptions: NestApplicationOptions['httpsOptions'] = {};
+let httpsOptions: NestApplicationOptions['httpsOptions'] = {};
 
 try {
   httpsOptions.key = fs.readFileSync('./privkey.pem');
@@ -23,6 +24,8 @@ try {
   httpsOptions.cert = fs.readFileSync('./fullchain.pem');
 } catch (e) {
   console.error(e);
+
+  httpsOptions = undefined;
 }
 
 async function bootstrap() {
@@ -34,9 +37,14 @@ async function bootstrap() {
   app.enableCors({
     origin: ['localhost', /https?:\/\/vera\.example\.com/],
   });
-
   const httpAdapter = app.get(HttpAdapterHost);
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+    })
+  );
 
   setupOpenApi(app);
 
