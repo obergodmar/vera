@@ -16,6 +16,9 @@ export class ParticipantsDto {
   @IsString()
   kind: 'all' | 'pick';
 
+  @IsNumber()
+  count: number;
+
   @ApiProperty({ required: false })
   @ValidateIf((obj) => obj?.kind === 'pick')
   @IsArray()

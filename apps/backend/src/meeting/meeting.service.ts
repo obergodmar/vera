@@ -57,26 +57,42 @@ export class MeetingService {
     const _id = new ObjectId(meetingId);
 
     try {
-      const meetingMatch = await this.meetingModel
-        .findOne(
+      await this.meetingModel
+        .updateOne(
+          {
+            peerId,
+            meetings: {
+              $elemMatch: { _id },
+            },
+          },
+          { $set: { 'meetings.$': { ...createThreadDto, _id } } }
+        )
+        .exec();
+    } catch (e: unknown) {
+      console.error(e);
+    }
+  }
+
+  public async deleteMeetingByPeerIdAndMeetingId(
+    peerId: number,
+    meetingId: string
+  ) {
+    const _id = new ObjectId(meetingId);
+
+    try {
+      await this.meetingModel
+        .updateOne(
           {
             peerId,
           },
           {
-            meetings: {
-              $elemMatch: { _id },
+            $pullAll: {
+              meetings: [{ _id }],
             },
           }
         )
         .exec();
-
-      if (!meetingMatch || !meetingMatch.meetings?.length) {
-        return new NotFoundException('Встреча не найдена');
-      }
-
-      Object.assign(meetingMatch.meetings[0], createThreadDto);
-      await meetingMatch.save();
-    } catch (e) {
+    } catch (e: unknown) {
       console.error(e);
     }
   }

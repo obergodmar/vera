@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 
 import { CreateNewMeetingDto } from './dto/create-new-meeting.dto';
 import { MeetingService } from './meeting.service';
@@ -17,7 +25,7 @@ export class MeetingController {
     return this.meetingsService.getMeetingsByPeerId(peerId);
   }
 
-  @Post('update/:peerId/:meetingId')
+  @Patch('update/:peerId/:meetingId')
   public async updateMeetingByPeerIdAndMeetingId(
     @Param('peerId') peerId: number,
     @Param('meetingId') meetingId: string,
@@ -27,6 +35,17 @@ export class MeetingController {
       peerId,
       meetingId,
       createThreadDto
+    );
+  }
+
+  @Delete('remove/:peerId/:meetingId')
+  public async deleteMeetingByPeerIdAndMeetingId(
+    @Param('peerId') peerId: number,
+    @Param('meetingId') meetingId: string
+  ) {
+    return this.meetingsService.deleteMeetingByPeerIdAndMeetingId(
+      peerId,
+      meetingId
     );
   }
 }
