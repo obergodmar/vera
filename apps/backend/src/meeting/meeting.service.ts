@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
-import { ObjectId } from 'mongodb';
+import { MongoUnexpectedServerResponseError, ObjectId } from 'mongodb';
 import { Model } from 'mongoose';
 
 import { CreateNewMeetingDto } from './dto/create-new-meeting.dto';
@@ -29,6 +29,9 @@ export class MeetingService {
       }
     } catch (e: unknown) {
       console.error(e);
+      return new MongoUnexpectedServerResponseError(
+        'Ошибка при попытке создать встречу'
+      );
     }
   }
 
@@ -45,7 +48,9 @@ export class MeetingService {
       return existingChat.meetings;
     } catch (e) {
       console.error(e);
-      return [];
+      return new MongoUnexpectedServerResponseError(
+        'Ошибка при попытке получить встречи'
+      );
     }
   }
 
@@ -70,6 +75,9 @@ export class MeetingService {
         .exec();
     } catch (e: unknown) {
       console.error(e);
+      return new MongoUnexpectedServerResponseError(
+        'Ошибка при попытке обновить встречу'
+      );
     }
   }
 
@@ -94,6 +102,9 @@ export class MeetingService {
         .exec();
     } catch (e: unknown) {
       console.error(e);
+      return new MongoUnexpectedServerResponseError(
+        'Ошибка при попытке удалить встречу'
+      );
     }
   }
 }

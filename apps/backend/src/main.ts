@@ -1,7 +1,3 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
 import {
   INestApplication,
   Logger,
@@ -61,7 +57,6 @@ function setupOpenApi(app: INestApplication) {
   const config = new DocumentBuilder()
     .setTitle('API Documentation')
     .setVersion('1.0')
-    .addTag('api')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
