@@ -33,6 +33,8 @@ export class MeetingService {
         'Ошибка при попытке создать встречу'
       );
     }
+
+    return {};
   }
 
   public async getMeetingsByPeerId(peerId: number) {
@@ -79,6 +81,8 @@ export class MeetingService {
         'Ошибка при попытке обновить встречу'
       );
     }
+
+    return {};
   }
 
   public async deleteMeetingByPeerIdAndMeetingId(
@@ -106,5 +110,7 @@ export class MeetingService {
         'Ошибка при попытке удалить встречу'
       );
     }
+
+    return {};
   }
 }

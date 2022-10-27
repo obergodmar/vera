@@ -30,6 +30,8 @@ export class GreetingService {
         'Ошибка при попытке добавить приветствие'
       );
     }
+
+    return {};
   }
 
   public async removeGreeting(peerId: number) {
