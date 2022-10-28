@@ -31,7 +31,7 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix);
 
   app.enableCors({
-    origin: ['http://localhost', /https?:\/\/vera\.example\.com/],
+    origin: ['http://localhost', 'https://app.example.com'],
   });
   const httpAdapter = app.get(HttpAdapterHost);
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
