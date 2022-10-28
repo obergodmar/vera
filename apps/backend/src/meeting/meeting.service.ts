@@ -14,18 +14,29 @@ export class MeetingService {
     private readonly meetingModel: Model<MeetingDocument>
   ) {}
 
-  public async createMeeting(meetingDto: CreateNewMeetingDto) {
-    const { peerId } = meetingDto;
+  public async createMeeting(
+    meetingDto: CreateNewMeetingDto,
+    createCronJob: (time: Date, peerId: number, message: string) => string
+  ) {
+    const {
+      peerId,
+      when: { time },
+      inviteText,
+    } = meetingDto;
 
     try {
+      const cronJobId = createCronJob(new Date(time), peerId, inviteText);
+
       const existingChat = await this.meetingModel.findOne({ peerId }).exec();
 
+      const meeting = { ...meetingDto, cronJobId };
+
       if (existingChat && Array.isArray(existingChat.meetings)) {
-        existingChat.meetings.push(meetingDto);
+        existingChat.meetings.push(meeting);
 
         await existingChat.save();
       } else {
-        await this.meetingModel.create({ peerId, meetings: [meetingDto] });
+        await this.meetingModel.create({ peerId, meetings: [meeting] });
       }
     } catch (e: unknown) {
       console.error(e);
@@ -59,11 +70,33 @@ export class MeetingService {
   public async updateMeetingByPeerIdAndMeetingId(
     peerId: number,
     meetingId: string,
-    createThreadDto: CreateNewMeetingDto
+    createThreadDto: CreateNewMeetingDto,
+    createCronJob: (time: Date, peerId: number, message: string) => string,
+    cancelCronJob: (cronJobId: string) => void
   ) {
     const _id = new ObjectId(meetingId);
 
+    const {
+      when: { time },
+      inviteText,
+    } = createThreadDto;
+
     try {
+      const result = await this.meetingModel
+        .findOne({
+          peerId,
+          meetings: {
+            $elemMatch: { _id },
+          },
+        })
+        .exec();
+
+      let cronJobId = result?.meetings?.[0]?.cronJobId;
+      if (cronJobId) {
+        cancelCronJob(cronJobId);
+        cronJobId = createCronJob(new Date(time), peerId, inviteText);
+      }
+
       await this.meetingModel
         .updateOne(
           {
@@ -72,7 +105,7 @@ export class MeetingService {
               $elemMatch: { _id },
             },
           },
-          { $set: { 'meetings.$': { ...createThreadDto, _id } } }
+          { $set: { 'meetings.$': { ...createThreadDto, _id, cronJobId } } }
         )
         .exec();
     } catch (e: unknown) {
@@ -87,11 +120,26 @@ export class MeetingService {
 
   public async deleteMeetingByPeerIdAndMeetingId(
     peerId: number,
-    meetingId: string
+    meetingId: string,
+    cancelCronJob: (cronJobId: string) => void
   ) {
     const _id = new ObjectId(meetingId);
 
     try {
+      const result = await this.meetingModel
+        .findOne({
+          peerId,
+          meetings: {
+            $elemMatch: { _id },
+          },
+        })
+        .exec();
+
+      const cronJobId = result?.meetings?.[0]?.cronJobId;
+      if (cronJobId) {
+        cancelCronJob(cronJobId);
+      }
+
       await this.meetingModel
         .updateOne(
           {

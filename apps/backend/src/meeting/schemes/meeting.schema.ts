@@ -20,6 +20,9 @@ export class Meeting {
 
   @Prop()
   inviteText: string;
+
+  @Prop()
+  cronJobId: string;
 }
 
 const MeetingArraySchema = SchemaFactory.createForClass(Meeting);
