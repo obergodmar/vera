@@ -18,7 +18,9 @@ export class MeetingController {
     private readonly meetingsService: MeetingService,
     private readonly botService: BotService
   ) {
-    this.botService.start().catch((e) => console.error(e));
+    if (process.env.BOT_STATUS === 'enabled') {
+      this.botService.start().catch((e) => console.error(e));
+    }
   }
 
   @Post('create')
