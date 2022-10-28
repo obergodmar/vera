@@ -12,6 +12,7 @@ import {
   Greeting,
   GreetingDocument,
 } from '../greeting/schemes/greeting.schema';
+import { Meeting, MeetingDocument } from '../meeting/schemes/meeting.schema';
 
 type BotMessageOptions = {
   keyboard?: Record<string, any>;
@@ -96,7 +97,9 @@ export class BotService {
 
   constructor(
     @InjectModel(Greeting.name)
-    private readonly greetingModel: Model<GreetingDocument>
+    private readonly greetingModel: Model<GreetingDocument>,
+    @InjectModel(Meeting.name)
+    private readonly meetingModel: Model<MeetingDocument>
   ) {
     this.vk = new VK({
       token: process.env.BOT_TOKEN,
@@ -158,6 +161,62 @@ export class BotService {
 
       this.vk.api.messages.send(parameters);
     });
+  }
+
+  private reactOnCreating() {
+    this.bot.hear(
+      /Был. создан. (?<type>.+) с идентификатором (?<id>.+)/,
+      (msg) => {
+        const { $match, peerId } = msg;
+
+        const meetingId = $match?.groups?.id;
+        const type = $match?.groups?.type;
+
+        if (!meetingId || !type) {
+          return;
+        }
+
+        const parameters = createMessage(peerId, 'Готово!');
+
+        setTimeout(async () => {
+          this.vk.api.messages.send(parameters);
+
+          if (type === 'встреча') {
+            const result = await this.meetingModel
+              .findOne({ meetings: { $elemMatch: { id: meetingId } } })
+              .exec();
+
+            if (result?.meetings?.[0].title) {
+              const { title, inviteText } = result.meetings[0];
+
+              const parameters = createMessage(
+                peerId,
+                `Успешно создано:\n${title}: ${inviteText}`
+              );
+
+              this.vk.api.messages.send(parameters);
+            }
+          }
+
+          if (type === 'приветствие') {
+            const result = await this.greetingModel
+              .findOne({ id: meetingId })
+              .exec();
+
+            console.log(result);
+
+            if (result?.text) {
+              const parameters = createMessage(
+                peerId,
+                `Успешно создано:\n${result?.text}`
+              );
+
+              this.vk.api.messages.send(parameters);
+            }
+          }
+        }, 300);
+      }
+    );
   }
 
   private createReactionQueue() {
@@ -574,6 +633,8 @@ export class BotService {
 
       this.createCommandsQueue();
       this.createReactionQueue();
+
+      this.reactOnCreating();
 
       await this.vk.updates.startPolling();
     } catch (e: unknown) {

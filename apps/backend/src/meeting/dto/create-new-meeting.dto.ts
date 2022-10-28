@@ -50,6 +50,9 @@ export class WhenDto {
 
 export class CreateNewMeetingDto {
   @IsString()
+  id: string;
+
+  @IsString()
   title: string;
 
   @IsNumber()

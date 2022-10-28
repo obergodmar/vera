@@ -5,6 +5,9 @@ export type GreetingDocument = Greeting & Document;
 @Schema()
 export class Greeting {
   @Prop()
+  id: string;
+
+  @Prop()
   peerId: number;
 
   @Prop()

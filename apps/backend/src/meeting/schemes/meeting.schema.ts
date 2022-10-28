@@ -7,6 +7,9 @@ export type MeetingDocument = Chat & Document;
 @Schema()
 export class Meeting {
   @Prop()
+  id: string;
+
+  @Prop()
   title: string;
 
   @Prop()
@@ -20,9 +23,6 @@ export class Meeting {
 
   @Prop()
   inviteText: string;
-
-  @Prop()
-  cronJobId: string;
 }
 
 const MeetingArraySchema = SchemaFactory.createForClass(Meeting);
