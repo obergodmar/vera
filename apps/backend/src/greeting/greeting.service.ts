@@ -58,5 +58,7 @@ export class GreetingService {
         'Ошибка при попытке удаления приветствия'
       );
     }
+
+    return {};
   }
 }
