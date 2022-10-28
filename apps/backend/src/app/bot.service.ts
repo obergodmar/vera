@@ -4,9 +4,11 @@ import { HearManager } from '@vk-io/hear';
 
 import { CronJob } from 'cron';
 import { Model } from 'mongoose';
-import { nanoid } from 'nanoid';
 import { ContextDefaultState, MessageEventContext, VK } from 'vk-io';
 import * as Params from 'vk-io/lib/api/schemas/params';
+
+//eslint-disable-next-line @typescript-eslint/no-var-requires
+const nanoid = require('nanoid');
 
 import {
   Greeting,
