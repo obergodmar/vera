@@ -7,9 +7,6 @@ import { Model } from 'mongoose';
 import { ContextDefaultState, MessageEventContext, VK } from 'vk-io';
 import * as Params from 'vk-io/lib/api/schemas/params';
 
-//eslint-disable-next-line @typescript-eslint/no-var-requires
-const nanoid = require('nanoid');
-
 import {
   Greeting,
   GreetingDocument,
@@ -113,7 +110,7 @@ export class BotService {
   }
 
   public createCronJob(time: Date, peerId: number, message: string) {
-    const id = nanoid();
+    const id = `${Math.random()}`;
 
     const job = new CronJob(
       time,
