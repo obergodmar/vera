@@ -19,7 +19,7 @@ export class GreetingService {
       const greeting = await this.greetingModel.findOne({ peerId }).exec();
 
       return {
-        text: greeting.text,
+        text: greeting?.text || '',
       };
     } catch (e: unknown) {
       console.error(e);
