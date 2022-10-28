@@ -98,8 +98,8 @@ export class MeetingService {
             peerId,
           },
           {
-            $pullAll: {
-              meetings: [{ _id }],
+            $pull: {
+              meetings: { _id: { $eq: _id } },
             },
           }
         )
