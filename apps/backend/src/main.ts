@@ -31,7 +31,8 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix);
 
   app.enableCors({
-    origin: ['http://localhost', 'https://app.example.com'],
+    allowedHeaders: '*',
+    origin: '*',
   });
   const httpAdapter = app.get(HttpAdapterHost);
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
