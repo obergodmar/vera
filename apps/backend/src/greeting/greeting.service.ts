@@ -14,6 +14,21 @@ export class GreetingService {
     private readonly greetingModel: Model<GreetingDocument>
   ) {}
 
+  public async getGreeting(peerId: number) {
+    try {
+      const greeting = await this.greetingModel.findOne({ peerId }).exec();
+
+      return {
+        text: greeting.text,
+      };
+    } catch (e: unknown) {
+      console.error(e);
+      return new MongoUnexpectedServerResponseError(
+        'Ошибка при попытке загрузить приветствие'
+      );
+    }
+  }
+
   public async createGreeting(greetingDto: CreateNewGreetingDto) {
     const { peerId } = greetingDto;
 

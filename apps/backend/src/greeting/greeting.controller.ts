@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 
 import { CreateNewGreetingDto } from './dto/create-new-greeting.dto';
 import { GreetingService } from './greeting.service';
@@ -6,6 +14,11 @@ import { GreetingService } from './greeting.service';
 @Controller('greetings')
 export class GreetingController {
   public constructor(private readonly greetingsService: GreetingService) {}
+
+  @Get(':peerId')
+  public async getGreeting(@Param('peerId') peerId: number) {
+    return this.greetingsService.getGreeting(peerId);
+  }
 
   @Post('create')
   public async createGreeting(@Body() createGreetingDto: CreateNewGreetingDto) {
