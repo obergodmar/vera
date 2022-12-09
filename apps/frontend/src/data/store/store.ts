@@ -1,4 +1,3 @@
-import { createStandaloneToast } from '@chakra-ui/react';
 import {
   configureStore,
   isRejectedWithValue,
@@ -23,8 +22,6 @@ export const { enableAutoPageviews, trackEvent } = Plausible({
 
 enableAutoPageviews();
 
-const { toast } = createStandaloneToast();
-
 const rtkQueryErrorLogger: ThunkMiddleware = () => (dispatch) => (action) => {
   if (isRejectedWithValue(action)) {
     const trace = action?.payload?.data?.cause;
@@ -32,15 +29,6 @@ const rtkQueryErrorLogger: ThunkMiddleware = () => (dispatch) => (action) => {
     if (trace) {
       console.error(trace);
     }
-
-    toast({
-      title: `Ошибка ${action?.payload?.data?.code || ''}`,
-      description: action?.payload?.data?.message || undefined,
-      status: 'error',
-      duration: 9000,
-      isClosable: true,
-      position: 'top-right',
-    });
   }
 
   return dispatch(action);

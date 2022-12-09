@@ -1,40 +1,72 @@
-import { Link, Route, Routes } from 'react-router-dom';
-
-import styles from './app.module.css';
-
+import {
+  Icon16Dropdown,
+  Icon28AddOutline,
+  Icon28CameraOutline,
+} from '@vkontakte/icons';
+import {
+  AppRoot,
+  Group,
+  Header,
+  Panel,
+  PanelHeader,
+  PanelHeaderButton,
+  SimpleCell,
+  SizeType,
+  SplitCol,
+  SplitLayout,
+  Tabs,
+  TabsItem,
+  useAdaptivity,
+  View,
+  ViewWidth,
+} from '@vkontakte/vkui';
 export function App() {
+  const { viewWidth, sizeX } = useAdaptivity();
+
   return (
-    <div className={styles['App']}>
-      <div role="navigation">
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/page-2">Page 2</Link>
-          </li>
-        </ul>
-      </div>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <div>
-              This is the generated root route.{' '}
-              <Link to="/page-2">Click here for page 2.</Link>
-            </div>
-          }
-        />
-        <Route
-          path="/page-2"
-          element={
-            <div>
-              <Link to="/">Click here to go back to root page.</Link>
-            </div>
-          }
-        />
-      </Routes>
-    </div>
+    <AppRoot>
+      <SplitLayout header={<PanelHeader separator={false} />}>
+        <SplitCol spaced={viewWidth && viewWidth > ViewWidth.MOBILE}>
+          <View activePanel="main">
+            <Panel id="main">
+              <PanelHeader
+                before={
+                  <PanelHeaderButton>
+                    <Icon28CameraOutline />
+                  </PanelHeaderButton>
+                }
+                after={
+                  <PanelHeaderButton>
+                    <Icon28AddOutline />
+                  </PanelHeaderButton>
+                }
+                separator={sizeX === SizeType.REGULAR}
+              >
+                <Tabs>
+                  <TabsItem
+                    after={<Icon16Dropdown />}
+                    id="tab-news"
+                    aria-controls="tab-content-news"
+                  >
+                    Новости
+                  </TabsItem>
+                  <TabsItem
+                    id="tab-recommendations"
+                    aria-controls="tab-content-recommendations"
+                  >
+                    Интересное
+                  </TabsItem>
+                </Tabs>
+              </PanelHeader>
+              <Group header={<Header mode="secondary">Items</Header>}>
+                <SimpleCell>Hello</SimpleCell>
+                <SimpleCell>World</SimpleCell>
+              </Group>
+            </Panel>
+          </View>
+        </SplitCol>
+      </SplitLayout>
+    </AppRoot>
   );
 }
 

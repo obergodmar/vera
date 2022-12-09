@@ -1,35 +1,29 @@
-import {
-  ChakraProvider,
-  GlobalStyle,
-  LightMode,
-  theme,
-} from '@chakra-ui/react';
+import { AdaptivityProvider, ConfigProvider } from '@vkontakte/vkui';
 
 import { StrictMode } from 'react';
-import * as ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 
+import '@vkontakte/vkui/dist/vkui.css';
+
 import App from './app/app';
 import { store } from './data/store/store';
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
+const root = createRoot(document.getElementById('root') as HTMLElement);
 
 root.render(
   <StrictMode>
     <Provider store={store}>
       <HelmetProvider>
-        <ChakraProvider theme={theme}>
-          <LightMode>
-            <GlobalStyle />
+        <ConfigProvider>
+          <AdaptivityProvider>
             <BrowserRouter>
               <App />
             </BrowserRouter>
-          </LightMode>
-        </ChakraProvider>
+          </AdaptivityProvider>
+        </ConfigProvider>
       </HelmetProvider>
     </Provider>
   </StrictMode>
