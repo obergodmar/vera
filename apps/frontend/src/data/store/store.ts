@@ -12,7 +12,8 @@ import { ThunkMiddleware } from 'redux-thunk/es/types';
 import { api } from '../services/api';
 import { persistedState, saveState } from './utils';
 
-const isDev = process.env['NODE_ENV'] !== 'production';
+const { MODE } = import.meta.env;
+const isDev = MODE !== 'production';
 
 const { enableAutoPageviews, trackEvent } = Plausible({
   domain: 'vera.example.com',
