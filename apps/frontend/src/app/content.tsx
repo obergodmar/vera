@@ -1,70 +1,30 @@
 import {
-  Icon16Dropdown,
-  Icon28AddOutline,
-  Icon28CameraOutline,
-} from '@vkontakte/icons';
-import {
+  Avatar,
   Group,
-  Header,
   Panel,
   PanelHeader,
-  PanelHeaderButton,
-  SimpleCell,
-  SizeType,
   SplitCol,
   SplitLayout,
-  Tabs,
-  TabsItem,
-  useAdaptivity,
+  useAdaptivityConditionalRender,
   View,
-  ViewWidth,
 } from '@vkontakte/vkui';
 
 import { FC } from 'react';
 
+import { Panels } from '../components/panels';
+
 export const Content: FC = () => {
-  const { viewWidth, sizeX } = useAdaptivity();
+  const { viewWidth } = useAdaptivityConditionalRender();
 
   return (
-    <SplitLayout header={<PanelHeader separator={false} />}>
-      <SplitCol spaced={viewWidth && viewWidth > ViewWidth.MOBILE}>
-        <View activePanel="main">
-          <Panel id="main">
-            <PanelHeader
-              before={
-                <PanelHeaderButton>
-                  <Icon28CameraOutline />
-                </PanelHeaderButton>
-              }
-              after={
-                <PanelHeaderButton>
-                  <Icon28AddOutline />
-                </PanelHeaderButton>
-              }
-              separator={sizeX === SizeType.REGULAR}
-            >
-              <Tabs>
-                <TabsItem
-                  after={<Icon16Dropdown />}
-                  id="tab-news"
-                  aria-controls="tab-content-news"
-                >
-                  Новости
-                </TabsItem>
-                <TabsItem
-                  id="tab-recommendations"
-                  aria-controls="tab-content-recommendations"
-                >
-                  Интересное
-                </TabsItem>
-              </Tabs>
-            </PanelHeader>
-            <Group header={<Header mode="secondary">Items</Header>}>
-              <SimpleCell>Hello</SimpleCell>
-              <SimpleCell>World</SimpleCell>
-            </Group>
-          </Panel>
-        </View>
+    <SplitLayout
+      style={{ justifyContent: 'center' }}
+      header={<PanelHeader separator={false} />}
+    >
+      <Panels />
+
+      <SplitCol width="100%" maxWidth="560px" stretchedOnMobile autoSpaced>
+        <View activePanel="duty"></View>
       </SplitCol>
     </SplitLayout>
   );
