@@ -4,7 +4,8 @@ import { getToken } from '../../utils/getToken';
 
 type Authorization = boolean;
 
-const initialState: Authorization = !!getToken();
+// const initialState: Authorization = !!getToken();
+const initialState: Authorization = true;
 
 export const authorization = createSlice({
   name: 'authorization',
