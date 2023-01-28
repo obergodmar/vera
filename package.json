@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "license": "UNLICENSED",
   "private": true,
+  "engines": {
+    "node": ">=16.x.x"
+  },
   "scripts": {
     "dev": "concurrently -p \"[{name}]\" -n \"frontend,backend\" -c \"bgGreen.bold,bgCyan.bold\" \"npm run dev:frontend\" \"npm run dev:backend\"",
     "dev:frontend": "nx serve frontend",
@@ -29,7 +32,7 @@
     "@nestjs/swagger": "^6.1.2",
     "@reduxjs/toolkit": "^1.8.6",
     "@vk-io/hear": "^1.1.0",
-    "@vkontakte/icons": "^2.1.1",
+    "@vkontakte/icons": "^1.213.0",
     "@vkontakte/vk-bridge": "^2.7.2",
     "@vkontakte/vkui": "^4.40.0",
     "class-transformer": "^0.5.1",
