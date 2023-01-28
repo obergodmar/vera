@@ -14,10 +14,10 @@ import { persistedState, saveState } from './utils';
 
 const isDev = process.env['NODE_ENV'] !== 'production';
 
-export const { enableAutoPageviews, trackEvent } = Plausible({
+const { enableAutoPageviews, trackEvent } = Plausible({
   domain: 'vera.example.com',
-  apiHost: 'https://app.example.com:3334',
-  trackLocalhost: !isDev,
+  apiHost: 'https://analytics.example.com',
+  trackLocalhost: false,
 });
 
 enableAutoPageviews();

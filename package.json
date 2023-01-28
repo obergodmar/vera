@@ -4,6 +4,7 @@
   "license": "UNLICENSED",
   "private": true,
   "engines": {
+    "yarn": ">=1.22.x",
     "node": ">=16.x.x"
   },
   "scripts": {
@@ -17,7 +18,7 @@
     "eslint:fix": "eslint --fix"
   },
   "lint-staged": {
-    "**/*.{ts,tsx,js,jsx}": "npm run eslint:fix"
+    "**/*.{ts,tsx,js,jsx}": "yarn eslint:fix"
   },
   "husky": {
     "hooks": {
