@@ -1,4 +1,4 @@
-import { AdaptivityProvider, ConfigProvider } from '@vkontakte/vkui';
+import { AdaptivityProvider, AppRoot, ConfigProvider } from '@vkontakte/vkui';
 
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -9,7 +9,7 @@ import { BrowserRouter } from 'react-router-dom';
 import '@vkontakte/vkui/dist/vkui.css';
 
 import App from './app/app';
-import { store } from './data/store/store';
+import { store } from './data/store';
 
 const root = createRoot(document.getElementById('root') as HTMLElement);
 
@@ -20,7 +20,9 @@ root.render(
         <ConfigProvider>
           <AdaptivityProvider>
             <BrowserRouter>
-              <App />
+              <AppRoot>
+                <App />
+              </AppRoot>
             </BrowserRouter>
           </AdaptivityProvider>
         </ConfigProvider>

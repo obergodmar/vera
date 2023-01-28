@@ -35,7 +35,7 @@
     "@vk-io/hear": "^1.1.0",
     "@vkontakte/icons": "^1.213.0",
     "@vkontakte/vk-bridge": "^2.7.2",
-    "@vkontakte/vkui": "^4.40.0",
+    "@vkontakte/vkui": "^5.1.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
     "core-js": "^3.6.5",
