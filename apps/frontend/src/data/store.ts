@@ -6,6 +6,7 @@ import logger from 'redux-logger';
 import { ThunkMiddleware } from 'redux-thunk/es/types';
 
 import { authorization } from './reducers/authorization';
+import { duties } from './reducers/duties';
 import { api } from './services/api';
 
 const { MODE } = import.meta.env;
@@ -36,6 +37,7 @@ const devMiddlewares = [logger];
 export const store = configureStore({
   reducer: {
     authorization: authorization.reducer,
+    duties: duties.reducer,
     [api.reducerPath]: api.reducer,
   },
   middleware: (getDefaultMiddleware) =>

@@ -9,14 +9,18 @@ import {
   Select,
 } from '@vkontakte/vkui';
 
-import { FC, useState } from 'react';
+import { FC } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
+import { setPeerId } from '../data/reducers/duties';
 import { useGetConversationsQuery } from '../data/services/api';
+import { RootState } from '../data/store';
 import { DutyMembers } from './duty-members';
 
 export const DutyPanel: FC = () => {
+  const dispatch = useDispatch();
   const { isLoading, data: chats } = useGetConversationsQuery();
-  const [peerId, setPeerId] = useState<number | undefined>();
+  const peerId = useSelector((state: RootState) => state.duties.current);
 
   if (isLoading || !chats) {
     return <PanelSpinner />;
@@ -31,7 +35,10 @@ export const DutyPanel: FC = () => {
           <FormItem top="Чат">
             <Select
               value={peerId}
-              onChange={(e) => setPeerId(Number(e.target.value))}
+              onChange={(e) => {
+                const id = Number(e.target.value);
+                dispatch(setPeerId(id));
+              }}
               placeholder="Не выбран"
               options={chats}
               renderOption={({

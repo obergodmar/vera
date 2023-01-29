@@ -13,49 +13,33 @@ import {
   Spinner,
   unstable_ChipsSelect as ChipsSelect,
 } from '@vkontakte/vkui';
-import { ChipOption } from '@vkontakte/vkui/dist/components/Chip/Chip';
-import { ChipsInputProps } from '@vkontakte/vkui/dist/components/ChipsInput/ChipsInput';
 
-import { FC, useEffect, useState } from 'react';
+import { FC } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
+import {
+  dragDuties,
+  removeDuty,
+  setDuties,
+  sortDays,
+} from '../data/reducers/duties';
 import { useGetConversationMembersQuery } from '../data/services/api';
+import { RootState } from '../data/store';
+import { modalsIds, useModal } from '../hooks/useModal';
 import { useSnackbar } from '../hooks/useSnackbar';
 
 type Props = {
   peerId: number;
 };
 export const DutyMembers: FC<Props> = ({ peerId }) => {
+  const open = useModal();
   const snackbar = useSnackbar();
   const { isLoading, data: members } = useGetConversationMembersQuery(peerId);
-  const [duties, setDuties] = useState<ChipOption[]>([]);
 
-  const [days, setDays] = useState([
-    {
-      name: 'пн',
-      value: 1,
-      checked: true,
-    },
-    {
-      name: 'вт',
-      value: 2,
-      checked: true,
-    },
-    {
-      name: 'ср',
-      value: 3,
-      checked: true,
-    },
-    {
-      name: 'чт',
-      value: 4,
-      checked: true,
-    },
-    {
-      name: 'пт',
-      value: 5,
-      checked: true,
-    },
-  ]);
+  const dispatch = useDispatch();
+
+  const duties = useSelector((state: RootState) => state.duties[peerId].duties);
+  const days = useSelector((state: RootState) => state.duties[peerId].days);
 
   if (isLoading || !members) {
     return <Spinner />;
@@ -78,7 +62,7 @@ export const DutyMembers: FC<Props> = ({ peerId }) => {
               });
             }
           }}
-          onChange={setDuties}
+          onChange={(items) => dispatch(setDuties({ duties: items, peerId }))}
           options={members}
           showSelected={false}
           renderChip={(props) => {
@@ -129,42 +113,20 @@ export const DutyMembers: FC<Props> = ({ peerId }) => {
                 mode="selectable"
                 checked={checked}
                 onChange={({ target }) => {
-                  const _list = [...days];
-                  const _item = _list[idx];
-                  _item.checked = (target as HTMLInputElement).checked;
-
-                  if (!_item.checked) {
-                    _list.splice(idx, 1);
-                    _list.push(_item);
-                  } else {
-                    _list.sort((a, b) => {
-                      if (
-                        (a.checked && b.checked) ||
-                        (!a.checked && !b.checked)
-                      ) {
-                        return a.value - b.value;
-                      }
-
-                      if (!a.checked && b.checked) {
-                        return 1;
-                      }
-
-                      if (a.checked && !b.checked) {
-                        return -1;
-                      }
-
-                      return 0;
-                    });
-                  }
-
-                  setDays(_list);
+                  dispatch(
+                    sortDays({
+                      checked: (target as HTMLInputElement).checked,
+                      idx,
+                      peerId,
+                    })
+                  );
                 }}
               />
             ))}
           </List>
         </FormItem>
 
-        <FormItem top="Дежурит" style={{ flexGrow: 2 }}>
+        <FormItem top="В этот день дежурит" style={{ flexGrow: 2 }}>
           <List>
             {duties.map(({ value, label, avatar }, idx) => (
               <Cell
@@ -172,17 +134,10 @@ export const DutyMembers: FC<Props> = ({ peerId }) => {
                 before={<Avatar src={avatar} />}
                 mode="removable"
                 draggable
-                onDragFinish={({ from, to }) => {
-                  const _list = [...duties];
-                  _list.splice(from, 1);
-                  _list.splice(to, 0, duties[from]);
-                  setDuties(_list);
-                }}
-                onRemove={() => {
-                  const _list = [...duties];
-                  _list.splice(idx, 1);
-                  setDuties(_list);
-                }}
+                onDragFinish={(args) =>
+                  dispatch(dragDuties({ ...args, peerId }))
+                }
+                onRemove={() => dispatch(removeDuty({ idx, peerId }))}
               >
                 {label}
               </Cell>
@@ -198,7 +153,9 @@ export const DutyMembers: FC<Props> = ({ peerId }) => {
           <Button mode="secondary" appearance="negative">
             Сбросить
           </Button>
-          <Button>Применить дежурство</Button>
+          <Button onClick={() => open(modalsIds.dutyCheckout)}>
+            Применить дежурство
+          </Button>
         </ButtonGroup>
       </ButtonGroup>
 
