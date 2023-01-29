@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { Config, Duties } from '@vera-reforged/common';
 import { HearManager } from '@vk-io/hear';
 
+import { writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { VK } from 'vk-io';
 
 @Injectable()
@@ -32,14 +35,11 @@ export class ApiService {
   }
 
   public async getConversationsById() {
+    const config = (await import('../assets/config.json')) as Config;
+    const { duties } = config;
+
     return this.call('messages.getConversationsById', {
-      peer_ids: [
-        900002, 900005, 900003, 900035, 900008, 900025, 900004,
-        900026, 900009, 900012, 900001, 900033, 900007, 900013,
-        900027, 900015, 900029, 900039, 900030, 2000010042,
-        2000010044, 2000010047, 2000010041, 2000010046, 2000010048, 2000010049,
-        900040,
-      ].join(','),
+      peer_ids: duties.chats.join(','),
     });
   }
 
@@ -47,6 +47,31 @@ export class ApiService {
     return this.call('messages.getConversationMembers', {
       peer_id: peerId,
     });
+  }
+
+  public async updateDutiesSchedule(peerId: number, duties: Duties) {
+    const config = (await import('../assets/config.json')) as Config;
+
+    config.duties.schedule[peerId] = duties;
+
+    try {
+      writeFileSync(
+        `${join(__dirname, 'assets')}/config.json`,
+        JSON.stringify(config)
+      );
+
+      return {
+        success: true,
+      };
+    } catch (e) {
+      return {
+        error: e,
+      };
+    }
+  }
+
+  public async getConfig() {
+    return (await import('../assets/config.json')) as Config;
   }
 
   private call(method: string, params: object) {

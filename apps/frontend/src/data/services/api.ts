@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { Duties } from '@vera-reforged/common';
 import {
   MessagesGetConversationMembersResponse,
   MessagesGetConversationsByIdResponse,
@@ -6,10 +7,8 @@ import {
 import { CustomSelectOptionInterface } from '@vkontakte/vkui';
 import { ChipOption } from '@vkontakte/vkui/dist/components/Chip/Chip';
 
-const API = 'http://localhost:3333/api/methods';
-
 export const api = createApi({
-  baseQuery: fetchBaseQuery({ baseUrl: API }),
+  baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
   reducerPath: 'api',
   endpoints: (builder) => ({
     getConversations: builder.query<CustomSelectOptionInterface[], void>({
@@ -63,12 +62,31 @@ export const api = createApi({
             label: `${first_name} ${last_name}`,
             value: id,
             avatar: photo_100,
-            description: screen_name,
+            username: screen_name,
           }))
           .sort((a, b) => a.label.localeCompare(b.label));
+      },
+    }),
+
+    updateDuties: builder.mutation<
+      { error?: object; success?: boolean },
+      { peerId: number; duties: Duties }
+    >({
+      query({ peerId, duties }) {
+        return {
+          method: 'POST',
+          body: {
+            duties,
+          },
+          url: `updateDuties/${peerId}`,
+        };
       },
     }),
   }),
 });
 
-export const { useGetConversationsQuery, useGetConversationMembersQuery } = api;
+export const {
+  useGetConversationsQuery,
+  useGetConversationMembersQuery,
+  useUpdateDutiesMutation,
+} = api;

@@ -1,3 +1,5 @@
+import { createSelector } from '@reduxjs/toolkit';
+import { DutyChip } from '@vera-reforged/common';
 import { Icon24ErrorCircle } from '@vkontakte/icons';
 import {
   Avatar,
@@ -14,12 +16,14 @@ import {
   unstable_ChipsSelect as ChipsSelect,
 } from '@vkontakte/vkui';
 
-import { FC } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { FC, useCallback } from 'react';
+import { batch, useDispatch, useSelector } from 'react-redux';
 
 import {
   dragDuties,
+  initialDuties,
   removeDuty,
+  setDays,
   setDuties,
   sortDays,
 } from '../data/reducers/duties';
@@ -27,10 +31,24 @@ import { useGetConversationMembersQuery } from '../data/services/api';
 import { RootState } from '../data/store';
 import { modalsIds, useModal } from '../hooks/useModal';
 import { useSnackbar } from '../hooks/useSnackbar';
+import { getDutiesFromConfig } from '../utils/getDutiesFromConfig';
 
 type Props = {
   peerId: number;
 };
+
+const initialDutiesSelector = createSelector(
+  (state: RootState) => state.authorization.config,
+  (state: RootState) => state.duties.current,
+  (config, peerId) => {
+    if (config && peerId) {
+      return getDutiesFromConfig(config, peerId);
+    }
+
+    return { ...initialDuties };
+  }
+);
+
 export const DutyMembers: FC<Props> = ({ peerId }) => {
   const open = useModal();
   const snackbar = useSnackbar();
@@ -38,8 +56,18 @@ export const DutyMembers: FC<Props> = ({ peerId }) => {
 
   const dispatch = useDispatch();
 
+  const initialDuties = useSelector(initialDutiesSelector);
   const duties = useSelector((state: RootState) => state.duties[peerId].duties);
   const days = useSelector((state: RootState) => state.duties[peerId].days);
+
+  const reset = useCallback(() => {
+    const { duties, days } = initialDuties;
+
+    batch(() => {
+      dispatch(setDuties({ peerId, duties }));
+      dispatch(setDays({ peerId, days }));
+    });
+  }, [dispatch, initialDuties, peerId]);
 
   if (isLoading || !members) {
     return <Spinner />;
@@ -62,7 +90,9 @@ export const DutyMembers: FC<Props> = ({ peerId }) => {
               });
             }
           }}
-          onChange={(items) => dispatch(setDuties({ duties: items, peerId }))}
+          onChange={(items) =>
+            dispatch(setDuties({ duties: items as DutyChip[], peerId }))
+          }
           options={members}
           showSelected={false}
           renderChip={(props) => {
@@ -87,14 +117,11 @@ export const DutyMembers: FC<Props> = ({ peerId }) => {
               </Chip>
             );
           }}
-          renderOption={({
-            option: { avatar, description },
-            ...otherProps
-          }) => {
+          renderOption={({ option: { avatar, username }, ...otherProps }) => {
             return (
               <CustomSelectOption
                 before={<Avatar size={20} src={avatar} />}
-                description={description}
+                description={username}
                 {...otherProps}
               />
             );
@@ -150,7 +177,7 @@ export const DutyMembers: FC<Props> = ({ peerId }) => {
 
       <ButtonGroup align="right" stretched mode="vertical">
         <ButtonGroup stretched={false}>
-          <Button mode="secondary" appearance="negative">
+          <Button mode="secondary" appearance="negative" onClick={reset}>
             Сбросить
           </Button>
           <Button onClick={() => open(modalsIds.dutyCheckout)}>

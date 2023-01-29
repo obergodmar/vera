@@ -1,14 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ChipOption } from '@vkontakte/vkui/dist/components/Chip/Chip';
-
-type Duties = {
-  duties: ChipOption[];
-  days: {
-    name: string;
-    value: number;
-    checked: boolean;
-  }[];
-};
+import { Day, Duties, DutyChip } from '@vera-reforged/common';
 
 type DutiesPerChat = Record<number, Duties> & {
   current: number | undefined;
@@ -17,35 +8,37 @@ type DutiesPerChat = Record<number, Duties> & {
 const initialState: DutiesPerChat = {
   current: undefined,
 };
-const initialDuties: Duties = {
+export const initialDays: Day[] = [
+  {
+    name: 'пн',
+    value: 1,
+    checked: true,
+  },
+  {
+    name: 'вт',
+    value: 2,
+    checked: true,
+  },
+  {
+    name: 'ср',
+    value: 3,
+    checked: true,
+  },
+  {
+    name: 'чт',
+    value: 4,
+    checked: true,
+  },
+  {
+    name: 'пт',
+    value: 5,
+    checked: true,
+  },
+];
+
+export const initialDuties: Duties = {
   duties: [],
-  days: [
-    {
-      name: 'пн',
-      value: 1,
-      checked: true,
-    },
-    {
-      name: 'вт',
-      value: 2,
-      checked: true,
-    },
-    {
-      name: 'ср',
-      value: 3,
-      checked: true,
-    },
-    {
-      name: 'чт',
-      value: 4,
-      checked: true,
-    },
-    {
-      name: 'пт',
-      value: 5,
-      checked: true,
-    },
-  ],
+  days: initialDays,
 };
 
 export const duties = createSlice({
@@ -54,7 +47,7 @@ export const duties = createSlice({
   reducers: {
     setPeerId: (state, { payload }: PayloadAction<number>) => {
       if (!state[payload]) {
-        state[payload] = initialDuties;
+        state[payload] = { ...initialDuties };
       }
 
       state.current = payload;
@@ -63,8 +56,12 @@ export const duties = createSlice({
       state,
       {
         payload: { duties, peerId },
-      }: PayloadAction<{ duties: ChipOption[]; peerId: number }>
+      }: PayloadAction<{ duties: DutyChip[]; peerId: number }>
     ) => {
+      if (!state[peerId]) {
+        state[peerId] = { ...initialDuties };
+      }
+
       state[peerId].duties = duties;
     },
     dragDuties: (
@@ -84,6 +81,18 @@ export const duties = createSlice({
       }: PayloadAction<{ idx: number; peerId: number }>
     ) => {
       state[peerId].duties.splice(idx, 1);
+    },
+    setDays: (
+      state,
+      {
+        payload: { days, peerId },
+      }: PayloadAction<{ days: Day[]; peerId: number }>
+    ) => {
+      if (!state[peerId]) {
+        state[peerId] = { ...initialDuties };
+      }
+
+      state[peerId].days = days;
     },
     sortDays: (
       state,
@@ -118,5 +127,11 @@ export const duties = createSlice({
   },
 });
 
-export const { setDuties, removeDuty, dragDuties, sortDays, setPeerId } =
-  duties.actions;
+export const {
+  setDuties,
+  removeDuty,
+  dragDuties,
+  sortDays,
+  setPeerId,
+  setDays,
+} = duties.actions;

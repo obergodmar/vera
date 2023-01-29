@@ -13,15 +13,49 @@ import {
 
 import { FC, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import { VERA_AVATAR_100 } from '../data/constants';
-import { logOff } from '../data/reducers/authorization';
+import { authorize, logOff } from '../data/reducers/authorization';
+import { useAuthorizeMutation } from '../data/services/login';
+import { useSnackbar } from '../hooks/useSnackbar';
+import { isFetchBaseQueryError } from '../utils/isFetchBaseQueryError';
 
 export const Login: FC = () => {
+  const navigate = useNavigate();
+  const snackbar = useSnackbar();
   const dispatch = useDispatch();
   const [password, setPassword] = useState('');
 
-  // useEffect(() => {}, []);
+  const [authorizeRequest, authorizeResult] = useAuthorizeMutation();
+
+  useEffect(() => {
+    if (
+      authorizeResult.status === 'fulfilled' &&
+      authorizeResult.data.token &&
+      authorizeResult.data.config
+    ) {
+      dispatch(
+        authorize({
+          token: authorizeResult.data.token,
+          config: authorizeResult.data.config,
+        })
+      );
+
+      navigate('/', { replace: true });
+    }
+
+    if (
+      authorizeResult.status === 'rejected' &&
+      isFetchBaseQueryError(authorizeResult.error)
+    ) {
+      console.log(authorizeResult);
+      snackbar({
+        // @ts-expect-error data error exists
+        message: authorizeResult.error.data?.error || 'Ошибка',
+      });
+    }
+  }, [authorizeResult, dispatch, navigate, snackbar]);
 
   useEffect(() => {
     dispatch(logOff());
@@ -44,12 +78,19 @@ export const Login: FC = () => {
                   type="password"
                   value={password}
                   onChange={({ target: { value } }) => setPassword(value)}
+                  onKeyDown={({ key }) => {
+                    if (key !== 'Enter' || authorizeResult.isLoading) {
+                      return;
+                    }
+
+                    authorizeRequest(password);
+                  }}
                   after={
                     password.length > 0 && (
                       <IconButton
                         hoverMode="opacity"
                         aria-label="Авторизоваться"
-                        onClick={() => undefined}
+                        onClick={() => authorizeRequest(password)}
                       >
                         <Icon16DoorEnterArrowRightOutline />
                       </IconButton>

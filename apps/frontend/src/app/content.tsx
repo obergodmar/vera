@@ -1,4 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit';
+import { Day, DutyChip } from '@vera-reforged/common';
 import { Icon56CalendarOutline } from '@vkontakte/icons';
 import {
   Avatar,
@@ -23,36 +24,67 @@ import {
 import { ChipOption } from '@vkontakte/vkui/dist/components/Chip/Chip';
 
 import { FC, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import { Panels, panels } from '../components/panels';
 import { VERA_AVATAR_50 } from '../data/constants';
+import { updateConfig } from '../data/reducers/authorization';
+import { initialDays } from '../data/reducers/duties';
+import { useUpdateDutiesMutation } from '../data/services/api';
+import { useGetConfigQuery } from '../data/services/login';
 import { RootState } from '../data/store';
 import { ModalProvider, modalsIds } from '../hooks/useModal';
+import { useSnackbar } from '../hooks/useSnackbar';
 
 const dutyResultSelector = createSelector(
   (state: RootState) => state.duties,
   (state) => {
     if (!state.current) {
-      return [];
+      return {
+        peerId: undefined,
+        days: initialDays,
+        duties: [],
+        printData: [],
+      };
     }
     const { days, duties } = state[state.current];
     const workingDays = days.filter(({ checked }) => checked);
 
-    return duties.slice(0, workingDays.length).map((item, idx) => ({
-      ...item,
-      day: workingDays[idx].name,
-    }));
+    return {
+      duties,
+      printData: duties.slice(0, workingDays.length).map((item, idx) => ({
+        ...item,
+        day: workingDays[idx].name,
+      })),
+      days,
+      peerId: state.current,
+    };
   }
 );
 
 export const Content: FC = () => {
+  const { data: config, refetch } = useGetConfigQuery();
+  const snackbar = useSnackbar();
+  const [fetch, { data, isLoading, isError }] = useUpdateDutiesMutation();
+
+  const dispatch = useDispatch();
+
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { sizeX } = useAdaptivityConditionalRender();
 
-  const duty: ChipOption[] = useSelector(dutyResultSelector);
+  const {
+    printData,
+    duties,
+    peerId,
+    days,
+  }: {
+    printData: ChipOption[];
+    duties: DutyChip[];
+    days: Day[];
+    peerId: number | undefined;
+  } = useSelector(dutyResultSelector);
 
   const [activeModal, setActiveModal] = useState<modalsIds | null>(null);
   const [activePanel, setActivePanel] = useState(panels[0]);
@@ -67,6 +99,29 @@ export const Content: FC = () => {
       setActivePanel(panel);
     }
   }, [activePanel, navigate, pathname]);
+
+  useEffect(() => {
+    if (isError) {
+      snackbar({
+        message: 'Ошибка',
+      });
+      console.error(data);
+    }
+
+    if (data?.success) {
+      snackbar({
+        message: 'Успешно',
+      });
+
+      refetch();
+    }
+  }, [isError, data, snackbar, refetch]);
+
+  useEffect(() => {
+    if (config) {
+      dispatch(updateConfig(config));
+    }
+  }, [config, dispatch]);
 
   const closeModal = () => setActiveModal(null);
 
@@ -94,9 +149,28 @@ export const Content: FC = () => {
         <Group>
           <Placeholder
             icon={<Icon56CalendarOutline />}
-            action={<Button onClick={closeModal}>Применить</Button>}
+            action={
+              <Button
+                loading={isLoading}
+                onClick={() => {
+                  if (!peerId) {
+                    return;
+                  }
+
+                  fetch({
+                    peerId,
+                    duties: {
+                      days,
+                      duties,
+                    },
+                  });
+                }}
+              >
+                Применить
+              </Button>
+            }
           >
-            {duty.map(({ day, label, value, description: username }) => (
+            {printData.map(({ day, label, value, username }) => (
               <Text key={value}>
                 В{' '}
                 <Caption style={{ display: 'inline' }} caps weight="1">
