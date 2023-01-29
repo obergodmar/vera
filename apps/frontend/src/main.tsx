@@ -1,4 +1,9 @@
-import { AdaptivityProvider, AppRoot, ConfigProvider } from '@vkontakte/vkui';
+import {
+  AdaptivityProvider,
+  AppRoot,
+  ConfigProvider,
+  WebviewType,
+} from '@vkontakte/vkui';
 
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -17,7 +22,7 @@ root.render(
   <StrictMode>
     <Provider store={store}>
       <HelmetProvider>
-        <ConfigProvider>
+        <ConfigProvider webviewType={WebviewType.INTERNAL} appearance="light">
           <AdaptivityProvider>
             <BrowserRouter>
               <AppRoot>

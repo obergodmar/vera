@@ -1,20 +1,34 @@
 import {
   Avatar,
-  Group,
   Panel,
   PanelHeader,
   SplitCol,
   SplitLayout,
-  useAdaptivityConditionalRender,
   View,
 } from '@vkontakte/vkui';
 
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
-import { Panels } from '../components/panels';
+import { Panels, panels } from '../components/panels';
+import { VERA_AVATAR_50 } from '../data/constants';
 
 export const Content: FC = () => {
-  const { viewWidth } = useAdaptivityConditionalRender();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  const [activePanel, setActivePanel] = useState(panels[0]);
+
+  useEffect(() => {
+    const pathnamePanel = pathname.replace('/', '');
+    const panel = panels.find((panel) => panel.value === pathnamePanel);
+
+    if (!panel) {
+      navigate(`/${panels[0].value}`);
+    } else {
+      setActivePanel(panel);
+    }
+  }, [activePanel, navigate, pathname]);
 
   return (
     <SplitLayout
@@ -24,7 +38,15 @@ export const Content: FC = () => {
       <Panels />
 
       <SplitCol width="100%" maxWidth="560px" stretchedOnMobile autoSpaced>
-        <View activePanel="duty"></View>
+        <View activePanel={activePanel.value}>
+          <Panel id={activePanel.value}>
+            <PanelHeader after={<Avatar size={36} src={VERA_AVATAR_50} />}>
+              {activePanel.label}
+            </PanelHeader>
+
+            <Outlet />
+          </Panel>
+        </View>
       </SplitCol>
     </SplitLayout>
   );
