@@ -1,23 +1,24 @@
-import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
+import { Body, Controller, Inject, Param, Post } from '@nestjs/common';
 import { Duties } from '@vera-reforged/common';
 
 import { ApiService } from './api.service';
+
 @Controller()
 export class ApiController {
   public constructor(
     @Inject(ApiService) private readonly apiService: ApiService
   ) {}
 
-  @Get('getConversations')
+  @Post('getConversations')
   public async getConversations() {
     return this.apiService.getConversationsById();
   }
-  @Get('getConversationsById')
+  @Post('getConversationsById')
   public async getConversationsById() {
     return this.apiService.getConversationsById();
   }
 
-  @Get('getConversationMembers/:peerId')
+  @Post('getConversationMembers/:peerId')
   public async getConversationMembers(@Param('peerId') peerId: number) {
     return this.apiService.getConversationMembers(peerId);
   }

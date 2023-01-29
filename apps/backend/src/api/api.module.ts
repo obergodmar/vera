@@ -1,6 +1,7 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 
 import { BotModule } from '../bot/bot.module';
+import { AuthorizationMiddleware } from '../middlewares/authorization.middleware';
 import { ApiController } from './api.controller';
 import { ApiService } from './api.service';
 
@@ -9,4 +10,8 @@ import { ApiService } from './api.service';
   controllers: [ApiController],
   providers: [ApiService],
 })
-export class ApiModule {}
+export class ApiModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthorizationMiddleware).forRoutes(ApiController);
+  }
+}

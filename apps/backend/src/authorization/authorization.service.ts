@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Config } from '@vera-reforged/common';
 
 import { compare } from 'bcrypt';
 
+import { getConfig } from '../utils/getConfig';
 import { AuthorizeDto } from './dto/authorize.dto';
 
 @Injectable()
@@ -44,11 +44,15 @@ export class AuthorizationService {
       );
     }
 
-    const token = '123';
-    const config = (await import('../assets/config.json')) as Config;
+    const { TOKEN } = process.env;
+    if (!TOKEN) {
+      throw Error('TOKEN is empty');
+    }
+
+    const config = await getConfig();
 
     return {
-      token,
+      token: TOKEN,
       config,
     };
   }

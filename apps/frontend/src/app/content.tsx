@@ -29,13 +29,14 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import { Panels, panels } from '../components/panels';
 import { VERA_AVATAR_50 } from '../data/constants';
-import { updateConfig } from '../data/reducers/authorization';
+import { logOff, updateConfig } from '../data/reducers/authorization';
 import { initialDays } from '../data/reducers/duties';
 import { useUpdateDutiesMutation } from '../data/services/api';
 import { useGetConfigQuery } from '../data/services/login';
 import { RootState } from '../data/store';
 import { ModalProvider, modalsIds } from '../hooks/useModal';
 import { useSnackbar } from '../hooks/useSnackbar';
+import { getToken } from '../utils/getToken';
 
 const dutyResultSelector = createSelector(
   (state: RootState) => state.duties,
@@ -90,6 +91,12 @@ export const Content: FC = () => {
   const [activePanel, setActivePanel] = useState(panels[0]);
 
   useEffect(() => {
+    if (!getToken()) {
+      dispatch(logOff());
+    }
+  });
+
+  useEffect(() => {
     const pathnamePanel = pathname.replace('/', '');
     const panel = panels.find((panel) => panel.value === pathnamePanel);
 
@@ -125,6 +132,22 @@ export const Content: FC = () => {
 
   const closeModal = () => setActiveModal(null);
 
+  const applyDuty = () => {
+    if (!peerId) {
+      return;
+    }
+
+    fetch({
+      peerId,
+      duties: {
+        days,
+        duties,
+      },
+    });
+
+    closeModal();
+  };
+
   const modal = (
     <ModalRoot activeModal={activeModal} onClose={closeModal}>
       <ModalPage
@@ -140,7 +163,7 @@ export const Content: FC = () => {
                 />
               )
             }
-            after={<PanelHeaderSubmit onClick={closeModal} />}
+            after={<PanelHeaderSubmit onClick={applyDuty} />}
           >
             Расписание
           </ModalPageHeader>
@@ -150,22 +173,7 @@ export const Content: FC = () => {
           <Placeholder
             icon={<Icon56CalendarOutline />}
             action={
-              <Button
-                loading={isLoading}
-                onClick={() => {
-                  if (!peerId) {
-                    return;
-                  }
-
-                  fetch({
-                    peerId,
-                    duties: {
-                      days,
-                      duties,
-                    },
-                  });
-                }}
-              >
+              <Button loading={isLoading} onClick={applyDuty}>
                 Применить
               </Button>
             }

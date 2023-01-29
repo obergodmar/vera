@@ -24,7 +24,6 @@ export const authorization = createSlice({
       }: PayloadAction<{ token: string; config: Config }>
     ) => {
       window.localStorage.setItem('token', token);
-      window.localStorage.setItem('config', config);
 
       return {
         authorized: true,
@@ -33,14 +32,11 @@ export const authorization = createSlice({
     },
     logOff: () => {
       window.localStorage.removeItem('token');
-      window.localStorage.removeItem('config');
 
       return initialState;
     },
 
     updateConfig: (state, { payload }: PayloadAction<Config>) => {
-      window.localStorage.setItem('config', payload);
-
       state.config = payload;
     },
   },

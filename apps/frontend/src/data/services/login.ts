@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { Config } from '@vera-reforged/common';
 
+import { extendFetchArgs } from '../../utils/extendFetchArgs';
 import { getToken } from '../../utils/getToken';
 
 export const loginApi = createApi({
@@ -25,17 +26,13 @@ export const loginApi = createApi({
       },
     }),
     getConfig: builder.query<Config, void>({
-      query(token) {
-        return {
+      query() {
+        return extendFetchArgs({
           url: '/getConfig',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
           body: {
             token: getToken(),
           },
-        };
+        });
       },
     }),
   }),

@@ -10,16 +10,14 @@ async function bootstrap() {
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
 
-  app.enableCors({
-    allowedHeaders: '*',
-    origin: '*',
-  });
   app.useGlobalPipes(new ValidationPipe());
 
-  setupOpenApi(app);
+  if (process.env.NODE_ENV === 'development') {
+    setupOpenApi(app);
+  }
 
-  const port = process.env.PORT || 3333;
-  await app.listen(port);
+  const port = 4256;
+  await app.listen(port, '127.0.0.1');
   Logger.log(
     `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
   );

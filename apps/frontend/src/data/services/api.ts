@@ -1,3 +1,4 @@
+import { ResponseHandler } from '@reduxjs/toolkit/dist/query/fetchBaseQuery';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { Duties } from '@vera-reforged/common';
 import {
@@ -7,16 +8,18 @@ import {
 import { CustomSelectOptionInterface } from '@vkontakte/vkui';
 import { ChipOption } from '@vkontakte/vkui/dist/components/Chip/Chip';
 
+import { extendFetchArgs } from '../../utils/extendFetchArgs';
+import { getToken } from '../../utils/getToken';
+
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
   reducerPath: 'api',
   endpoints: (builder) => ({
     getConversations: builder.query<CustomSelectOptionInterface[], void>({
       query() {
-        return {
-          method: 'GET',
+        return extendFetchArgs({
           url: 'getConversations',
-        };
+        });
       },
       transformResponse(data: MessagesGetConversationsByIdResponse) {
         return data.items
@@ -45,10 +48,9 @@ export const api = createApi({
     }),
     getConversationMembers: builder.query<ChipOption[], number>({
       query(peerId) {
-        return {
-          method: 'GET',
+        return extendFetchArgs({
           url: `getConversationMembers/${peerId}`,
-        };
+        });
       },
       transformResponse(data: MessagesGetConversationMembersResponse) {
         const { profiles } = data;
@@ -73,13 +75,12 @@ export const api = createApi({
       { peerId: number; duties: Duties }
     >({
       query({ peerId, duties }) {
-        return {
-          method: 'POST',
+        return extendFetchArgs({
           body: {
             duties,
           },
           url: `updateDuties/${peerId}`,
-        };
+        });
       },
     }),
   }),
