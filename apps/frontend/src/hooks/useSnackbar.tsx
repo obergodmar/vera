@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { createRef, FC, useEffect, useMemo, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import { Snackbar, SnackbarExtendedProps } from '../components/snackbar';
@@ -36,17 +36,21 @@ export const SnackbarProvider: FC<SnackbarContainerProps> = ({
       {children}
       <SnackbarContainer {...containerProps}>
         <TransitionGroup component="ul" className="SnackbarContainer__list">
-          {state.map((snackbar) => (
-            <CSSTransition
-              key={snackbar.id}
-              timeout={400}
-              classNames="SnackbarContainer__item-"
-            >
-              <li className="SnackbarContainer__item">
-                <Snackbar {...snackbar} />
-              </li>
-            </CSSTransition>
-          ))}
+          {state.map((snackbar) => {
+            const itemRef = createRef<HTMLLIElement>();
+            return (
+              <CSSTransition
+                nodeRef={itemRef}
+                key={snackbar.id}
+                timeout={400}
+                classNames="SnackbarContainer__item-"
+              >
+                <li className="SnackbarContainer__item" ref={itemRef}>
+                  <Snackbar {...snackbar} />
+                </li>
+              </CSSTransition>
+            );
+          })}
         </TransitionGroup>
       </SnackbarContainer>
     </>
