@@ -15,6 +15,7 @@ import '@vkontakte/vkui/dist/vkui.css';
 
 import App from './app/app';
 import { store } from './data/store';
+import { SnackbarProvider } from './hooks/useSnackbar';
 
 const root = createRoot(document.getElementById('root') as HTMLElement);
 
@@ -27,6 +28,7 @@ root.render(
             <BrowserRouter>
               <AppRoot>
                 <App />
+                <SnackbarProvider />
               </AppRoot>
             </BrowserRouter>
           </AdaptivityProvider>

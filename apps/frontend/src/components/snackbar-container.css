@@ -1,0 +1,52 @@
+.SnackbarContainer {
+  position: fixed;
+  left: 0;
+  bottom: 8px;
+  width: 100%;
+  max-width: 100%;
+  padding: 0 8px;
+}
+
+.SnackbarModal {
+  z-index: 1001;
+  position: relative;
+}
+
+@media (min-width: 640px) {
+  .SnackbarContainer {
+    max-width: 328px;
+    bottom: 55px;
+  }
+}
+
+.SnackbarContainer__list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.SnackbarContainer__item + .SnackbarContainer__item {
+  margin-top: 8px;
+}
+
+.SnackbarContainer__item--enter {
+  transform: translate3d(-140%, 0, 0);
+  max-height: 0;
+}
+
+.SnackbarContainer__item--enter-active {
+  transform: translate3d(0, 0, 0);
+  max-height: 600px;
+  transition: transform 400ms ease-in-out, max-height 1200ms;
+}
+
+.SnackbarContainer__item--exit {
+  transform: translate3d(0, 0, 0);
+  max-height: 600px;
+}
+
+.SnackbarContainer__item--exit-active {
+  transform: translate3d(-140%, 0, 0);
+  max-height: 0;
+  transition: transform 400ms ease-in-out, max-height 400ms ease-in-out;
+}

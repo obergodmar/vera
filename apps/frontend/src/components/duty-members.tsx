@@ -1,3 +1,4 @@
+import { Icon24ErrorCircle } from '@vkontakte/icons';
 import {
   Avatar,
   Cell,
@@ -15,11 +16,13 @@ import { ChipsInputProps } from '@vkontakte/vkui/dist/components/ChipsInput/Chip
 import { FC, useEffect, useState } from 'react';
 
 import { useGetConversationMembersQuery } from '../data/services/api';
+import { useSnackbar } from '../hooks/useSnackbar';
 
 type Props = {
   peerId: number;
 };
 export const DutyMembers: FC<Props> = ({ peerId }) => {
+  const snackbar = useSnackbar();
   const { isLoading, data: members } = useGetConversationMembersQuery(peerId);
   const [duties, setDuties] = useState<ChipOption[]>([]);
 
@@ -63,6 +66,13 @@ export const DutyMembers: FC<Props> = ({ peerId }) => {
           onChangeStart={(e) => {
             if (duties.length === days.length) {
               e.preventDefault();
+
+              snackbar({
+                message: 'Людей выбрано больше, чем рабочих дней недели',
+                before: (
+                  <Icon24ErrorCircle fill="var(--vkui--color_icon_accent)" />
+                ),
+              });
             }
           }}
           onChange={setDuties}

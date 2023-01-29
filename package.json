@@ -39,10 +39,12 @@
     "@vkontakte/vkui": "^5.1.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
+    "classnames": "^2.3.2",
     "core-js": "^3.6.5",
     "cron": "^1.8.2",
     "mongodb": "^4.11.0",
     "mongoose": "^6.6.7",
+    "nanoid": "^4.0.0",
     "plausible-tracker": "^0.3.8",
     "ramda": "^0.28.0",
     "react": "18.2.0",
@@ -51,6 +53,7 @@
     "react-icons": "^4.6.0",
     "react-redux": "8.0.5",
     "react-router-dom": "6.4.3",
+    "react-transition-group": "^4.4.2",
     "redux-logger": "^3.0.6",
     "reflect-metadata": "^0.1.13",
     "regenerator-runtime": "0.13.7",
@@ -116,6 +119,7 @@
     "vite": "^4.0.1",
     "vite-plugin-eslint": "^1.8.1",
     "vite-tsconfig-paths": "^4.0.2",
-    "vitest": "^0.25.8"
+    "vitest": "^0.25.8",
+    "@types/react-transition-group": "^4.4.5"
   }
 }
