@@ -1,32 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Config, Duties } from '@vera-reforged/common';
-import { HearManager } from '@vk-io/hear';
 
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { VK } from 'vk-io';
+
+import { BotService } from '../bot/bot.service';
+import { getConfig } from '../utils/getConfig';
 
 @Injectable()
 export class ApiService {
-  private readonly vk: VK;
-  private readonly bot: HearManager<undefined>;
-
-  public constructor() {
-    this.vk = new VK({
-      token: process.env.BOT_TOKEN,
-      pollingGroupId: 900028,
-      apiMode: 'parallel',
-    });
-
-    this.bot = new HearManager();
-
-    this.vk.updates.on('message_new', this.bot.middleware);
-
-    this.vk.updates.startPolling().catch((e) => {
-      console.error(e);
-    });
-  }
-
+  public constructor(
+    @Inject(BotService) private readonly botService: BotService
+  ) {}
   public async getConversations() {
     return this.call('messages.getConversations', {
       filter: 'all',
@@ -35,7 +20,7 @@ export class ApiService {
   }
 
   public async getConversationsById() {
-    const config = (await import('../assets/config.json')) as Config;
+    const config = await getConfig();
     const { duties } = config;
 
     return this.call('messages.getConversationsById', {
@@ -50,7 +35,7 @@ export class ApiService {
   }
 
   public async updateDutiesSchedule(peerId: number, duties: Duties) {
-    const config = (await import('../assets/config.json')) as Config;
+    const config = await getConfig();
 
     config.duties.schedule[peerId] = duties;
 
@@ -75,7 +60,7 @@ export class ApiService {
   }
 
   private call(method: string, params: object) {
-    return this.vk.api.call(method, {
+    return this.botService.vk.api.call(method, {
       group_id: 900028,
       fields: [
         'id',
