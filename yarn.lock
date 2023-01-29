@@ -3585,6 +3585,11 @@
   dependencies:
     middleware-io "^2.6.0"
 
+"@vkontakte/api-schema-typescript@^1.5131.2":
+  version "1.5131.2"
+  resolved "https://registry.yarnpkg.com/@vkontakte/api-schema-typescript/-/api-schema-typescript-1.5131.2.tgz#ef2ce67214a064c2add40e11cb06020940381e16"
+  integrity sha512-A4ZQdYqwM5PvgFumwEYSZjipLmwnwiJoR2uUyND8JyYeJTI02LAuhVfjP8QATEjY6x3m/AiyZxKBDlr4uqlplQ==
+
 "@vkontakte/icons@^1.213.0":
   version "1.213.0"
   resolved "https://registry.yarnpkg.com/@vkontakte/icons/-/icons-1.213.0.tgz#5da609b6a99eca9aa595f1aa2d4340437104a30f"
