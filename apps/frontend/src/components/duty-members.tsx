@@ -1,12 +1,15 @@
 import { Icon24ErrorCircle } from '@vkontakte/icons';
 import {
   Avatar,
+  Button,
+  ButtonGroup,
   Cell,
   Chip,
   CustomSelectOption,
   FormItem,
   FormLayoutGroup,
   List,
+  Spacing,
   Spinner,
   unstable_ChipsSelect as ChipsSelect,
 } from '@vkontakte/vkui';
@@ -187,6 +190,19 @@ export const DutyMembers: FC<Props> = ({ peerId }) => {
           </List>
         </FormItem>
       </FormLayoutGroup>
+
+      <Spacing />
+
+      <ButtonGroup align="right" stretched mode="vertical">
+        <ButtonGroup stretched={false}>
+          <Button mode="secondary" appearance="negative">
+            Сбросить
+          </Button>
+          <Button>Применить дежурство</Button>
+        </ButtonGroup>
+      </ButtonGroup>
+
+      <Spacing />
     </>
   );
 };
