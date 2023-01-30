@@ -44,7 +44,7 @@ export class AuthorizationService {
       );
     }
 
-    const config = await getConfig();
+    const config = getConfig();
 
     return {
       token: 'REMOVED_AUTH_TOKEN',

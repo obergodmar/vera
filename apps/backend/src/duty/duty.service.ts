@@ -8,8 +8,8 @@ export class DutyService {
   public constructor(
     @Inject(BotService) private readonly botService: BotService
   ) {
-    this.botService.bot.hear(/duty/, async (msg: any) => {
-      const currentDuty = await getDuty(msg.peerId);
+    this.botService.bot.hear(/duty/, (msg: any) => {
+      const currentDuty = getDuty(msg.peerId);
 
       let message = 'duty отсутствует';
 
@@ -49,9 +49,9 @@ export class DutyService {
   }
 }
 
-async function getDuty(peerId: number) {
+function getDuty(peerId: number) {
   const day = new Date().getDay();
-  const config = await getConfig();
+  const config = getConfig();
   const { duties: dutiesSchedule } = config;
 
   const schedule = dutiesSchedule.schedule[peerId];

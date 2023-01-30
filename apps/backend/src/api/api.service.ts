@@ -17,7 +17,7 @@ export class ApiService {
   }
 
   public async getConversationsById() {
-    const config = await getConfig();
+    const config = getConfig();
     const { duties } = config;
 
     return this.call('messages.getConversationsById', {
@@ -32,7 +32,7 @@ export class ApiService {
   }
 
   public async updateDutiesSchedule(peerId: number, duties: Duties) {
-    const config = await getConfig();
+    const config = getConfig();
 
     config.duties.schedule[peerId] = duties;
 

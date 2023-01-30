@@ -1,12 +1,18 @@
 import { Config } from '@vera-reforged/common';
 
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 
 const filePath = `${homedir()}/vera.json`;
 
-export async function getConfig(): Promise<Config> {
-  return (await import(filePath)) as Config;
+export function getConfig(): Config {
+  try {
+    const fileContent = readFileSync(filePath, 'utf-8');
+
+    return JSON.parse(fileContent) as Config;
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 export function writeConfig(config: Config): boolean {
