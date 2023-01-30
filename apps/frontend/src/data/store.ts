@@ -12,7 +12,8 @@ import Plausible from 'plausible-tracker';
 import logger from 'redux-logger';
 import { ThunkMiddleware } from 'redux-thunk/es/types';
 
-import { authorization } from './reducers/authorization';
+import { getToken } from '../utils/getToken';
+import { authorization, logOff } from './reducers/authorization';
 import { duties, setDays, setDuties } from './reducers/duties';
 import { api } from './services/api';
 import { loginApi } from './services/login';
@@ -41,6 +42,10 @@ const rtkQueryErrorLogger: ThunkMiddleware = () => (dispatch) => (action) => {
 };
 
 const middleware: Middleware = (api) => (dispatch) => (action) => {
+  if (!getToken()) {
+    dispatch(logOff());
+  }
+
   switch (action.type) {
     case 'authorization/updateConfig': {
       const config: Config = action.payload;

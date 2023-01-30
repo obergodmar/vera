@@ -91,12 +91,6 @@ export const Content: FC = () => {
   const [activePanel, setActivePanel] = useState(panels[0]);
 
   useEffect(() => {
-    if (!getToken()) {
-      dispatch(logOff());
-    }
-  });
-
-  useEffect(() => {
     const pathnamePanel = pathname.replace('/', '');
     const panel = panels.find((panel) => panel.value === pathnamePanel);
 
