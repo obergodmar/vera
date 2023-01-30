@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 
 import { BotService } from '../bot/bot.service';
-import { getConfig } from '../utils/getConfig';
+import { getConfig, writeConfig } from '../utils/getConfig';
 
 @Injectable()
 export class DutyService {
@@ -53,6 +53,12 @@ function getDuty(peerId: number) {
   const day = new Date().getDay();
   const config = getConfig();
   const { duties: dutiesSchedule } = config;
+
+  const { chats } = dutiesSchedule;
+  if (!chats.includes(peerId)) {
+    chats.push(peerId);
+    writeConfig(config);
+  }
 
   const schedule = dutiesSchedule.schedule[peerId];
 
