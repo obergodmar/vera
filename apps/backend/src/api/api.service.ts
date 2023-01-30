@@ -1,11 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Config, Duties } from '@vera-reforged/common';
-
-import { writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { Duties } from '@vera-reforged/common';
 
 import { BotService } from '../bot/bot.service';
-import { getConfig } from '../utils/getConfig';
+import { getConfig, writeConfig } from '../utils/getConfig';
 
 @Injectable()
 export class ApiService {
@@ -39,24 +36,21 @@ export class ApiService {
 
     config.duties.schedule[peerId] = duties;
 
-    try {
-      writeFileSync(
-        `${join(__dirname, 'assets')}/config.json`,
-        JSON.stringify(config)
-      );
+    const status = writeConfig(config);
 
+    if (status) {
       return {
         success: true,
       };
-    } catch (e) {
-      return {
-        error: e,
-      };
     }
+
+    return {
+      error: 'Ошибка записи файла',
+    };
   }
 
-  public async getConfig() {
-    return (await import('../assets/config.json')) as Config;
+  public async getAppConfig() {
+    return getConfig();
   }
 
   private call(method: string, params: object) {

@@ -11,11 +11,12 @@
     "dev": "concurrently -p \"[{name}]\" -n \"frontend,backend\" -c \"bgGreen.bold,bgCyan.bold\" \"npm run dev:frontend\" \"npm run dev:backend\"",
     "dev:frontend": "nx serve frontend",
     "dev:backend": "nx serve backend",
-    "build:frontend": "nx build frontend",
-    "build:backend": "nx build backend",
+    "build:frontend": "nx build frontend --source-map false",
+    "build:backend": "nx build backend --source-map false",
     "build": "concurrently -p \"[{name}]\" -n \"frontend,backend\" -c \"bgGreen.bold,bgCyan.bold\" \"npm run build:frontend\" \"npm run build:backend\"",
     "prepare": "husky install",
-    "eslint:fix": "eslint --fix"
+    "eslint:fix": "eslint --fix",
+    "deploy": "node scripts/deploy.js"
   },
   "lint-staged": {
     "**/*.{ts,tsx,js,jsx}": "yarn eslint:fix"
@@ -114,6 +115,7 @@
     "jest-environment-jsdom": "28.1.1",
     "jsdom": "~20.0.3",
     "lint-staged": "^13.0.3",
+    "node-ssh": "^13.0.1",
     "nx": "15.7.0-beta.0",
     "prettier": "^2.6.2",
     "react-test-renderer": "18.2.0",

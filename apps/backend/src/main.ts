@@ -12,10 +12,6 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
 
-  if (process.env.NODE_ENV === 'development') {
-    setupOpenApi(app);
-  }
-
   const port = 4256;
   await app.listen(port, '127.0.0.1');
   Logger.log(

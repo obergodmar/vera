@@ -33,6 +33,6 @@ export class ApiController {
 
   @Post('getConfig')
   public async getConfig() {
-    return this.apiService.getConfig();
+    return this.apiService.getAppConfig();
   }
 }

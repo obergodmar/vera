@@ -44,15 +44,10 @@ export class AuthorizationService {
       );
     }
 
-    const { TOKEN } = process.env;
-    if (!TOKEN) {
-      throw Error('TOKEN is empty');
-    }
-
     const config = await getConfig();
 
     return {
-      token: TOKEN,
+      token: 'REMOVED_AUTH_TOKEN',
       config,
     };
   }
