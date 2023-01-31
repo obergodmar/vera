@@ -15,31 +15,26 @@ export const initialDays: Day[] = [
     name: 'пн',
     value: 1,
     checked: true,
-    time: '00:00',
   },
   {
     name: 'вт',
     value: 2,
     checked: true,
-    time: '00:00',
   },
   {
     name: 'ср',
     value: 3,
     checked: true,
-    time: '00:00',
   },
   {
     name: 'чт',
     value: 4,
     checked: true,
-    time: '00:00',
   },
   {
     name: 'пт',
     value: 5,
     checked: true,
-    time: '00:00',
   },
 ];
 
