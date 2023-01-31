@@ -1,0 +1,89 @@
+.react-time-picker {
+  display: inline-flex;
+  position: relative;
+  font-family: var(--vkui--font_family_base);
+  color: var(--vkui--color_text_primary);
+  font-size: var(--vkui--font_text--font_size--regular);
+  font-weight: var(--vkui--font_text--font_weight--regular);
+  line-height: var(--vkui--font_text--line_height--regular);
+}
+
+.react-time-picker,
+.react-time-picker *,
+.react-time-picker *:before,
+.react-time-picker *:after {
+  display: flex;
+}
+
+.react-time-picker__wrapper {
+  display: flex;
+  flex-grow: 1;
+  flex-shrink: 0;
+  max-width: 61px;
+
+  border: var(--vkui_internal--thin_border) solid
+    var(--vkui--color_field_border_alpha);
+  background-color: var(--vkui--color_field_background);
+  border-radius: var(--vkui--size_border_radius--regular);
+}
+
+.react-time-picker__wrapper:hover {
+  border-color: var(--vkui--color_field_border_alpha--hover);
+}
+
+.react-time-picker__inputGroup {
+  flex-grow: 1;
+  padding: 5px;
+  box-sizing: content-box;
+}
+
+.react-time-picker__inputGroup__divider {
+  white-space: pre;
+  /*padding-right: 2px;*/
+}
+
+.react-time-picker__inputGroup__divider,
+.react-time-picker__inputGroup__leadingZero {
+  display: inline-block;
+  color: var(--vkui--color_text_subhead);
+}
+
+.react-time-picker__inputGroup__input {
+  min-width: 0.54em;
+  height: 100%;
+  position: relative;
+  padding: 0 2px;
+  border: 0;
+  background: none;
+  font: inherit;
+  box-sizing: content-box;
+  -webkit-appearance: textfield;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.react-time-picker__inputGroup__input::placeholder {
+  font-size: var(--vkui--font_text--font_size--compact);
+}
+
+.react-time-picker__inputGroup__input:active,
+.react-time-picker__inputGroup__input:focus {
+  outline: none;
+}
+
+.react-time-picker__wrapper:focus-within {
+  border-color: var(--vkui--color_stroke_accent);
+}
+
+.react-time-picker__inputGroup__input::-webkit-outer-spin-button,
+.react-time-picker__inputGroup__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+.react-time-picker__inputGroup__input--hasLeadingZero {
+  margin-left: -0.54em;
+  padding-left: calc(1px + 0.54em);
+}

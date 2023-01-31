@@ -1,6 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Day, Duties, DutyChip } from '@vera-reforged/common';
 
+import { WritableDraft } from 'immer/dist/types/types-external';
+
 type DutiesPerChat = Record<number, Duties> & {
   current: number | undefined;
 };
@@ -13,26 +15,31 @@ export const initialDays: Day[] = [
     name: 'пн',
     value: 1,
     checked: true,
+    time: '00:00',
   },
   {
     name: 'вт',
     value: 2,
     checked: true,
+    time: '00:00',
   },
   {
     name: 'ср',
     value: 3,
     checked: true,
+    time: '00:00',
   },
   {
     name: 'чт',
     value: 4,
     checked: true,
+    time: '00:00',
   },
   {
     name: 'пт',
     value: 5,
     checked: true,
+    time: '00:00',
   },
 ];
 
@@ -94,6 +101,14 @@ export const duties = createSlice({
 
       state[peerId].days = days;
     },
+    setTime: (
+      state,
+      {
+        payload: { peerId, idx, value },
+      }: PayloadAction<{ peerId: number; idx: number; value: string }>
+    ) => {
+      state[peerId].days[idx].time = value;
+    },
     sortDays: (
       state,
       {
@@ -103,25 +118,18 @@ export const duties = createSlice({
       const day = state[peerId].days[idx];
       day.checked = checked;
 
-      if (!state[peerId].days[idx].checked) {
+      if (!day.checked) {
         state[peerId].days.splice(idx, 1);
+      }
+
+      sortDaysFn(state[peerId].days);
+
+      if (!day.checked) {
         state[peerId].days.push(day);
-      } else {
-        state[peerId].days.sort((a, b) => {
-          if ((a.checked && b.checked) || (!a.checked && !b.checked)) {
-            return a.value - b.value;
-          }
+      }
 
-          if (!a.checked && b.checked) {
-            return 1;
-          }
-
-          if (a.checked && !b.checked) {
-            return -1;
-          }
-
-          return 0;
-        });
+      if (!state[peerId].days.some(({ checked }) => checked)) {
+        sortDaysFn(state[peerId].days);
       }
     },
   },
@@ -134,4 +142,23 @@ export const {
   sortDays,
   setPeerId,
   setDays,
+  setTime,
 } = duties.actions;
+
+function sortDaysFn(days: WritableDraft<Day[]>) {
+  days.sort((a, b) => {
+    if ((a.checked && b.checked) || (!a.checked && !b.checked)) {
+      return a.value - b.value;
+    }
+
+    if (!a.checked && b.checked) {
+      return 1;
+    }
+
+    if (a.checked && !b.checked) {
+      return -1;
+    }
+
+    return 0;
+  });
+}

@@ -29,14 +29,13 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import { Panels, panels } from '../components/panels';
 import { VERA_AVATAR_50 } from '../data/constants';
-import { logOff, updateConfig } from '../data/reducers/authorization';
+import { updateConfig } from '../data/reducers/authorization';
 import { initialDays } from '../data/reducers/duties';
 import { useUpdateDutiesMutation } from '../data/services/api';
 import { useGetConfigQuery } from '../data/services/login';
 import { RootState } from '../data/store';
 import { ModalProvider, modalsIds } from '../hooks/useModal';
 import { useSnackbar } from '../hooks/useSnackbar';
-import { getToken } from '../utils/getToken';
 
 const dutyResultSelector = createSelector(
   (state: RootState) => state.duties,
@@ -57,6 +56,7 @@ const dutyResultSelector = createSelector(
       printData: duties.slice(0, workingDays.length).map((item, idx) => ({
         ...item,
         day: workingDays[idx].name,
+        time: workingDays[idx].time || '00:00',
       })),
       days,
       peerId: state.current,
@@ -172,11 +172,29 @@ export const Content: FC = () => {
               </Button>
             }
           >
-            {printData.map(({ day, label, value, username }) => (
+            {printData.map(({ day, label, value, username, time }) => (
               <Text key={value}>
                 В{' '}
-                <Caption style={{ display: 'inline' }} caps weight="1">
+                <Caption
+                  style={{
+                    display: 'inline',
+                    color: 'var(--vkui--color_text_accent)',
+                  }}
+                  caps
+                  weight="1"
+                >
                   {day}
+                </Caption>{' '}
+                с{' '}
+                <Caption
+                  style={{
+                    display: 'inline',
+                    color: 'var(--vkui--color_text_accent)',
+                  }}
+                  caps
+                  weight="1"
+                >
+                  {time}
                 </Caption>{' '}
                 дежурит{' '}
                 <Link href={`https://vk.com/${username}`} target="_blank">

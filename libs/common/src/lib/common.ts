@@ -16,6 +16,7 @@ export type Day = {
   name: string;
   value: number;
   checked: boolean;
+  time: string;
 };
 
 export type Duties = {

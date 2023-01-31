@@ -14,24 +14,54 @@ export class DutyService {
       let message = 'duty отсутствует';
 
       if (currentDuty) {
-        const { username, label } = currentDuty;
+        const { username, label, time, dayNumber } = currentDuty;
 
         const [firstName] = label.split(' ');
         const date = new Date();
-        let month: string | number = date.getMonth() + 1;
-        month = month > 10 ? month : `0${month}`;
 
+        const month = date.getMonth() + 1;
         const day = date.getDate();
+        const weekDay = date.getDay();
 
         const tomorrow = new Date(date);
         tomorrow.setDate(day + 1);
-        let tomorrowMonth: string | number = tomorrow.getMonth() + 1;
-        tomorrowMonth =
-          tomorrowMonth > 10 ? tomorrowMonth : `0${tomorrowMonth}`;
 
+        const tomorrowMonth = tomorrow.getMonth() + 1;
         const tomorrowDay = tomorrow.getDate();
 
-        message = `@${username} (${firstName}) c 00:00 ${day}.${month} до 00:00 ${tomorrowDay}.${tomorrowMonth}.`;
+        const yesterday = new Date(date);
+        yesterday.setDate(day - 1);
+
+        const yesterdayMonth = yesterday.getMonth() + 1;
+        const yesterdayDay = yesterday.getDate();
+        const yesterdayWeekDay = yesterday.getDay();
+
+        const fromYesterdayToToday = dayNumber === yesterdayWeekDay;
+        const fromTodayToYesterday = dayNumber === weekDay;
+
+        let dayFrom = '';
+        let monthFrom = '';
+
+        let dayTo = '';
+        let monthTo = '';
+
+        if (fromYesterdayToToday) {
+          dayFrom = addLeadingZero(yesterdayDay);
+          monthFrom = addLeadingZero(yesterdayMonth);
+
+          dayTo = addLeadingZero(day);
+          monthTo = addLeadingZero(month);
+        } else if (fromTodayToYesterday) {
+          dayFrom = addLeadingZero(day);
+          monthFrom = addLeadingZero(month);
+
+          dayTo = addLeadingZero(tomorrowDay);
+          monthTo = addLeadingZero(tomorrowMonth);
+        }
+
+        message = `@${username} (${firstName}) c ${
+          time || '00:00'
+        } ${dayFrom}.${monthFrom} до ${time || '00:00'} ${dayTo}.${monthTo}.`;
       }
 
       this.botService.vk.api.messages.send({
@@ -50,7 +80,11 @@ export class DutyService {
 }
 
 function getDuty(peerId: number) {
-  const day = new Date().getDay();
+  const date = new Date();
+  const day = date.getDay();
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+
   const config = getConfig();
   const { duties: dutiesSchedule } = config;
 
@@ -73,7 +107,42 @@ function getDuty(peerId: number) {
     .map((item, idx) => ({
       ...item,
       dayNumber: workingDays[idx].value,
+      time: workingDays[idx].time,
     }));
 
-  return workingDuties.find(({ dayNumber }) => dayNumber === day);
+  return workingDuties.find(({ dayNumber, time }) => {
+    let [hh, mm]: (number | string)[] = time?.split(':') ?? ['00', '00'];
+
+    if (!hh || !mm) {
+      return dayNumber !== day;
+    }
+
+    hh = parseInt(hh);
+    mm = parseInt(mm);
+
+    const sameDay = dayNumber === day;
+    const nextDay = dayNumber === day - 1;
+
+    if (sameDay && hours > hh) {
+      return true;
+    }
+
+    if (sameDay && hours === hh && minutes > mm) {
+      return true;
+    }
+
+    if (nextDay && hours < hh) {
+      return true;
+    }
+
+    if (nextDay && hours === hh && minutes < mm) {
+      return true;
+    }
+
+    return false;
+  });
+}
+
+function addLeadingZero(num: number) {
+  return num > 10 ? `${num}` : `0${num}`;
 }

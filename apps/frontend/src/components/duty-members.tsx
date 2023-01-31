@@ -11,13 +11,18 @@ import {
   FormItem,
   FormLayoutGroup,
   List,
+  RichCell,
   Spacing,
   Spinner,
+  Switch,
   unstable_ChipsSelect as ChipsSelect,
 } from '@vkontakte/vkui';
 
 import { FC, useCallback } from 'react';
 import { batch, useDispatch, useSelector } from 'react-redux';
+import TimePicker from 'react-time-picker/dist/entry.nostyle';
+
+import './duty-members.css';
 
 import {
   dragDuties,
@@ -25,6 +30,7 @@ import {
   removeDuty,
   setDays,
   setDuties,
+  setTime,
   sortDays,
 } from '../data/reducers/duties';
 import { useGetConversationMembersQuery } from '../data/services/api';
@@ -130,25 +136,59 @@ export const DutyMembers: FC<Props> = ({ peerId }) => {
       </FormItem>
 
       <FormLayoutGroup mode="horizontal">
-        <FormItem top="Дежурство по" style={{ flexGrow: 1 }}>
+        <FormItem top="Дежурство по" style={{ flexGrow: 1.15 }}>
           <List>
-            {days.map(({ name, checked, value }, idx) => (
-              <Cell
+            {days.map(({ name, checked, value, time }, idx) => (
+              <RichCell
+                disabled
                 name={name}
                 key={value}
-                before={<Avatar initials={name} />}
-                mode="selectable"
-                checked={checked}
-                onChange={({ target }) => {
-                  dispatch(
-                    sortDays({
-                      checked: (target as HTMLInputElement).checked,
-                      idx,
-                      peerId,
-                    })
-                  );
-                }}
-              />
+                before={
+                  <Avatar
+                    initials={name}
+                    gradientColor={checked ? 'blue' : undefined}
+                  />
+                }
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '5px',
+                  }}
+                >
+                  <span>c</span>
+                  <TimePicker
+                    value={time}
+                    onChange={(newTime) => {
+                      dispatch(
+                        setTime({ idx, peerId, value: newTime as string })
+                      );
+                    }}
+                    locale="ru-ru"
+                    autoFocus={false}
+                    clearIcon={null}
+                    disableClock
+                    hourPlaceholder="чч"
+                    minutePlaceholder="мм"
+                    format="HH:mm"
+                  />
+
+                  <Switch
+                    checked={checked}
+                    onChange={({ target }) => {
+                      dispatch(
+                        sortDays({
+                          checked: target.checked,
+                          idx,
+                          peerId,
+                        })
+                      );
+                    }}
+                  />
+                </div>
+              </RichCell>
             ))}
           </List>
         </FormItem>
