@@ -103,7 +103,7 @@ export const duties = createSlice({
       const day = state[peerId].days[idx];
       day.checked = checked;
 
-      if (state[peerId].days[idx].checked) {
+      if (!state[peerId].days[idx].checked) {
         state[peerId].days.splice(idx, 1);
         state[peerId].days.push(day);
       } else {

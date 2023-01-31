@@ -31,10 +31,8 @@ enableAutoPageviews();
 
 const rtkQueryErrorLogger: ThunkMiddleware = () => (dispatch) => (action) => {
   if (isRejectedWithValue(action)) {
-    const trace = action?.payload?.data?.cause;
-
-    if (trace) {
-      console.error(trace);
+    if (action?.payload?.originalStatus === 401) {
+      dispatch(logOff());
     }
   }
 

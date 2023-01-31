@@ -11,7 +11,7 @@ export default defineConfig({
     port: 4200,
     host: 'localhost',
     proxy: {
-      '/api': 'http://localhost:4256',
+      '/api': 'https://vera.example.com',
     },
   },
 

@@ -33,7 +33,10 @@ export const authorization = createSlice({
     logOff: (state) => {
       window.localStorage.removeItem('token');
 
-      state = { ...initialState };
+      return {
+        authorized: false,
+        config: null,
+      };
     },
 
     updateConfig: (state, { payload }: PayloadAction<Config>) => {
