@@ -160,7 +160,7 @@ export const DutyMembers: FC<Props> = ({ peerId }) => {
                 >
                   <span>c</span>
                   <TimePicker
-                    value={time}
+                    value={time || ''}
                     onChange={(newTime) => {
                       dispatch(
                         setTime({ idx, peerId, value: newTime as string })
@@ -197,6 +197,7 @@ export const DutyMembers: FC<Props> = ({ peerId }) => {
           <List>
             {duties.map(({ value, label, avatar }, idx) => (
               <Cell
+                style={{ padding: '4px 0' }}
                 key={value}
                 before={<Avatar src={avatar} />}
                 mode="removable"

@@ -1,11 +1,11 @@
 .react-time-picker {
   display: inline-flex;
   position: relative;
-  font-family: var(--vkui--font_family_base);
   color: var(--vkui--color_text_primary);
-  font-size: var(--vkui--font_text--font_size--regular);
-  font-weight: var(--vkui--font_text--font_weight--regular);
-  line-height: var(--vkui--font_text--line_height--regular);
+
+  font: var(--vkui--font_text--font_weight--regular)
+    var(--vkui--font_text--font_size--regular) /
+    var(--vkui--font_text--line_height--regular) var(--vkui--font_family_base);
 }
 
 .react-time-picker,
@@ -39,7 +39,6 @@
 
 .react-time-picker__inputGroup__divider {
   white-space: pre;
-  /*padding-right: 2px;*/
 }
 
 .react-time-picker__inputGroup__divider,
@@ -50,7 +49,6 @@
 
 .react-time-picker__inputGroup__input {
   min-width: 0.54em;
-  height: 100%;
   position: relative;
   padding: 0 2px;
   border: 0;
