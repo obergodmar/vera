@@ -14,6 +14,7 @@ export type DutyChip = {
 
 export type Day = {
   name: string;
+  fullName: string;
   value: number;
   checked: boolean;
   time?: string;

@@ -13,26 +13,31 @@ const initialState: DutiesPerChat = {
 export const initialDays: Day[] = [
   {
     name: 'пн',
+    fullName: 'понедельник',
     value: 1,
     checked: true,
   },
   {
     name: 'вт',
+    fullName: 'вторник',
     value: 2,
     checked: true,
   },
   {
     name: 'ср',
+    fullName: 'среда',
     value: 3,
     checked: true,
   },
   {
     name: 'чт',
+    fullName: 'четверг',
     value: 4,
     checked: true,
   },
   {
     name: 'пт',
+    fullName: 'пятница',
     value: 5,
     checked: true,
   },

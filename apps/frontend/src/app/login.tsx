@@ -1,6 +1,11 @@
 import { Icon16DoorEnterArrowRightOutline } from '@vkontakte/icons';
 import {
   Avatar,
+  Button,
+  Div,
+  FormItem,
+  FormLayout,
+  FormLayoutGroup,
   Group,
   IconButton,
   Input,
@@ -70,33 +75,33 @@ export const Login: FC = () => {
               icon={<Avatar src={VERA_AVATAR_100} size={100} />}
               header="Вера"
               action={
-                <Input
-                  style={{
-                    maxWidth: '196px',
-                  }}
-                  placeholder="Введите пароль"
-                  type="password"
-                  value={password}
-                  onChange={({ target: { value } }) => setPassword(value)}
-                  onKeyDown={({ key }) => {
-                    if (key !== 'Enter' || authorizeResult.isLoading) {
-                      return;
-                    }
+                <FormLayoutGroup mode="vertical">
+                  <Input
+                    style={{
+                      maxWidth: '196px',
+                    }}
+                    placeholder="Введите пароль"
+                    type="password"
+                    value={password}
+                    onChange={({ target: { value } }) => setPassword(value)}
+                    onKeyDown={({ key }) => {
+                      if (key !== 'Enter' || authorizeResult.isLoading) {
+                        return;
+                      }
 
-                    authorizeRequest(password);
-                  }}
-                  after={
-                    password.length > 0 && (
-                      <IconButton
-                        hoverMode="opacity"
-                        aria-label="Авторизоваться"
-                        onClick={() => authorizeRequest(password)}
-                      >
-                        <Icon16DoorEnterArrowRightOutline />
-                      </IconButton>
-                    )
-                  }
-                />
+                      authorizeRequest(password);
+                    }}
+                  />
+
+                  <Button
+                    style={{ top: '10px' }}
+                    size="m"
+                    stretched
+                    onClick={() => authorizeRequest(password)}
+                  >
+                    Авторизоваться
+                  </Button>
+                </FormLayoutGroup>
               }
             >
               <Text>Панель управления</Text>

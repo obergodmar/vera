@@ -56,11 +56,7 @@ export const DutyPanel: FC = () => {
         </FormLayoutGroup>
       </Group>
 
-      {peerId && (
-        <Group>
-          <DutyMembers peerId={peerId} />
-        </Group>
-      )}
+      {peerId && <DutyMembers peerId={peerId} />}
     </>
   );
 };

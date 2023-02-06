@@ -1,6 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { DutyChip } from '@vera-reforged/common';
-import { Icon24ErrorCircle } from '@vkontakte/icons';
+import { Icon16Hashtag, Icon24ErrorCircle } from '@vkontakte/icons';
 import {
   Avatar,
   Button,
@@ -8,13 +8,17 @@ import {
   Cell,
   Chip,
   CustomSelectOption,
+  Div,
   FormItem,
   FormLayoutGroup,
+  Group,
+  Input,
   List,
   RichCell,
   Spacing,
   Spinner,
   Switch,
+  Text,
   unstable_ChipsSelect as ChipsSelect,
 } from '@vkontakte/vkui';
 
@@ -23,6 +27,7 @@ import { batch, useDispatch, useSelector } from 'react-redux';
 import TimePicker from 'react-time-picker/dist/entry.nostyle';
 
 import './duty-members.css';
+import * as rn from 'russian-nouns-js';
 
 import {
   dragDuties,
@@ -38,6 +43,7 @@ import { RootState } from '../data/store';
 import { modalsIds, useModal } from '../hooks/useModal';
 import { useSnackbar } from '../hooks/useSnackbar';
 import { getDutiesFromConfig } from '../utils/getDutiesFromConfig';
+import { DutyPicker } from './duty-picker';
 
 type Props = {
   peerId: number;
@@ -81,138 +87,68 @@ export const DutyMembers: FC<Props> = ({ peerId }) => {
 
   return (
     <>
-      <FormItem top="Дежурные">
-        <ChipsSelect
-          value={duties}
-          onChangeStart={(e) => {
-            if (duties.length === days.length) {
-              e.preventDefault();
+      {days.map(({ name, fullName, value, checked }) => {
+        const rne = new rn.Engine();
 
-              snackbar({
-                message: 'Людей выбрано больше, чем рабочих дней недели',
-                before: (
-                  <Icon24ErrorCircle fill="var(--vkui--color_icon_accent)" />
-                ),
-              });
-            }
-          }}
-          onChange={(items) =>
-            dispatch(setDuties({ duties: items as DutyChip[], peerId }))
-          }
-          options={members}
-          showSelected={false}
-          renderChip={(props) => {
-            if (!props) {
-              return;
-            }
+        const dayName = rn.createLemma({
+          text: fullName,
+          gender: rn.Gender.COMMON,
+        });
 
-            const {
-              value,
-              label,
-              option: { avatar },
-              ...rest
-            } = props;
-
-            return (
-              <Chip
-                value={value}
-                before={<Avatar size={20} src={avatar} />}
-                {...rest}
-              >
-                {props?.label}
-              </Chip>
-            );
-          }}
-          renderOption={({ option: { avatar, username }, ...otherProps }) => {
-            return (
-              <CustomSelectOption
-                before={<Avatar size={20} src={avatar} />}
-                description={username}
-                {...otherProps}
-              />
-            );
-          }}
-        />
-      </FormItem>
-
-      <FormLayoutGroup mode="horizontal">
-        <FormItem top="Дежурство по" style={{ flexGrow: 1.15 }}>
-          <List>
-            {days.map(({ name, checked, value, time }, idx) => (
+        return (
+          <Group>
+            <FormItem top={<Switch checked={checked} />}>
               <RichCell
                 disabled
+                subhead="Результат"
                 name={name}
                 key={value}
+                caption={`Дежурства в ${rne.decline(
+                  dayName,
+                  rn.Case.GENITIVE
+                )} отсутствуют`}
                 before={
                   <Avatar
                     initials={name}
                     gradientColor={checked ? 'blue' : undefined}
                   />
                 }
-              >
+              ></RichCell>
+            </FormItem>
+
+            {checked && (
+              <FormItem top="Смена 1">
                 <div
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '5px',
+                    gap: '15px',
                   }}
                 >
-                  <span>c</span>
-                  <TimePicker
-                    value={time || ''}
-                    onChange={(newTime) => {
-                      dispatch(
-                        setTime({ idx, peerId, value: newTime as string })
-                      );
-                    }}
-                    locale="ru-ru"
-                    autoFocus={false}
-                    clearIcon={null}
-                    disableClock
-                    hourPlaceholder="чч"
-                    minutePlaceholder="мм"
-                    format="HH:mm"
+                  <Input
+                    style={{ maxWidth: '75px' }}
+                    before={<Icon16Hashtag />}
                   />
-
-                  <Switch
-                    checked={checked}
-                    onChange={({ target }) => {
-                      dispatch(
-                        sortDays({
-                          checked: target.checked,
-                          idx,
-                          peerId,
-                        })
-                      );
+                  <div
+                    style={{
+                      flexGrow: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
                     }}
-                  />
+                  >
+                    c <TimePicker value="" disableClock clearIcon={null} /> по
+                    <TimePicker value="" disableClock clearIcon={null} />
+                  </div>
+                  <DutyPicker members={members} />
                 </div>
-              </RichCell>
-            ))}
-          </List>
-        </FormItem>
+              </FormItem>
+            )}
+          </Group>
+        );
+      })}
 
-        <FormItem top="В этот день дежурит" style={{ flexGrow: 2 }}>
-          <List>
-            {duties.map(({ value, label, avatar }, idx) => (
-              <Cell
-                style={{ padding: '4px 0' }}
-                key={value}
-                before={<Avatar src={avatar} />}
-                mode="removable"
-                draggable
-                onDragFinish={(args) =>
-                  dispatch(dragDuties({ ...args, peerId }))
-                }
-                onRemove={() => dispatch(removeDuty({ idx, peerId }))}
-              >
-                {label}
-              </Cell>
-            ))}
-          </List>
-        </FormItem>
-      </FormLayoutGroup>
+      <FormLayoutGroup mode="horizontal"></FormLayoutGroup>
 
       <Spacing />
 
