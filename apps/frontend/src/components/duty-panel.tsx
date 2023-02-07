@@ -1,3 +1,4 @@
+import { Icon20RefreshOutline } from '@vkontakte/icons';
 import {
   Avatar,
   CustomSelectOption,
@@ -5,6 +6,7 @@ import {
   FormLayoutGroup,
   Group,
   Header,
+  IconButton,
   PanelSpinner,
   Select,
 } from '@vkontakte/vkui';
@@ -15,12 +17,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setPeerId } from '../data/reducers/duties';
 import { useGetConversationsQuery } from '../data/services/api';
 import { RootState } from '../data/store';
-import { DutyMembers } from './duty-members';
+import { DutyDays } from './duty-days';
 
 export const DutyPanel: FC = () => {
   const dispatch = useDispatch();
-  const { isLoading, data: chats } = useGetConversationsQuery();
-  const peerId = useSelector((state: RootState) => state.duties.current);
+  const { isLoading, data: chats, refetch } = useGetConversationsQuery();
+  const chatId = useSelector((state: RootState) => state.duties.current);
 
   if (isLoading || !chats) {
     return <PanelSpinner />;
@@ -31,10 +33,10 @@ export const DutyPanel: FC = () => {
       <Group>
         <Header>Установка дежурства в чаты</Header>
 
-        <FormLayoutGroup mode="vertical">
+        <FormLayoutGroup mode="horizontal">
           <FormItem top="Чат">
             <Select
-              value={peerId}
+              value={chatId}
               onChange={(e) => {
                 const id = Number(e.target.value);
                 dispatch(setPeerId(id));
@@ -53,10 +55,15 @@ export const DutyPanel: FC = () => {
               )}
             />
           </FormItem>
+          <FormItem>
+            <IconButton aria-label="Обновить" onClick={refetch}>
+              <Icon20RefreshOutline />
+            </IconButton>
+          </FormItem>
         </FormLayoutGroup>
       </Group>
 
-      {peerId && <DutyMembers peerId={peerId} />}
+      {chatId && <DutyDays peerId={chatId} />}
     </>
   );
 };

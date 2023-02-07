@@ -4,27 +4,10 @@ import { Config } from '@vera-reforged/common';
 import { extendFetchArgs } from '../../utils/extendFetchArgs';
 import { getToken } from '../../utils/getToken';
 
-export const loginApi = createApi({
+export const configApi = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
-  reducerPath: 'loginApi',
+  reducerPath: 'configApi',
   endpoints: (builder) => ({
-    authorize: builder.mutation<
-      { config?: Config; token?: string; error?: string },
-      string
-    >({
-      query(password) {
-        return {
-          method: 'POST',
-          url: '/login',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: {
-            password,
-          },
-        };
-      },
-    }),
     getConfig: builder.query<Config, void>({
       query() {
         return extendFetchArgs({
@@ -38,4 +21,4 @@ export const loginApi = createApi({
   }),
 });
 
-export const { useAuthorizeMutation, useGetConfigQuery } = loginApi;
+export const { useGetConfigQuery } = configApi;

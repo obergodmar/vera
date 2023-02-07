@@ -8,26 +8,20 @@ import { Config } from '@vera-reforged/common';
 
 import { batch } from 'react-redux';
 
-import Plausible from 'plausible-tracker';
 import logger from 'redux-logger';
 import { ThunkMiddleware } from 'redux-thunk/es/types';
 
+import { toDutiesState } from '../models/Configuration';
 import { getToken } from '../utils/getToken';
 import { authorization, logOff } from './reducers/authorization';
+import { config } from './reducers/config';
 import { duties, setDays, setDuties } from './reducers/duties';
 import { api } from './services/api';
+import { configApi } from './services/config';
 import { loginApi } from './services/login';
 
 const { MODE } = import.meta.env;
 const isDev = MODE !== 'production';
-
-const { enableAutoPageviews, trackEvent } = Plausible({
-  domain: 'vera.example.com',
-  apiHost: 'https://analytics.example.com',
-  trackLocalhost: false,
-});
-
-enableAutoPageviews();
 
 const rtkQueryErrorLogger: ThunkMiddleware = () => (dispatch) => (action) => {
   if (isRejectedWithValue(action)) {
@@ -45,24 +39,10 @@ const middleware: Middleware = (api) => (dispatch) => (action) => {
   }
 
   switch (action.type) {
-    case 'authorization/updateConfig': {
+    case 'config/setConfig': {
       const config: Config = action.payload;
-      const {
-        duties: { schedule: dutiesSchedule },
-      } = config;
 
-      batch(() => {
-        Object.entries(dutiesSchedule).forEach(([peerIdString, schedule]) => {
-          if (schedule) {
-            const { duties, days } = schedule;
-
-            const peerId = Number(peerIdString);
-
-            dispatch(setDuties({ peerId, duties }));
-            dispatch(setDays({ peerId, days }));
-          }
-        });
-      });
+      const schedulesPerChatWithDays = toDutiesState(config);
     }
   }
 
@@ -75,13 +55,16 @@ export const store = configureStore({
   reducer: {
     authorization: authorization.reducer,
     duties: duties.reducer,
+    config: config.reducer,
     [api.reducerPath]: api.reducer,
     [loginApi.reducerPath]: loginApi.reducer,
+    [configApi.reducerPath]: configApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       api.middleware,
       loginApi.middleware,
+      configApi.middleware,
       rtkQueryErrorLogger,
       middleware,
       ...(isDev ? devMiddlewares : [])

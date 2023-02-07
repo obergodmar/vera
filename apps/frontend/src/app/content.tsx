@@ -1,12 +1,8 @@
-import { createSelector } from '@reduxjs/toolkit';
-import { Day, DutyChip } from '@vera-reforged/common';
 import { Icon56CalendarOutline } from '@vkontakte/icons';
 import {
   Avatar,
   Button,
-  Caption,
   Group,
-  Link,
   ModalPage,
   ModalPageHeader,
   ModalRoot,
@@ -17,52 +13,21 @@ import {
   Placeholder,
   SplitCol,
   SplitLayout,
-  Text,
   useAdaptivityConditionalRender,
   View,
 } from '@vkontakte/vkui';
-import { ChipOption } from '@vkontakte/vkui/dist/components/Chip/Chip';
 
 import { FC, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import { Panels, panels } from '../components/panels';
 import { VERA_AVATAR_50 } from '../data/constants';
 import { updateConfig } from '../data/reducers/authorization';
-import { initialDays } from '../data/reducers/duties';
 import { useUpdateDutiesMutation } from '../data/services/api';
 import { useGetConfigQuery } from '../data/services/login';
-import { RootState } from '../data/store';
 import { ModalProvider, modalsIds } from '../hooks/useModal';
 import { useSnackbar } from '../hooks/useSnackbar';
-
-const dutyResultSelector = createSelector(
-  (state: RootState) => state.duties,
-  (state) => {
-    if (!state.current) {
-      return {
-        peerId: undefined,
-        days: initialDays,
-        duties: [],
-        printData: [],
-      };
-    }
-    const { days, duties } = state[state.current];
-    const workingDays = days.filter(({ checked }) => checked);
-
-    return {
-      duties,
-      printData: duties.slice(0, workingDays.length).map((item, idx) => ({
-        ...item,
-        day: workingDays[idx].name,
-        time: workingDays[idx].time || '00:00',
-      })),
-      days,
-      peerId: state.current,
-    };
-  }
-);
 
 export const Content: FC = () => {
   const { data: config, refetch } = useGetConfigQuery();
@@ -74,18 +39,6 @@ export const Content: FC = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { sizeX } = useAdaptivityConditionalRender();
-
-  const {
-    printData,
-    duties,
-    peerId,
-    days,
-  }: {
-    printData: ChipOption[];
-    duties: DutyChip[];
-    days: Day[];
-    peerId: number | undefined;
-  } = useSelector(dutyResultSelector);
 
   const [activeModal, setActiveModal] = useState<modalsIds | null>(null);
   const [activePanel, setActivePanel] = useState(panels[0]);
@@ -127,18 +80,6 @@ export const Content: FC = () => {
   const closeModal = () => setActiveModal(null);
 
   const applyDuty = () => {
-    if (!peerId) {
-      return;
-    }
-
-    fetch({
-      peerId,
-      duties: {
-        days,
-        duties,
-      },
-    });
-
     closeModal();
   };
 
@@ -171,38 +112,7 @@ export const Content: FC = () => {
                 Применить
               </Button>
             }
-          >
-            {printData.map(({ day, label, value, username, time }) => (
-              <Text key={value}>
-                В{' '}
-                <Caption
-                  style={{
-                    display: 'inline',
-                    color: 'var(--vkui--color_text_accent)',
-                  }}
-                  caps
-                  weight="1"
-                >
-                  {day}
-                </Caption>{' '}
-                с{' '}
-                <Caption
-                  style={{
-                    display: 'inline',
-                    color: 'var(--vkui--color_text_accent)',
-                  }}
-                  caps
-                  weight="1"
-                >
-                  {time}
-                </Caption>{' '}
-                дежурит{' '}
-                <Link href={`https://vk.com/${username}`} target="_blank">
-                  {label}
-                </Link>
-              </Text>
-            ))}
-          </Placeholder>
+          ></Placeholder>
         </Group>
       </ModalPage>
     </ModalRoot>

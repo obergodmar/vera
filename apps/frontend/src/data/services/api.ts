@@ -1,6 +1,5 @@
-import { ResponseHandler } from '@reduxjs/toolkit/dist/query/fetchBaseQuery';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { Duties } from '@vera-reforged/common';
+import { SchedulePerChat } from '@vera-reforged/common';
 import {
   MessagesGetConversationMembersResponse,
   MessagesGetConversationsByIdResponse,
@@ -9,7 +8,6 @@ import { CustomSelectOptionInterface } from '@vkontakte/vkui';
 import { ChipOption } from '@vkontakte/vkui/dist/components/Chip/Chip';
 
 import { extendFetchArgs } from '../../utils/extendFetchArgs';
-import { getToken } from '../../utils/getToken';
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
@@ -72,12 +70,12 @@ export const api = createApi({
 
     updateDuties: builder.mutation<
       { error?: object; success?: boolean },
-      { peerId: number; duties: Duties }
+      { peerId: number; schedule: SchedulePerChat }
     >({
-      query({ peerId, duties }) {
+      query({ peerId, schedule }) {
         return extendFetchArgs({
           body: {
-            duties,
+            schedule,
           },
           url: `updateDuties/${peerId}`,
         });

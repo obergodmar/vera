@@ -61,7 +61,7 @@ const initialDutiesSelector = createSelector(
   }
 );
 
-export const DutyMembers: FC<Props> = ({ peerId }) => {
+export const DutyDays: FC<Props> = ({ peerId }) => {
   const open = useModal();
   const snackbar = useSnackbar();
   const { isLoading, data: members } = useGetConversationMembersQuery(peerId);
@@ -95,25 +95,34 @@ export const DutyMembers: FC<Props> = ({ peerId }) => {
           gender: rn.Gender.COMMON,
         });
 
+        const [dayNameWithCase] = rne.decline(dayName, rn.Case.ACCUSATIVE);
+
+        const preposition = dayNameWithCase.startsWith('в') ? 'во' : 'в';
+
         return (
           <Group>
-            <FormItem top={<Switch checked={checked} />}>
+            <FormItem
+              top={
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <Switch checked={checked} />
+                  <Text>{fullName}</Text>
+                </div>
+              }
+            >
               <RichCell
                 disabled
                 subhead="Результат"
                 name={name}
                 key={value}
-                caption={`Дежурства в ${rne.decline(
-                  dayName,
-                  rn.Case.GENITIVE
-                )} отсутствуют`}
                 before={
                   <Avatar
                     initials={name}
                     gradientColor={checked ? 'blue' : undefined}
                   />
                 }
-              ></RichCell>
+              >
+                Дежурства {preposition} {dayNameWithCase} отсутствуют
+              </RichCell>
             </FormItem>
 
             {checked && (
@@ -147,10 +156,6 @@ export const DutyMembers: FC<Props> = ({ peerId }) => {
           </Group>
         );
       })}
-
-      <FormLayoutGroup mode="horizontal"></FormLayoutGroup>
-
-      <Spacing />
 
       <ButtonGroup align="right" stretched mode="vertical">
         <ButtonGroup stretched={false}>
