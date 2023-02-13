@@ -14,7 +14,7 @@ import React, {
 import './snackbar.css';
 import cx from 'classnames';
 
-import { SnackbarHelpersProps, SnackbarProps } from '../data/snackbarStore';
+import { SnackbarHelpersProps, SnackbarProps } from '../data/snackbar-store';
 
 /**
  * SnackbarProps из стора скудны и без завязки на реакт (не можем передать JSX

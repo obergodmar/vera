@@ -10,7 +10,7 @@ import {
 import { FC, ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { DutyPanel } from './duty-panel';
+import { Panel as DutyPanel } from './duty/panel';
 import { NotImplementedPanel } from './not-implemented-panel';
 
 export const panels: PanelItem[] = [

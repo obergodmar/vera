@@ -1,17 +1,10 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { Config } from '@vera-reforged/common';
-
-import { extendFetchArgs } from '../../utils/extendFetchArgs';
-import { getToken } from '../../utils/getToken';
 
 export const loginApi = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
   reducerPath: 'loginApi',
   endpoints: (builder) => ({
-    authorize: builder.mutation<
-      { config?: Config; token?: string; error?: string },
-      string
-    >({
+    authorize: builder.mutation<{ token?: string; error?: string }, string>({
       query(password) {
         return {
           method: 'POST',
@@ -25,17 +18,7 @@ export const loginApi = createApi({
         };
       },
     }),
-    getConfig: builder.query<Config, void>({
-      query() {
-        return extendFetchArgs({
-          url: '/getConfig',
-          body: {
-            token: getToken(),
-          },
-        });
-      },
-    }),
   }),
 });
 
-export const { useAuthorizeMutation, useGetConfigQuery } = loginApi;
+export const { useAuthorizeMutation } = loginApi;

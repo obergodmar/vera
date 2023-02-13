@@ -4,18 +4,15 @@ import {
   Middleware,
 } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
-import { Config } from '@vera-reforged/common';
-
-import { batch } from 'react-redux';
+import { IConfig } from '@vera-reforged/common';
 
 import logger from 'redux-logger';
 import { ThunkMiddleware } from 'redux-thunk/es/types';
 
-import { toDutiesState } from '../models/Configuration';
 import { getToken } from '../utils/getToken';
 import { authorization, logOff } from './reducers/authorization';
 import { config } from './reducers/config';
-import { duties, setDays, setDuties } from './reducers/duties';
+import { duty, setDutyFromConfig } from './reducers/duty';
 import { api } from './services/api';
 import { configApi } from './services/config';
 import { loginApi } from './services/login';
@@ -40,9 +37,11 @@ const middleware: Middleware = (api) => (dispatch) => (action) => {
 
   switch (action.type) {
     case 'config/setConfig': {
-      const config: Config = action.payload;
+      const config: IConfig.IConfig = action.payload;
 
-      const schedulesPerChatWithDays = toDutiesState(config);
+      const { duty } = config;
+
+      dispatch(setDutyFromConfig(duty));
     }
   }
 
@@ -53,9 +52,9 @@ const devMiddlewares = [logger];
 
 export const store = configureStore({
   reducer: {
-    authorization: authorization.reducer,
-    duties: duties.reducer,
-    config: config.reducer,
+    [authorization.name]: authorization.reducer,
+    [duty.name]: duty.reducer,
+    [config.name]: config.reducer,
     [api.reducerPath]: api.reducer,
     [loginApi.reducerPath]: loginApi.reducer,
     [configApi.reducerPath]: configApi.reducer,

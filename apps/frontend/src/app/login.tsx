@@ -1,13 +1,8 @@
-import { Icon16DoorEnterArrowRightOutline } from '@vkontakte/icons';
 import {
   Avatar,
   Button,
-  Div,
-  FormItem,
-  FormLayout,
   FormLayoutGroup,
   Group,
-  IconButton,
   Input,
   Panel,
   Placeholder,
@@ -35,15 +30,10 @@ export const Login: FC = () => {
   const [authorizeRequest, authorizeResult] = useAuthorizeMutation();
 
   useEffect(() => {
-    if (
-      authorizeResult.status === 'fulfilled' &&
-      authorizeResult.data.token &&
-      authorizeResult.data.config
-    ) {
+    if (authorizeResult.status === 'fulfilled' && authorizeResult.data.token) {
       dispatch(
         authorize({
           token: authorizeResult.data.token,
-          config: authorizeResult.data.config,
         })
       );
 

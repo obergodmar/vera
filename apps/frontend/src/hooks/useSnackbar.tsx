@@ -11,7 +11,7 @@ import {
   createSnackbar,
   SnackbarState,
   snackbarStore,
-} from '../data/snackbarStore';
+} from '../data/snackbar-store';
 
 /**
  * Единый хранитель всех снэкбаров

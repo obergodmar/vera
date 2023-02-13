@@ -10,6 +10,7 @@ import {
   PanelHeader,
   PanelHeaderClose,
   PanelHeaderSubmit,
+  PanelSpinner,
   Placeholder,
   SplitCol,
   SplitLayout,
@@ -18,23 +19,25 @@ import {
 } from '@vkontakte/vkui';
 
 import { FC, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import { Panels, panels } from '../components/panels';
 import { VERA_AVATAR_50 } from '../data/constants';
-import { updateConfig } from '../data/reducers/authorization';
+import { setConfig } from '../data/reducers/config';
 import { useUpdateDutiesMutation } from '../data/services/api';
 import { useGetConfigQuery } from '../data/services/login';
+import { RootState } from '../data/store';
 import { ModalProvider, modalsIds } from '../hooks/useModal';
 import { useSnackbar } from '../hooks/useSnackbar';
 
 export const Content: FC = () => {
-  const { data: config, refetch } = useGetConfigQuery();
+  const { data: configResponse, refetch } = useGetConfigQuery();
   const snackbar = useSnackbar();
   const [fetch, { data, isLoading, isError }] = useUpdateDutiesMutation();
 
   const dispatch = useDispatch();
+  const config = useSelector((state: RootState) => state.config);
 
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -72,10 +75,10 @@ export const Content: FC = () => {
   }, [isError, data, snackbar, refetch]);
 
   useEffect(() => {
-    if (config) {
-      dispatch(updateConfig(config));
+    if (configResponse) {
+      dispatch(setConfig(configResponse));
     }
-  }, [config, dispatch]);
+  }, [configResponse, dispatch]);
 
   const closeModal = () => setActiveModal(null);
 
@@ -134,7 +137,7 @@ export const Content: FC = () => {
                 {activePanel.label}
               </PanelHeader>
 
-              <Outlet />
+              {config ? <Outlet /> : <PanelSpinner />}
             </Panel>
           </View>
         </SplitCol>

@@ -1,5 +1,4 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { SchedulePerChat } from '@vera-reforged/common';
 import {
   MessagesGetConversationMembersResponse,
   MessagesGetConversationsByIdResponse,
@@ -8,6 +7,14 @@ import { CustomSelectOptionInterface } from '@vkontakte/vkui';
 import { ChipOption } from '@vkontakte/vkui/dist/components/Chip/Chip';
 
 import { extendFetchArgs } from '../../utils/extendFetchArgs';
+
+export type Member = ChipOption & {
+  peerId: number;
+  firstName: string;
+  lastName: string;
+  avatar: string;
+  screenName: string;
+};
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
@@ -44,7 +51,7 @@ export const api = createApi({
           }, []);
       },
     }),
-    getConversationMembers: builder.query<ChipOption[], number>({
+    getConversationMembers: builder.query<Member[], number>({
       query(peerId) {
         return extendFetchArgs({
           url: `getConversationMembers/${peerId}`,
@@ -58,34 +65,27 @@ export const api = createApi({
         }
 
         return profiles
-          .map(({ id, photo_100, screen_name, first_name, last_name }) => ({
-            label: `${first_name} ${last_name}`,
-            value: id,
-            avatar: photo_100,
-            username: screen_name,
-          }))
+          .map(
+            ({
+              id: peerId,
+              photo_100: avatar = '',
+              screen_name: screenName = '',
+              first_name: firstName,
+              last_name: lastName,
+            }) => ({
+              label: `${firstName} ${lastName}`,
+              value: peerId,
+              avatar,
+              screenName,
+              peerId,
+              firstName,
+              lastName,
+            })
+          )
           .sort((a, b) => a.label.localeCompare(b.label));
-      },
-    }),
-
-    updateDuties: builder.mutation<
-      { error?: object; success?: boolean },
-      { peerId: number; schedule: SchedulePerChat }
-    >({
-      query({ peerId, schedule }) {
-        return extendFetchArgs({
-          body: {
-            schedule,
-          },
-          url: `updateDuties/${peerId}`,
-        });
       },
     }),
   }),
 });
 
-export const {
-  useGetConversationsQuery,
-  useGetConversationMembersQuery,
-  useUpdateDutiesMutation,
-} = api;
+export const { useGetConversationsQuery, useGetConversationMembersQuery } = api;

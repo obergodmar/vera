@@ -1,10 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Config } from '@vera-reforged/common';
+import { IConfig } from '@vera-reforged/common';
 
-const initialState: Config = {
-  duties: {
+const initialState: IConfig.IConfig = {
+  duty: {
     chats: [],
-    schedulesPerChat: {},
+    days: [],
+    schedule: [],
   },
 };
 
@@ -12,7 +13,7 @@ export const config = createSlice({
   name: 'config',
   initialState,
   reducers: {
-    setConfig: (state, { payload }: PayloadAction<Config>) => {
+    setConfig: (state, { payload }: PayloadAction<IConfig.IConfig>) => {
       state = payload;
     },
   },

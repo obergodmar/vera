@@ -12,5 +12,19 @@ export namespace IDuty {
     dayNumber: number;
   };
 
-  export type Schedule = Record<number, any>;
+  /**
+   * By ChatId
+   */
+  export type Schedule = Record<number, Duty[]>;
+  export type Duty = {
+    peerId: number;
+    firstName: string;
+    lastName: string;
+    avatar: string;
+    screenName: string;
+    dayNumber: number | undefined;
+    timeFrom: string;
+    timeTo: string;
+    tag?: string;
+  };
 }

@@ -14,15 +14,15 @@ import {
 import { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { setPeerId } from '../data/reducers/duties';
-import { useGetConversationsQuery } from '../data/services/api';
-import { RootState } from '../data/store';
-import { DutyDays } from './duty-days';
+import { setCurrentChatId } from '../../data/reducers/duty';
+import { useGetConversationsQuery } from '../../data/services/api';
+import { RootState } from '../../data/store';
+import { Days } from './days';
 
-export const DutyPanel: FC = () => {
+export const Panel: FC = () => {
   const dispatch = useDispatch();
   const { isLoading, data: chats, refetch } = useGetConversationsQuery();
-  const chatId = useSelector((state: RootState) => state.duties.current);
+  const chatId = useSelector((state: RootState) => state.duty.currentChatId);
 
   if (isLoading || !chats) {
     return <PanelSpinner />;
@@ -39,7 +39,7 @@ export const DutyPanel: FC = () => {
               value={chatId}
               onChange={(e) => {
                 const id = Number(e.target.value);
-                dispatch(setPeerId(id));
+                dispatch(setCurrentChatId(id));
               }}
               placeholder="Не выбран"
               options={chats}
@@ -63,7 +63,7 @@ export const DutyPanel: FC = () => {
         </FormLayoutGroup>
       </Group>
 
-      {chatId && <DutyDays peerId={chatId} />}
+      {chatId && <Days peerId={chatId} />}
     </>
   );
 };

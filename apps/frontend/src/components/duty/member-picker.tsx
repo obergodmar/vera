@@ -4,22 +4,24 @@ import {
   CustomSelectOption,
   unstable_ChipsSelect as ChipsSelect,
 } from '@vkontakte/vkui';
-import { ChipOption } from '@vkontakte/vkui/dist/components/Chip/Chip';
 
 import { FC } from 'react';
 
+import { Member } from '../../data/services/api';
+
 type Props = {
-  members: ChipOption[];
+  duties: Member[];
+  members: Member[];
 };
 
-export const DutyPicker: FC<Props> = ({ members }) => {
+export const MemberPicker: FC<Props> = ({ duties, members }) => {
   return (
     <ChipsSelect
       style={{
         width: '100%',
       }}
       placeholder="Дежурный"
-      value={[]}
+      value={duties}
       options={members}
       showSelected={false}
       renderChip={(props) => {
@@ -44,11 +46,11 @@ export const DutyPicker: FC<Props> = ({ members }) => {
           </Chip>
         );
       }}
-      renderOption={({ option: { avatar, username }, ...otherProps }) => {
+      renderOption={({ option: { avatar, screenName }, ...otherProps }) => {
         return (
           <CustomSelectOption
             before={<Avatar size={20} src={avatar} />}
-            description={username}
+            description={screenName}
             {...otherProps}
           />
         );
