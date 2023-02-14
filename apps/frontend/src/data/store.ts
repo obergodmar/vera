@@ -13,9 +13,9 @@ import { getToken } from '../utils/getToken';
 import { authorization, logOff } from './reducers/authorization';
 import { config } from './reducers/config';
 import { duty, setDutyFromConfig } from './reducers/duty';
-import { api } from './services/api';
-import { configApi } from './services/config';
-import { loginApi } from './services/login';
+import { configApi } from './services/config-api';
+import { dutyApi } from './services/duty-api';
+import { loginApi } from './services/login-api';
 
 const { MODE } = import.meta.env;
 const isDev = MODE !== 'production';
@@ -55,13 +55,12 @@ export const store = configureStore({
     [authorization.name]: authorization.reducer,
     [duty.name]: duty.reducer,
     [config.name]: config.reducer,
-    [api.reducerPath]: api.reducer,
+    [dutyApi.reducerPath]: dutyApi.reducer,
     [loginApi.reducerPath]: loginApi.reducer,
     [configApi.reducerPath]: configApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
-      api.middleware,
       loginApi.middleware,
       configApi.middleware,
       rtkQueryErrorLogger,

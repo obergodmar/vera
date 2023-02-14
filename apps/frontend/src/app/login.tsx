@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { VERA_AVATAR_100 } from '../data/constants';
 import { authorize, logOff } from '../data/reducers/authorization';
-import { useAuthorizeMutation } from '../data/services/login';
+import { useAuthorizeMutation } from '../data/services/login-api';
 import { useSnackbar } from '../hooks/useSnackbar';
 import { isFetchBaseQueryError } from '../utils/isFetchBaseQueryError';
 

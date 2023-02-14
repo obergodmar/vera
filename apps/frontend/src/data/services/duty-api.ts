@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { ROUTES } from '@vera-reforged/common';
 import {
   MessagesGetConversationMembersResponse,
   MessagesGetConversationsByIdResponse,
@@ -16,14 +17,14 @@ export type Member = ChipOption & {
   screenName: string;
 };
 
-export const api = createApi({
-  baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
-  reducerPath: 'api',
+export const dutyApi = createApi({
+  baseQuery: fetchBaseQuery({ baseUrl: ROUTES.duty.baseUrl }),
+  reducerPath: 'dutyApi',
   endpoints: (builder) => ({
-    getConversations: builder.query<CustomSelectOptionInterface[], void>({
+    getDutyChats: builder.query<CustomSelectOptionInterface[], void>({
       query() {
         return extendFetchArgs({
-          url: 'getConversations',
+          url: 'getDutyChats',
         });
       },
       transformResponse(data: MessagesGetConversationsByIdResponse) {
@@ -51,10 +52,10 @@ export const api = createApi({
           }, []);
       },
     }),
-    getConversationMembers: builder.query<Member[], number>({
+    getDutyMembersForChat: builder.query<Member[], number>({
       query(peerId) {
         return extendFetchArgs({
-          url: `getConversationMembers/${peerId}`,
+          url: `getDutyMembersForChat/${peerId}`,
         });
       },
       transformResponse(data: MessagesGetConversationMembersResponse) {
@@ -88,4 +89,4 @@ export const api = createApi({
   }),
 });
 
-export const { useGetConversationsQuery, useGetConversationMembersQuery } = api;
+export const { useGetDutyChatsQuery, useGetDutyMembersForChatQuery } = dutyApi;

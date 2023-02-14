@@ -15,13 +15,13 @@ import { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { setCurrentChatId } from '../../data/reducers/duty';
-import { useGetConversationsQuery } from '../../data/services/api';
+import { useGetDutyChatsQuery } from '../../data/services/duty-api';
 import { RootState } from '../../data/store';
 import { Days } from './days';
 
 export const Panel: FC = () => {
   const dispatch = useDispatch();
-  const { isLoading, data: chats, refetch } = useGetConversationsQuery();
+  const { isLoading, data: chats, refetch } = useGetDutyChatsQuery();
   const chatId = useSelector((state: RootState) => state.duty.currentChatId);
 
   if (isLoading || !chats) {

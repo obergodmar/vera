@@ -3,11 +3,11 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { compare } from 'bcrypt';
 
 import { getConfig } from '../utils/getConfig';
-import { AuthorizeDto } from './dto/authorize.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
-export class AuthorizationService {
-  public async authorize(authorizeDto: AuthorizeDto) {
+export class LoginService {
+  public async authorize(authorizeDto: LoginDto) {
     const { password } = authorizeDto;
 
     if (!password) {

@@ -1,13 +1,10 @@
 import { Button, ButtonGroup, Spacing, Spinner } from '@vkontakte/vkui';
 
-import { createContext, FC } from 'react';
+import { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { setDuties } from '../../data/reducers/duty';
-import {
-  Member,
-  useGetConversationMembersQuery,
-} from '../../data/services/api';
+import { useGetDutyMembersForChatQuery } from '../../data/services/duty-api';
 import { RootState } from '../../data/store';
 import { ChatMembersProvider } from '../../hooks/useChatMembers';
 import { modalsIds, useModal } from '../../hooks/useModal';
@@ -17,11 +14,9 @@ type Props = {
   peerId: number;
 };
 
-const MembersContext = createContext<Member[] | undefined>(undefined);
-
 export const Days: FC<Props> = ({ peerId }) => {
   const open = useModal();
-  const { isLoading, data: members } = useGetConversationMembersQuery(peerId);
+  const { isLoading, data: members } = useGetDutyMembersForChatQuery(peerId);
 
   const dispatch = useDispatch();
 

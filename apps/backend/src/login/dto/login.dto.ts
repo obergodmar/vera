@@ -1,3 +1,3 @@
-export class AuthorizeDto {
+export class LoginDto {
   readonly password!: string;
 }

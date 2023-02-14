@@ -7,7 +7,7 @@ import {
 
 import { FC } from 'react';
 
-import { Member } from '../../data/services/api';
+import { Member } from '../../data/services/duty-api';
 
 type Props = {
   duties: Member[];

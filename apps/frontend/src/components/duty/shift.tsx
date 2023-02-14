@@ -4,7 +4,7 @@ import { FormItem, Input } from '@vkontakte/vkui';
 
 import { FC } from 'react';
 
-import { Member } from '../../data/services/api';
+import { Member } from '../../data/services/duty-api';
 import { useChatMembers } from '../../hooks/useChatMembers';
 import { TimePicker } from '../time-picker';
 import { MemberPicker } from './member-picker';

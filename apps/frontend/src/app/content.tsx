@@ -25,8 +25,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Panels, panels } from '../components/panels';
 import { VERA_AVATAR_50 } from '../data/constants';
 import { setConfig } from '../data/reducers/config';
-import { useUpdateDutiesMutation } from '../data/services/api';
-import { useGetConfigQuery } from '../data/services/login';
+import { useGetConfigQuery } from '../data/services/config-api';
 import { RootState } from '../data/store';
 import { ModalProvider, modalsIds } from '../hooks/useModal';
 import { useSnackbar } from '../hooks/useSnackbar';
@@ -34,7 +33,6 @@ import { useSnackbar } from '../hooks/useSnackbar';
 export const Content: FC = () => {
   const { data: configResponse, refetch } = useGetConfigQuery();
   const snackbar = useSnackbar();
-  const [fetch, { data, isLoading, isError }] = useUpdateDutiesMutation();
 
   const dispatch = useDispatch();
   const config = useSelector((state: RootState) => state.config);
@@ -57,22 +55,22 @@ export const Content: FC = () => {
     }
   }, [activePanel, navigate, pathname]);
 
-  useEffect(() => {
-    if (isError) {
-      snackbar({
-        message: 'Ошибка',
-      });
-      console.error(data);
-    }
-
-    if (data?.success) {
-      snackbar({
-        message: 'Успешно',
-      });
-
-      refetch();
-    }
-  }, [isError, data, snackbar, refetch]);
+  // useEffect(() => {
+  //   if (isError) {
+  //     snackbar({
+  //       message: 'Ошибка',
+  //     });
+  //     console.error(data);
+  //   }
+  //
+  //   if (data?.success) {
+  //     snackbar({
+  //       message: 'Успешно',
+  //     });
+  //
+  //     refetch();
+  //   }
+  // }, [isError, data, snackbar, refetch]);
 
   useEffect(() => {
     if (configResponse) {
@@ -111,7 +109,10 @@ export const Content: FC = () => {
           <Placeholder
             icon={<Icon56CalendarOutline />}
             action={
-              <Button loading={isLoading} onClick={applyDuty}>
+              <Button
+                // loading={isLoading}
+                onClick={applyDuty}
+              >
                 Применить
               </Button>
             }

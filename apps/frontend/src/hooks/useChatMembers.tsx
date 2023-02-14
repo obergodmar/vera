@@ -1,6 +1,6 @@
 import { createContext, FC, PropsWithChildren, useContext } from 'react';
 
-import { Member } from '../data/services/api';
+import { Member } from '../data/services/duty-api';
 
 const ChatMembersContext = createContext<Member[] | undefined>(undefined);
 
