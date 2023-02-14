@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { ROUTES } from '@vera-reforged/common';
+import { IConfig, ROUTES } from '@vera-reforged/common';
 import {
   MessagesGetConversationMembersResponse,
   MessagesGetConversationsByIdResponse,
@@ -24,7 +24,7 @@ export const dutyApi = createApi({
     getDutyChats: builder.query<CustomSelectOptionInterface[], void>({
       query() {
         return extendFetchArgs({
-          url: 'getDutyChats',
+          url: 'getChats',
         });
       },
       transformResponse(data: MessagesGetConversationsByIdResponse) {
@@ -55,7 +55,7 @@ export const dutyApi = createApi({
     getDutyMembersForChat: builder.query<Member[], number>({
       query(peerId) {
         return extendFetchArgs({
-          url: `getDutyMembersForChat/${peerId}`,
+          url: `getMembersForChat/${peerId}`,
         });
       },
       transformResponse(data: MessagesGetConversationMembersResponse) {
@@ -86,7 +86,18 @@ export const dutyApi = createApi({
           .sort((a, b) => a.label.localeCompare(b.label));
       },
     }),
+    getDutyConfig: builder.query<IConfig.IConfig['duty'], void>({
+      query() {
+        return extendFetchArgs({
+          url: 'getConfig',
+        });
+      },
+    }),
   }),
 });
 
-export const { useGetDutyChatsQuery, useGetDutyMembersForChatQuery } = dutyApi;
+export const {
+  useGetDutyChatsQuery,
+  useGetDutyMembersForChatQuery,
+  useGetDutyConfigQuery,
+} = dutyApi;

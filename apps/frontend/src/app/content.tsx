@@ -10,7 +10,6 @@ import {
   PanelHeader,
   PanelHeaderClose,
   PanelHeaderSubmit,
-  PanelSpinner,
   Placeholder,
   SplitCol,
   SplitLayout,
@@ -19,24 +18,13 @@ import {
 } from '@vkontakte/vkui';
 
 import { FC, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import { Panels, panels } from '../components/panels';
 import { VERA_AVATAR_50 } from '../data/constants';
-import { setConfig } from '../data/reducers/config';
-import { useGetConfigQuery } from '../data/services/config-api';
-import { RootState } from '../data/store';
 import { ModalProvider, modalsIds } from '../hooks/useModal';
-import { useSnackbar } from '../hooks/useSnackbar';
 
 export const Content: FC = () => {
-  const { data: configResponse, refetch } = useGetConfigQuery();
-  const snackbar = useSnackbar();
-
-  const dispatch = useDispatch();
-  const config = useSelector((state: RootState) => state.config);
-
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { sizeX } = useAdaptivityConditionalRender();
@@ -71,12 +59,6 @@ export const Content: FC = () => {
   //     refetch();
   //   }
   // }, [isError, data, snackbar, refetch]);
-
-  useEffect(() => {
-    if (configResponse) {
-      dispatch(setConfig(configResponse));
-    }
-  }, [configResponse, dispatch]);
 
   const closeModal = () => setActiveModal(null);
 
@@ -138,7 +120,7 @@ export const Content: FC = () => {
                 {activePanel.label}
               </PanelHeader>
 
-              {config ? <Outlet /> : <PanelSpinner />}
+              <Outlet />
             </Panel>
           </View>
         </SplitCol>

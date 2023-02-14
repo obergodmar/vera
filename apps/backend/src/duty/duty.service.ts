@@ -1,11 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { getConfig } from '../utils/getConfig';
+import { ConfigService } from '../config/config.service';
 import { VkApiService } from '../vk-api/vk-api.service';
 
 @Injectable()
 export class DutyService {
-  public constructor(@Inject(VkApiService) private readonly api: VkApiService) {
+  public constructor(
+    @Inject(VkApiService) private readonly api: VkApiService,
+    @Inject(ConfigService) private readonly config: ConfigService
+  ) {
     this.api.botService.bot.hear(/duty/, (msg: any) => {
       // const currentDuty = getDuty(msg.peerId);
       //
@@ -76,18 +79,18 @@ export class DutyService {
     });
   }
 
-  public getDutyChats() {
-    const { chats } = this.getDutyConfig();
+  public getChats() {
+    const { chats } = this.getConfig();
 
     return this.api.getConversationsById(chats);
   }
 
-  public getDutyMembersForChat(chatId: number) {
+  public getMembersForChat(chatId: number) {
     return this.api.getConversationMembers(chatId);
   }
 
-  private getDutyConfig() {
-    const { duty } = getConfig();
+  public getConfig() {
+    const { duty } = this.config.getConfig();
 
     return duty;
   }

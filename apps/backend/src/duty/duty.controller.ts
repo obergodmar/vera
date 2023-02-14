@@ -9,13 +9,18 @@ export class DutyController {
     @Inject(DutyService) private readonly dutyService: DutyService
   ) {}
 
-  @Post('getDutyChats')
-  public getDutyChats() {
-    return this.dutyService.getDutyChats();
+  @Post('getChats')
+  public getChats() {
+    return this.dutyService.getChats();
   }
 
-  @Post('getDutyMembersForChat/:chatId')
-  public getDutyMembersForChat(@Param('chatId') chatId: number) {
-    return this.dutyService.getDutyMembersForChat(chatId);
+  @Post('getMembersForChat/:chatId')
+  public getMembersForChat(@Param('chatId') chatId: number) {
+    return this.dutyService.getMembersForChat(chatId);
+  }
+
+  @Post('getConfig')
+  public getConfig() {
+    return this.dutyService.getConfig();
   }
 }

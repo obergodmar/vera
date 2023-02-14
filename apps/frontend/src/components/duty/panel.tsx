@@ -11,20 +11,40 @@ import {
   Select,
 } from '@vkontakte/vkui';
 
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { setCurrentChatId } from '../../data/reducers/duty';
-import { useGetDutyChatsQuery } from '../../data/services/duty-api';
+import { setCurrentChatId, setDutyFromConfig } from '../../data/reducers/duty';
+import {
+  useGetDutyChatsQuery,
+  useGetDutyConfigQuery,
+} from '../../data/services/duty-api';
 import { RootState } from '../../data/store';
 import { Days } from './days';
 
 export const Panel: FC = () => {
   const dispatch = useDispatch();
-  const { isLoading, data: chats, refetch } = useGetDutyChatsQuery();
+
+  const {
+    isLoading: isConfigLoading,
+    data: configResponse,
+    // refetch: refetchConfig,
+  } = useGetDutyConfigQuery();
+
+  useEffect(() => {
+    if (configResponse) {
+      dispatch(setDutyFromConfig(configResponse));
+    }
+  }, [configResponse, dispatch]);
+
+  const {
+    isLoading: isChatsLoading,
+    data: chats,
+    refetch: refetchChats,
+  } = useGetDutyChatsQuery();
   const chatId = useSelector((state: RootState) => state.duty.currentChatId);
 
-  if (isLoading || !chats) {
+  if (isConfigLoading || !configResponse || isChatsLoading || !chats) {
     return <PanelSpinner />;
   }
 
@@ -56,7 +76,7 @@ export const Panel: FC = () => {
             />
           </FormItem>
           <FormItem>
-            <IconButton aria-label="Обновить" onClick={refetch}>
+            <IconButton aria-label="Обновить" onClick={refetchChats}>
               <Icon20RefreshOutline />
             </IconButton>
           </FormItem>

@@ -4,16 +4,13 @@ import {
   Middleware,
 } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
-import { IConfig } from '@vera-reforged/common';
 
 import logger from 'redux-logger';
 import { ThunkMiddleware } from 'redux-thunk/es/types';
 
 import { getToken } from '../utils/getToken';
 import { authorization, logOff } from './reducers/authorization';
-import { config } from './reducers/config';
-import { duty, setDutyFromConfig } from './reducers/duty';
-import { configApi } from './services/config-api';
+import { duty } from './reducers/duty';
 import { dutyApi } from './services/duty-api';
 import { loginApi } from './services/login-api';
 
@@ -35,16 +32,6 @@ const middleware: Middleware = (api) => (dispatch) => (action) => {
     dispatch(logOff());
   }
 
-  switch (action.type) {
-    case 'config/setConfig': {
-      const config: IConfig.IConfig = action.payload;
-
-      const { duty } = config;
-
-      dispatch(setDutyFromConfig(duty));
-    }
-  }
-
   dispatch(action);
 };
 
@@ -54,15 +41,12 @@ export const store = configureStore({
   reducer: {
     [authorization.name]: authorization.reducer,
     [duty.name]: duty.reducer,
-    [config.name]: config.reducer,
     [dutyApi.reducerPath]: dutyApi.reducer,
     [loginApi.reducerPath]: loginApi.reducer,
-    [configApi.reducerPath]: configApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       loginApi.middleware,
-      configApi.middleware,
       rtkQueryErrorLogger,
       middleware,
       ...(isDev ? devMiddlewares : [])
