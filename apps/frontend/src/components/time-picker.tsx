@@ -6,5 +6,16 @@ import TimePickerComponent, {
 import './time-picker.css';
 
 export const TimePicker: FC<TimePickerProps> = (props) => {
-  return <TimePickerComponent disableClock clearIcon={null} {...props} />;
+  return (
+    <TimePickerComponent
+      disableClock
+      clearIcon={null}
+      locale="ru-ru"
+      autoFocus={false}
+      hourPlaceholder="чч"
+      minutePlaceholder="мм"
+      format="HH:mm"
+      {...props}
+    />
+  );
 };

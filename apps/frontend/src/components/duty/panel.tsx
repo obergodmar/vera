@@ -10,6 +10,7 @@ import {
   PanelSpinner,
   Select,
 } from '@vkontakte/vkui';
+import { TextTooltip } from '@vkontakte/vkui/dist/components/TextTooltip/TextTooltip';
 
 import { FC, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -53,32 +54,48 @@ export const Panel: FC = () => {
       <Group>
         <Header>Установка дежурства в чаты</Header>
 
-        <FormLayoutGroup mode="horizontal">
+        <FormLayoutGroup
+          mode="horizontal"
+          style={{ display: 'flex', gap: '10px' }}
+        >
           <FormItem top="Чат">
-            <Select
-              value={chatId}
-              onChange={(e) => {
-                const id = Number(e.target.value);
-                dispatch(setCurrentChatId(id));
-              }}
-              placeholder="Не выбран"
-              options={chats}
-              renderOption={({
-                option: { avatar, description },
-                ...restProps
-              }) => (
-                <CustomSelectOption
-                  {...restProps}
-                  before={<Avatar size={24} src={avatar} />}
-                  description={description}
-                />
-              )}
-            />
-          </FormItem>
-          <FormItem>
-            <IconButton aria-label="Обновить" onClick={refetchChats}>
-              <Icon20RefreshOutline />
-            </IconButton>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <Select
+                value={chatId}
+                onChange={(e) => {
+                  const id = Number(e.target.value);
+                  dispatch(setCurrentChatId(id));
+                }}
+                placeholder="Не выбран"
+                options={chats}
+                renderOption={({
+                  option: { avatar, description },
+                  ...restProps
+                }) => (
+                  <CustomSelectOption
+                    {...restProps}
+                    before={<Avatar size={24} src={avatar} />}
+                    description={description}
+                  />
+                )}
+              />
+
+              <TextTooltip text="Обновить">
+                <IconButton
+                  aria-label="Обновить"
+                  onClick={refetchChats}
+                  style={{
+                    minWidth: '44px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--vkui--color_text_subhead)',
+                  }}
+                >
+                  <Icon20RefreshOutline />
+                </IconButton>
+              </TextTooltip>
+            </div>
           </FormItem>
         </FormLayoutGroup>
       </Group>

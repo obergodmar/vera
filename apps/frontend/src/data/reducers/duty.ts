@@ -35,10 +35,8 @@ export const duty = createSlice({
     },
 
     setDuties(state, { payload }: PayloadAction<IDuty.Duty[]>) {
-      if (!state.currentChatId || state.schedule[state.currentChatId]) {
-        throw Error(
-          'currentChatId не задан или для него отсутствует расписание'
-        );
+      if (!state.currentChatId) {
+        throw Error('currentChatId не задан');
       }
 
       state.schedule[state.currentChatId] = payload;
@@ -50,15 +48,17 @@ export const duty = createSlice({
         payload: { member, dayNumber },
       }: PayloadAction<{ member: Member; dayNumber: number }>
     ) {
-      if (!state.currentChatId || state.schedule[state.currentChatId]) {
-        throw Error(
-          'currentChatId не задан или для него отсутствует расписание'
-        );
+      if (!state.currentChatId) {
+        throw Error('currentChatId не задан');
+      }
+
+      if (!member) {
+        return;
       }
 
       const { peerId, firstName, lastName, avatar, screenName } = member;
 
-      state.schedule[state.currentChatId].push({
+      const shift = {
         peerId,
         firstName,
         lastName,
@@ -68,7 +68,13 @@ export const duty = createSlice({
         tag: '',
         timeTo: '00:01',
         timeFrom: '23:59',
-      });
+      };
+
+      if (state.schedule[state.currentChatId]) {
+        state.schedule[state.currentChatId].push(shift);
+      } else {
+        state.schedule[state.currentChatId] = [shift];
+      }
     },
 
     editShift(
@@ -77,7 +83,10 @@ export const duty = createSlice({
         payload: { shift, shiftNumber },
       }: PayloadAction<{ shift: Partial<IDuty.Duty>; shiftNumber: number }>
     ) {
-      if (!state.currentChatId || state.schedule[state.currentChatId]) {
+      if (
+        !state.currentChatId ||
+        !state.schedule[state.currentChatId]?.length
+      ) {
         throw Error(
           'currentChatId не задан или для него отсутствует расписание'
         );
@@ -94,6 +103,18 @@ export const duty = createSlice({
         shift
       );
     },
+
+    removeShift(state, { payload }: PayloadAction<number>) {
+      if (!state.currentChatId) {
+        throw Error('currentChatId не задан');
+      }
+
+      if (!state.schedule[state.currentChatId]?.length) {
+        return;
+      }
+
+      state.schedule[state.currentChatId].splice(payload, 1);
+    },
   },
 });
 
@@ -103,4 +124,5 @@ export const {
   setDuties,
   createShift,
   editShift,
+  removeShift,
 } = duty.actions;

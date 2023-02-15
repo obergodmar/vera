@@ -2,7 +2,6 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
 import { compare } from 'bcrypt';
 
-import { getConfig } from '../utils/getConfig';
 import { LoginDto } from './dto/login.dto';
 
 @Injectable()
@@ -44,11 +43,8 @@ export class LoginService {
       );
     }
 
-    const config = getConfig();
-
     return {
       token: 'REMOVED_AUTH_TOKEN',
-      config,
     };
   }
 }

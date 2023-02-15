@@ -47,6 +47,7 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       loginApi.middleware,
+      dutyApi.middleware,
       rtkQueryErrorLogger,
       middleware,
       ...(isDev ? devMiddlewares : [])
