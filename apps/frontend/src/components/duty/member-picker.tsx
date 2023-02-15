@@ -12,9 +12,10 @@ import { Member } from '../../data/services/duty-api';
 type Props = {
   duties: Member[];
   members: Member[];
+  onChange: (members: Member[]) => void;
 };
 
-export const MemberPicker: FC<Props> = ({ duties, members }) => {
+export const MemberPicker: FC<Props> = ({ duties, members, onChange }) => {
   return (
     <ChipsSelect
       style={{
@@ -22,6 +23,7 @@ export const MemberPicker: FC<Props> = ({ duties, members }) => {
       }}
       placeholder="Дежурный"
       value={duties}
+      onChange={onChange}
       options={members}
       showSelected={false}
       renderChip={(props) => {

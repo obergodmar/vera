@@ -1,7 +1,7 @@
 import { IDuty } from '@vera-reforged/common';
 import { Avatar, FormItem, Group, RichCell } from '@vkontakte/vkui';
 
-import { FC } from 'react';
+import { FC, useState } from 'react';
 
 import { Shift } from './shift';
 
@@ -11,7 +11,9 @@ type Props = {
 };
 
 export const Day: FC<Props> = ({ day, duties }) => {
-  const { name, nameWhen, shortName } = day;
+  const [shifts, setShifts] = useState();
+
+  const { name, nameWhen, shortName, dayNumber } = day;
 
   return (
     <Group>
@@ -31,7 +33,12 @@ export const Day: FC<Props> = ({ day, duties }) => {
         </RichCell>
 
         {duties.map((duty, idx) => (
-          <Shift key={duty.peerId} duty={duty} title={`Смена ${idx + 1}`} />
+          <Shift
+            key={duty.peerId}
+            duty={duty}
+            shiftNumber={idx}
+            dayNumber={dayNumber}
+          />
         ))}
       </FormItem>
     </Group>

@@ -1,6 +1,6 @@
 import { Button, ButtonGroup, Spacing, Spinner } from '@vkontakte/vkui';
 
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { setDuties } from '../../data/reducers/duty';
@@ -14,14 +14,14 @@ type Props = {
   peerId: number;
 };
 
-export const Days: FC<Props> = ({ peerId }) => {
+export const Days: FC<Props> = memo(({ peerId }) => {
   const open = useModal();
   const { isLoading, data: members } = useGetDutyMembersForChatQuery(peerId);
 
   const dispatch = useDispatch();
 
-  const dutiesFromConfig = useSelector(
-    (state: RootState) => state.config.duty.schedule[peerId]
+  const initialSchedule = useSelector(
+    (state: RootState) => state.duty.initialSchedule[peerId]
   );
   const days = useSelector((state: RootState) => state.duty.days);
   const duties = useSelector((state: RootState) => state.duty.schedule[peerId]);
@@ -51,7 +51,7 @@ export const Days: FC<Props> = ({ peerId }) => {
           <Button
             mode="secondary"
             appearance="negative"
-            onClick={() => dispatch(setDuties(dutiesFromConfig))}
+            onClick={() => dispatch(setDuties(initialSchedule))}
           >
             Сбросить
           </Button>
@@ -64,4 +64,4 @@ export const Days: FC<Props> = ({ peerId }) => {
       <Spacing />
     </>
   );
-};
+});
