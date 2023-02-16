@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { IConfig, ROUTES } from '@vera-reforged/common';
+import { IConfig, IDuty, ROUTES } from '@vera-reforged/common';
 import {
   MessagesGetConversationMembersResponse,
   MessagesGetConversationsByIdResponse,
@@ -93,6 +93,16 @@ export const dutyApi = createApi({
         });
       },
     }),
+    updateSchedule: builder.mutation<void, IDuty.Schedule>({
+      query(schedule) {
+        return extendFetchArgs({
+          body: {
+            schedule,
+          },
+          url: 'updateSchedule',
+        });
+      },
+    }),
   }),
 });
 
@@ -100,4 +110,5 @@ export const {
   useGetDutyChatsQuery,
   useGetDutyMembersForChatQuery,
   useGetDutyConfigQuery,
+  useUpdateScheduleMutation,
 } = dutyApi;

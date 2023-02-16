@@ -3,7 +3,7 @@ import { IDuty } from '@vera-reforged/common';
 
 type State = IDuty.IDuty & {
   currentChatId: number | undefined;
-  initialSchedule: IDuty.Schedule;
+  configSchedule: IDuty.Schedule;
 };
 
 const initialState: State = {
@@ -11,7 +11,7 @@ const initialState: State = {
   chats: [],
   days: [],
   schedule: {},
-  initialSchedule: {},
+  configSchedule: {},
 };
 
 export const duty = createSlice({
@@ -19,9 +19,11 @@ export const duty = createSlice({
   initialState,
   reducers: {
     setDutyFromConfig(state, { payload }: PayloadAction<IDuty.IDuty>) {
-      state = Object.assign(state, payload);
+      if (!Object.keys(state.schedule).length) {
+        state = Object.assign(state, payload);
+      }
 
-      state.initialSchedule = payload.schedule;
+      state.configSchedule = payload.schedule;
     },
 
     setCurrentChatId(state, { payload }: PayloadAction<number>) {
@@ -32,12 +34,8 @@ export const duty = createSlice({
       }
     },
 
-    setDuties(state, { payload }: PayloadAction<IDuty.Duty[]>) {
-      if (!state.currentChatId) {
-        throw Error('currentChatId не задан');
-      }
-
-      state.schedule[state.currentChatId] = payload;
+    resetSchedule(state) {
+      state.schedule = state.configSchedule;
     },
 
     createShift(
@@ -48,7 +46,11 @@ export const duty = createSlice({
         throw Error('currentChatId не задан');
       }
 
-      const length = state.schedule[state.currentChatId].length;
+      let length = state.schedule[state.currentChatId]?.length;
+      if (!length) {
+        state.schedule[state.currentChatId] = [];
+        length = 0;
+      }
 
       state.schedule[state.currentChatId].push({
         dayNumber,
@@ -123,7 +125,7 @@ export const duty = createSlice({
 export const {
   setDutyFromConfig,
   setCurrentChatId,
-  setDuties,
+  resetSchedule,
   createShift,
   editShift,
   removeShift,

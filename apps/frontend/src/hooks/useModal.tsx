@@ -5,7 +5,7 @@ type Open = (id: modalsIds) => void;
 const ModalContext = createContext<Open | undefined>(undefined);
 
 export const enum modalsIds {
-  dutyCheckout = 'dutyCheckout',
+  resetSchedule = 'resetSchedule',
 }
 
 type Props = PropsWithChildren<{

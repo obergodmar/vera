@@ -1,8 +1,9 @@
 import { IDuty } from '@vera-reforged/common';
 import { Icon12Delete, Icon16Hashtag } from '@vkontakte/icons';
 import { FormItem, IconButton, Input, Text } from '@vkontakte/vkui';
+import { TextTooltip } from '@vkontakte/vkui/dist/components/TextTooltip/TextTooltip';
 
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { editShift, removeShift } from '../../data/reducers/duty';
@@ -19,6 +20,7 @@ type Props = {
 };
 
 export const Shift: FC<Props> = ({ duty, shiftNumber, dayNumber }) => {
+  const [, rerender] = useState({});
   const members = useChatMembers();
   const dispatch = useDispatch();
 
@@ -49,35 +51,45 @@ export const Shift: FC<Props> = ({ duty, shiftNumber, dayNumber }) => {
           <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
             <Text>Смена {shiftNumber + 1}</Text>
             {shiftNumber > 0 && (
-              <IconButton
-                style={{
-                  maxHeight: '20px',
-                  width: '20px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-                onClick={() =>
-                  dispatch(removeShift({ shiftNumber, dayNumber }))
-                }
-              >
-                <Icon12Delete />
-              </IconButton>
+              <TextTooltip text="Удалить смену">
+                <IconButton
+                  style={{
+                    maxHeight: '20px',
+                    width: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  onClick={() =>
+                    dispatch(removeShift({ shiftNumber, dayNumber }))
+                  }
+                >
+                  <Icon12Delete />
+                </IconButton>
+              </TextTooltip>
             )}
           </div>
         }
-        style={{ padding: 0, flexGrow: 1 }}
+        style={{
+          flexGrow: 1,
+          paddingRight: 0,
+          paddingTop: 0,
+          paddingBottom: 0,
+        }}
       >
         <MemberPicker
           duties={duties}
           members={members}
           onChange={(values) => {
-            const [member] = values;
-            if (!member) {
-              return;
-            }
+            const [member, nextMember] = values;
 
-            const { peerId, firstName, lastName, avatar, screenName } = member;
+            const {
+              peerId = shiftNumber,
+              firstName = '',
+              lastName = '',
+              avatar = '',
+              screenName = '',
+            } = nextMember || member || {};
             handleEditShift({
               peerId,
               firstName,
@@ -85,6 +97,7 @@ export const Shift: FC<Props> = ({ duty, shiftNumber, dayNumber }) => {
               avatar,
               screenName,
             });
+            rerender({});
           }}
         />
       </FormItem>
@@ -106,11 +119,25 @@ export const Shift: FC<Props> = ({ duty, shiftNumber, dayNumber }) => {
         />
       </FormItem>
 
-      <FormItem top="Тег" style={{ padding: 0 }}>
+      <FormItem
+        top={
+          <Text
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+              maxHeight: '16px',
+            }}
+          >
+            <Icon16Hashtag />
+            Тег
+          </Text>
+        }
+        style={{ paddingLeft: 0, paddingTop: 0, paddingBottom: 0 }}
+      >
         <Input
           placeholder="Без тега"
-          style={{ width: '103px' }}
-          before={<Icon16Hashtag />}
+          style={{ width: '95px' }}
           value={tag}
           onChange={({ target: { value } }) => handleEditShift({ tag: value })}
         />

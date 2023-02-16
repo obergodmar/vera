@@ -1,5 +1,5 @@
 import { IDuty } from '@vera-reforged/common';
-import { Avatar, Button, Group, RichCell } from '@vkontakte/vkui';
+import { Avatar, Button, Div, Group, RichCell } from '@vkontakte/vkui';
 
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
@@ -20,7 +20,6 @@ export const Day: FC<Props> = ({ day, duties }) => {
   return (
     <Group>
       <RichCell
-        style={{ padding: '0' }}
         disabled
         subhead="Результат"
         name={name}
@@ -51,13 +50,16 @@ export const Day: FC<Props> = ({ day, duties }) => {
           />
         ))}
 
-        <Button
-          mode="outline"
-          appearance="neutral"
-          onClick={() => dispatch(createShift({ dayNumber }))}
-        >
-          Добавить смену
-        </Button>
+        <Div>
+          <Button
+            stretched
+            mode="outline"
+            appearance="neutral"
+            onClick={() => dispatch(createShift({ dayNumber }))}
+          >
+            Добавить смену
+          </Button>
+        </Div>
       </div>
     </Group>
   );

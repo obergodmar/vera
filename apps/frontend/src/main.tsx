@@ -2,6 +2,7 @@ import {
   AdaptivityProvider,
   AppRoot,
   ConfigProvider,
+  SizeType,
   WebviewType,
 } from '@vkontakte/vkui';
 
@@ -25,7 +26,7 @@ root.render(
     <Provider store={store}>
       <HelmetProvider>
         <ConfigProvider appearance="light" webviewType={WebviewType.INTERNAL}>
-          <AdaptivityProvider>
+          <AdaptivityProvider sizeY={SizeType.COMPACT}>
             <BrowserRouter>
               <AppRoot>
                 <App />

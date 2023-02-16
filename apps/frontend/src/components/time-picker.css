@@ -2,6 +2,7 @@
   display: inline-flex;
   position: relative;
   color: var(--vkui--color_text_primary);
+  max-height: 36px;
 
   font: var(--vkui--font_text--font_weight--regular)
     var(--vkui--font_text--font_size--regular) /
@@ -17,9 +18,13 @@
 
 .react-time-picker__wrapper {
   display: flex;
+  align-items: center;
+  justify-content: center;
   flex-grow: 1;
   flex-shrink: 0;
+  width: 61px;
   max-width: 61px;
+  height: 36px;
 
   border: var(--vkui_internal--thin_border) solid
     var(--vkui--color_field_border_alpha);
@@ -33,7 +38,7 @@
 
 .react-time-picker__inputGroup {
   flex-grow: 1;
-  padding: 5px;
+  padding: 0 5px;
   box-sizing: content-box;
 }
 
