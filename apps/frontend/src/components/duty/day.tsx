@@ -1,8 +1,10 @@
 import { IDuty } from '@vera-reforged/common';
-import { Avatar, Button, FormItem, Group, RichCell } from '@vkontakte/vkui';
+import { Avatar, Button, Group, RichCell } from '@vkontakte/vkui';
 
-import { FC, useState } from 'react';
+import { FC } from 'react';
+import { useDispatch } from 'react-redux';
 
+import { createShift } from '../../data/reducers/duty';
 import { Shift } from './shift';
 
 type Props = {
@@ -11,7 +13,7 @@ type Props = {
 };
 
 export const Day: FC<Props> = ({ day, duties }) => {
-  const [shifts, setShifts] = useState(duties.length || 1);
+  const dispatch = useDispatch();
 
   const { name, nameWhen, shortName, dayNumber } = day;
 
@@ -40,11 +42,11 @@ export const Day: FC<Props> = ({ day, duties }) => {
           gap: '5px',
         }}
       >
-        {[...Array(shifts).keys()].map((value, idx) => (
+        {duties.map((duty, idx) => (
           <Shift
-            key={value}
-            duty={duties[value]}
-            shiftNumber={value}
+            key={`${duty.peerId}-shift-${idx}`}
+            duty={duty}
+            shiftNumber={idx}
             dayNumber={dayNumber}
           />
         ))}
@@ -52,7 +54,7 @@ export const Day: FC<Props> = ({ day, duties }) => {
         <Button
           mode="outline"
           appearance="neutral"
-          onClick={() => setShifts((prev) => ++prev)}
+          onClick={() => dispatch(createShift({ dayNumber }))}
         >
           Добавить смену
         </Button>

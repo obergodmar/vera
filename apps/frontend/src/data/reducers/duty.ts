@@ -1,8 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IDuty } from '@vera-reforged/common';
 
-import { Member } from '../services/duty-api';
-
 type State = IDuty.IDuty & {
   currentChatId: number | undefined;
   initialSchedule: IDuty.Schedule;
@@ -44,44 +42,36 @@ export const duty = createSlice({
 
     createShift(
       state,
-      {
-        payload: { member, dayNumber },
-      }: PayloadAction<{ member: Member; dayNumber: number }>
+      { payload: { dayNumber } }: PayloadAction<{ dayNumber: number }>
     ) {
       if (!state.currentChatId) {
         throw Error('currentChatId не задан');
       }
 
-      if (!member) {
-        return;
-      }
+      const length = state.schedule[state.currentChatId].length;
 
-      const { peerId, firstName, lastName, avatar, screenName } = member;
-
-      const shift = {
-        peerId,
-        firstName,
-        lastName,
-        screenName,
-        avatar,
+      state.schedule[state.currentChatId].push({
         dayNumber,
         tag: '',
-        timeTo: '00:01',
-        timeFrom: '23:59',
-      };
-
-      if (state.schedule[state.currentChatId]) {
-        state.schedule[state.currentChatId].push(shift);
-      } else {
-        state.schedule[state.currentChatId] = [shift];
-      }
+        timeTo: '',
+        timeFrom: '',
+        peerId: length,
+        avatar: '',
+        firstName: '',
+        screenName: '',
+        lastName: '',
+      });
     },
 
     editShift(
       state,
       {
-        payload: { shift, shiftNumber },
-      }: PayloadAction<{ shift: Partial<IDuty.Duty>; shiftNumber: number }>
+        payload: { shift, shiftNumber, dayNumber },
+      }: PayloadAction<{
+        shift: Partial<IDuty.Duty>;
+        shiftNumber: number;
+        dayNumber: number;
+      }>
     ) {
       if (
         !state.currentChatId ||
@@ -92,28 +82,40 @@ export const duty = createSlice({
         );
       }
 
-      const currentShift = state.schedule[state.currentChatId][shiftNumber];
+      const currentSchedule = state.schedule[state.currentChatId];
+      const shiftIndex = findScheduleShiftIndex(
+        currentSchedule,
+        dayNumber,
+        shiftNumber
+      );
 
-      if (!currentShift) {
-        throw Error('Невозможно отредактировать несозданную смену');
-      }
-
-      state.schedule[state.currentChatId][shiftNumber] = Object.assign(
-        currentShift,
+      currentSchedule[shiftIndex] = Object.assign(
+        currentSchedule[shiftIndex],
         shift
       );
     },
 
-    removeShift(state, { payload }: PayloadAction<number>) {
+    removeShift(
+      state,
+      {
+        payload: { shiftNumber, dayNumber },
+      }: PayloadAction<{
+        dayNumber: number;
+        shiftNumber: number;
+      }>
+    ) {
       if (!state.currentChatId) {
         throw Error('currentChatId не задан');
       }
 
-      if (!state.schedule[state.currentChatId]?.length) {
-        return;
-      }
+      const currentSchedule = state.schedule[state.currentChatId];
+      const shiftIndex = findScheduleShiftIndex(
+        currentSchedule,
+        dayNumber,
+        shiftNumber
+      );
 
-      state.schedule[state.currentChatId].splice(payload, 1);
+      currentSchedule.splice(shiftIndex, 1);
     },
   },
 });
@@ -126,3 +128,25 @@ export const {
   editShift,
   removeShift,
 } = duty.actions;
+
+function findScheduleShiftIndex(
+  schedule: IDuty.Duty[],
+  dayNumber: number,
+  shiftNumber: number
+): number {
+  const shiftsIndexes = schedule.reduce((acc: number[], duty, index) => {
+    if (duty.dayNumber === dayNumber) {
+      acc.push(index);
+    }
+
+    return acc;
+  }, []);
+
+  const shiftIndex = shiftsIndexes[shiftNumber];
+
+  if (shiftIndex === undefined) {
+    throw Error('Индекс смены не найден');
+  }
+
+  return shiftIndex;
+}

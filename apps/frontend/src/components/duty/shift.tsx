@@ -2,10 +2,10 @@ import { IDuty } from '@vera-reforged/common';
 import { Icon12Delete, Icon16Hashtag } from '@vkontakte/icons';
 import { FormItem, IconButton, Input, Text } from '@vkontakte/vkui';
 
-import { FC, useCallback } from 'react';
+import { FC } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { createShift, editShift, removeShift } from '../../data/reducers/duty';
+import { editShift, removeShift } from '../../data/reducers/duty';
 import { Member } from '../../data/services/duty-api';
 import { useChatMembers } from '../../hooks/useChatMembers';
 import { truthy } from '../../utils/truthy';
@@ -13,7 +13,7 @@ import { TimePicker } from '../time-picker';
 import { MemberPicker } from './member-picker';
 
 type Props = {
-  duty?: IDuty.Duty;
+  duty: IDuty.Duty;
   shiftNumber: number;
   dayNumber: number;
 };
@@ -23,29 +23,19 @@ export const Shift: FC<Props> = ({ duty, shiftNumber, dayNumber }) => {
   const dispatch = useDispatch();
 
   const duties: Member[] = [
-    duty && {
+    duty.firstName !== '' && {
       value: duty.peerId,
       label: `${duty.firstName} ${duty.lastName}`,
       ...duty,
     },
   ].filter(truthy);
 
-  const { timeTo, timeFrom, tag } = duty || {
-    timeTo: '',
-    timeFrom: '',
-    tag: '',
-  };
-
-  const handleCreateShift = useCallback(
-    (members: Member[]) => {
-      dispatch(createShift({ member: members[0], dayNumber }));
-    },
-    [dayNumber, dispatch]
-  );
+  const { timeTo, timeFrom, tag } = duty;
 
   const handleEditShift = (values: Partial<IDuty.Duty>) => {
-    dispatch(editShift({ shiftNumber, shift: values }));
+    dispatch(editShift({ shiftNumber, shift: values, dayNumber }));
   };
+
   return (
     <div
       style={{
@@ -67,7 +57,9 @@ export const Shift: FC<Props> = ({ duty, shiftNumber, dayNumber }) => {
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
-                onClick={() => dispatch(removeShift(shiftNumber))}
+                onClick={() =>
+                  dispatch(removeShift({ shiftNumber, dayNumber }))
+                }
               >
                 <Icon12Delete />
               </IconButton>
@@ -79,7 +71,21 @@ export const Shift: FC<Props> = ({ duty, shiftNumber, dayNumber }) => {
         <MemberPicker
           duties={duties}
           members={members}
-          onChange={handleCreateShift}
+          onChange={(values) => {
+            const [member] = values;
+            if (!member) {
+              return;
+            }
+
+            const { peerId, firstName, lastName, avatar, screenName } = member;
+            handleEditShift({
+              peerId,
+              firstName,
+              lastName,
+              avatar,
+              screenName,
+            });
+          }}
         />
       </FormItem>
       <FormItem top="Начало" style={{ padding: 0 }}>
