@@ -1,4 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { Draft } from '@reduxjs/toolkit';
+import { IConfig, IDuty } from '@vera-reforged/common';
+
+import produce from 'immer';
+import {
+  MessagesGetConversationMembersResponse,
+  MessagesGetConversationsByIdResponse,
+} from 'vk-io/lib/api/schemas/responses';
 
 import { ConfigService } from '../config/config.service';
 import { VkApiService } from '../vk-api/vk-api.service';
@@ -79,20 +87,64 @@ export class DutyService {
     });
   }
 
-  public getChats() {
+  public async getChats() {
     const { chats } = this.getConfig();
 
     return this.api.getConversationsById(chats);
   }
 
-  public getMembersForChat(chatId: number) {
+  public async getMembersForChat(chatId: number) {
     return this.api.getConversationMembers(chatId);
   }
 
-  public getConfig() {
+  public getDays() {
+    const { days } = this.getConfig();
+
+    return days;
+  }
+
+  public getSchedule() {
+    const { schedule } = this.getConfig();
+
+    return schedule;
+  }
+
+  public getScheduleForChat(chatId: number) {
+    const { schedule } = this.getConfig();
+
+    return schedule.find((duties) => duties.chatId === chatId) || null;
+  }
+
+  public addChat(chatId: number) {
+    if (typeof chatId !== 'number' || Number.isNaN(chatId)) {
+      return;
+    }
+
+    this.updateConfig(({ chats }) => chats.push(chatId));
+  }
+
+  public updateSchedule(duty: IDuty.Schedule[]) {
+    const status = this.updateConfig(({ schedule }) => schedule.push(duty));
+
+    if (typeof status === 'string') {
+      return {
+        error: status,
+      };
+    }
+
+    return {
+      success: true,
+    };
+  }
+
+  private getConfig() {
     const { duty } = this.config.getConfig();
 
     return duty;
+  }
+
+  private updateConfig(recipe: (duty: Draft<IDuty.IDuty>) => void) {
+    return this.config.updateConfig(({ duty }) => recipe(duty));
   }
 }
 

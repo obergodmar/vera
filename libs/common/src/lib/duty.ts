@@ -1,20 +1,16 @@
-import { plainToClass, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 import {
   IsNumber,
-  isObject,
   IsOptional,
   IsString,
-  registerDecorator,
   ValidateNested,
-  validateSync,
-  ValidationOptions,
 } from 'class-validator';
 
 export namespace IDuty {
   export interface IDuty {
     chats: number[];
     days: Day[];
-    schedule: Schedule;
+    schedule: Schedule[];
   }
 
   export type Day = {
@@ -24,11 +20,8 @@ export namespace IDuty {
     dayNumber: number;
   };
 
-  /**
-   * By ChatId
-   */
-  export type Schedule = Record<number, Duty[]>;
-  export type Duty = {
+  export type Schedule = {
+    chatId: number;
     peerId: number;
     firstName: string;
     lastName: string;
@@ -50,9 +43,9 @@ export class DutyConfigModel implements IDuty.IDuty {
   @Type(() => DayModel)
   days!: DayModel[];
 
-  @ValidateNested()
-  @IsDuty()
-  schedule!: IDuty.Schedule;
+  @ValidateNested({ each: true })
+  @Type(() => ScheduleModel)
+  schedule!: IDuty.Schedule[];
 }
 
 class DayModel implements IDuty.Day {
@@ -69,7 +62,10 @@ class DayModel implements IDuty.Day {
   dayNumber!: number;
 }
 
-class DutyModel implements IDuty.Duty {
+class ScheduleModel implements IDuty.Schedule {
+  @IsNumber()
+  chatId!: number;
+
   @IsNumber()
   peerId!: number;
 
@@ -98,53 +94,4 @@ class DutyModel implements IDuty.Duty {
   @IsOptional()
   @IsString()
   tag?: string;
-}
-
-function IsDuty(validationOptions?: ValidationOptions) {
-  return function (object: object, propertyName: string) {
-    registerDecorator({
-      name: 'IsDuty',
-      target: object.constructor,
-      propertyName: propertyName,
-      constraints: [],
-      options: {
-        message: 'Wrong object format',
-        ...validationOptions,
-      },
-      validator: {
-        validate(obj: object) {
-          if (!isObject(obj)) {
-            return false;
-          }
-
-          if (Object.keys(obj).length === 0) {
-            return true;
-          }
-
-          const values = Object.values(obj);
-          return values.every((value) => {
-            if (!isObject(value)) {
-              return false;
-            }
-
-            const validatedDuty = plainToClass(DutyModel, value, {
-              enableImplicitConversion: true,
-            });
-
-            const errors = validateSync(validatedDuty, {
-              skipMissingProperties: false,
-            });
-
-            if (errors.length > 0) {
-              console.error(errors.toString());
-
-              return false;
-            }
-
-            return true;
-          });
-        },
-      },
-    });
-  };
 }

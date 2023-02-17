@@ -1,5 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 
+import {
+  MessagesGetConversationMembersResponse,
+  MessagesGetConversationsByIdResponse,
+} from 'vk-io/lib/api/schemas/responses';
+
 import { BotService } from '../bot/bot.service';
 
 @Injectable()
@@ -10,13 +15,17 @@ export class VkApiService {
     @Inject(BotService) public readonly botService: BotService
   ) {}
 
-  public async getConversationsById(peerIds: number[]) {
+  public async getConversationsById(
+    peerIds: number[]
+  ): Promise<MessagesGetConversationsByIdResponse> {
     return this.fetch('messages.getConversationsById', {
       peer_ids: peerIds.join(','),
     });
   }
 
-  public async getConversationMembers(chatId: number) {
+  public async getConversationMembers(
+    chatId: number
+  ): Promise<MessagesGetConversationMembersResponse> {
     return this.fetch('messages.getConversationMembers', {
       peer_id: chatId,
     });

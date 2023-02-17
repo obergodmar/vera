@@ -58,7 +58,10 @@ export const Panel: FC = () => {
           mode="horizontal"
           style={{ display: 'flex', gap: '10px' }}
         >
-          <FormItem top="Чат">
+          <FormItem
+            top="Чат"
+            bottom="Чтобы чат появился в списке, достаточно один раз написать duty в чат, где Вера установлена администратором"
+          >
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
               <Select
                 value={chatId}

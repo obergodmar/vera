@@ -1,11 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { Draft } from '@reduxjs/toolkit';
 import { ConfigModel, IConfig } from '@vera-reforged/common';
 
 import { plainToClass } from 'class-transformer';
 import { validateSync } from 'class-validator';
-import { readFileSync } from 'node:fs';
+import produce from 'immer';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 
+import { LoggerService } from '../logger/logger.service';
 import { initialConfig } from './initial-config';
 
 const filePath = `${homedir()}/vera.json`;
@@ -13,23 +16,43 @@ const filePath = `${homedir()}/vera.json`;
 @Injectable()
 export class ConfigService {
   private config: IConfig.IConfig;
-  constructor() {
+  constructor(@Inject(LoggerService) private readonly logger: LoggerService) {
     try {
-      const fileContent = readFileSync(filePath, 'utf-8');
-
-      this.config = validateConfig(JSON.parse(fileContent));
+      this.config = readConfig();
     } catch (e) {
-      console.error(`${filePath} doesn't exist or is invalid`);
+      logger.log(`ConfigService: ${filePath} doesn't exist or is invalid`, {
+        type: 'error',
+      });
 
       this.config = initialConfig;
     }
   }
 
   public getConfig() {
+    return this.config;
+  }
+
+  public updateConfig(recipe: (config: Draft<IConfig.IConfig>) => void) {
+    const newConfig = produce(this.config, recipe);
+
+    this.writeConfig(newConfig);
+  }
+
+  private writeConfig(newConfig: IConfig.IConfig): true | string {
     try {
-      return readConfig();
+      writeConfig(newConfig);
+
+      this.logger.log('ConfigService: config file was updated');
+
+      this.config = newConfig;
+
+      return true;
     } catch (e) {
-      return initialConfig;
+      const errorText = JSON.stringify(e);
+
+      this.logger.log(`ConfigService: ${errorText}`, { type: 'error' });
+
+      return errorText;
     }
   }
 }
@@ -37,7 +60,13 @@ export class ConfigService {
 function readConfig() {
   const fileContent = readFileSync(filePath, 'utf-8');
 
-  return JSON.parse(fileContent) as IConfig.IConfig;
+  return validateConfig(JSON.parse(fileContent));
+}
+
+function writeConfig(config: IConfig.IConfig) {
+  const validatedConfig = validateConfig(config);
+
+  writeFileSync(filePath, JSON.stringify(validatedConfig));
 }
 
 export function validateConfig(config: object): IConfig.IConfig {

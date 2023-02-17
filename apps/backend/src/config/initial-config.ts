@@ -35,6 +35,6 @@ export const initialConfig: IConfig.IConfig = {
         dayNumber: 5,
       },
     ],
-    schedule: {},
+    schedule: [],
   },
 };
