@@ -1,41 +1,47 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IDuty } from '@vera-reforged/common';
 
-type State = IDuty.IDuty & {
+type State = {
   currentChatId: number | undefined;
-  configSchedule: IDuty.Schedule;
+  currentSchedule: IDuty.Schedule[];
+  days: IDuty.Day[];
+  schedule: Record<number, IDuty.Schedule[]>;
 };
 
 const initialState: State = {
   currentChatId: undefined,
-  chats: [],
+  currentSchedule: [],
   days: [],
   schedule: {},
-  configSchedule: {},
 };
 
 export const duty = createSlice({
   name: 'duty',
   initialState,
   reducers: {
-    setDutyFromConfig(state, { payload }: PayloadAction<IDuty.IDuty>) {
-      if (!Object.keys(state.schedule).length) {
-        state = Object.assign(state, payload);
-      }
-
-      state.configSchedule = payload.schedule;
+    setDutyDays(state, { payload }: PayloadAction<IDuty.Day[]>) {
+      state.days = payload;
     },
 
     setCurrentChatId(state, { payload }: PayloadAction<number>) {
       state.currentChatId = payload;
+    },
 
-      if (typeof state.schedule[payload] === 'undefined') {
-        state.schedule[payload] = [];
+    setCurrentSchedule(state, { payload }: PayloadAction<IDuty.Schedule[]>) {
+      if (!state.currentChatId) {
+        throw Error('currentChatId не задан');
       }
+
+      state.currentSchedule = payload;
+      state.schedule[state.currentChatId] = payload;
     },
 
     resetSchedule(state) {
-      state.schedule = state.configSchedule;
+      if (!state.currentChatId) {
+        throw Error('currentChatId не задан');
+      }
+
+      state.schedule[state.currentChatId] = state.currentSchedule;
     },
 
     createShift(
@@ -53,10 +59,11 @@ export const duty = createSlice({
       }
 
       state.schedule[state.currentChatId].push({
+        chatId: state.currentChatId,
         dayNumber,
         tag: '',
-        timeTo: '',
-        timeFrom: '',
+        timeTo: '23:59',
+        timeFrom: '00:00',
         peerId: length,
         avatar: '',
         firstName: '',
@@ -70,7 +77,7 @@ export const duty = createSlice({
       {
         payload: { shift, shiftNumber, dayNumber },
       }: PayloadAction<{
-        shift: Partial<IDuty.Duty>;
+        shift: Partial<IDuty.Schedule>;
         shiftNumber: number;
         dayNumber: number;
       }>
@@ -123,8 +130,9 @@ export const duty = createSlice({
 });
 
 export const {
-  setDutyFromConfig,
+  setDutyDays,
   setCurrentChatId,
+  setCurrentSchedule,
   resetSchedule,
   createShift,
   editShift,
@@ -132,7 +140,7 @@ export const {
 } = duty.actions;
 
 function findScheduleShiftIndex(
-  schedule: IDuty.Duty[],
+  schedule: IDuty.Schedule[],
   dayNumber: number,
   shiftNumber: number
 ): number {

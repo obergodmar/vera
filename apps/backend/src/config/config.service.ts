@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Draft } from '@reduxjs/toolkit';
 import { ConfigModel, IConfig } from '@vera-reforged/common';
 
-import { plainToClass } from 'class-transformer';
+import { classToPlain, plainToClass } from 'class-transformer';
 import { validateSync } from 'class-validator';
 import produce from 'immer';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -19,10 +19,14 @@ export class ConfigService {
   constructor(@Inject(LoggerService) private readonly logger: LoggerService) {
     try {
       this.config = readConfig();
+      logger.log(`ConfigService: ${filePath} was loaded successfully`);
     } catch (e) {
-      logger.log(`ConfigService: ${filePath} doesn't exist or is invalid`, {
-        type: 'error',
-      });
+      logger.log(
+        `ConfigService: ${filePath} doesn't exist or is invalid: ${e}`,
+        {
+          type: 'error',
+        }
+      );
 
       this.config = initialConfig;
     }
@@ -35,7 +39,7 @@ export class ConfigService {
   public updateConfig(recipe: (config: Draft<IConfig.IConfig>) => void) {
     const newConfig = produce(this.config, recipe);
 
-    this.writeConfig(newConfig);
+    return this.writeConfig(newConfig);
   }
 
   private writeConfig(newConfig: IConfig.IConfig): true | string {
@@ -82,5 +86,5 @@ export function validateConfig(config: object): IConfig.IConfig {
     throw new Error(errors.toString());
   }
 
-  return validatedConfig;
+  return config as IConfig.IConfig;
 }

@@ -1,9 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { IConfig, IDuty, ROUTES } from '@vera-reforged/common';
-import {
-  MessagesGetConversationMembersResponse,
-  MessagesGetConversationsByIdResponse,
-} from '@vkontakte/api-schema-typescript';
+import { IApi, ROUTES } from '@vera-reforged/common';
 import { CustomSelectOptionInterface } from '@vkontakte/vkui';
 import { ChipOption } from '@vkontakte/vkui/dist/components/Chip/Chip';
 
@@ -20,45 +16,52 @@ export type Member = ChipOption & {
 export const dutyApi = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: ROUTES.duty.baseUrl }),
   reducerPath: 'dutyApi',
+  tagTypes: ['Schedule'],
   endpoints: (builder) => ({
     getDutyChats: builder.query<CustomSelectOptionInterface[], void>({
       query() {
-        return extendFetchArgs({
+        return extendFetchArgs<IApi.IDutyApi.GetChatsRequest>({
           url: 'getChats',
+          body: {},
         });
       },
-      transformResponse(data: MessagesGetConversationsByIdResponse) {
-        return data.items
-          .filter(({ peer: { type } }) => type === 'chat')
-          .reduce((acc: CustomSelectOptionInterface[], item) => {
-            const {
-              chat_settings,
-              peer: { id },
-            } = item;
+      transformResponse(data: IApi.IDutyApi.GetChatsResponse) {
+        return (
+          data.items
+            ?.filter(({ peer: { type } }) => type === 'chat')
+            .reduce((acc: CustomSelectOptionInterface[], item) => {
+              const {
+                chat_settings,
+                peer: { id },
+              } = item;
 
-            if (!chat_settings) {
+              if (!chat_settings) {
+                return acc;
+              }
+              const { title, photo } = chat_settings;
+
+              acc.push({
+                label: title,
+                value: id,
+                avatar: photo?.photo_100,
+                description: id,
+              });
+
               return acc;
-            }
-            const { title, photo } = chat_settings;
-
-            acc.push({
-              label: title,
-              value: id,
-              avatar: photo?.photo_100,
-              description: id,
-            });
-
-            return acc;
-          }, []);
+            }, []) || []
+        );
       },
     }),
     getDutyMembersForChat: builder.query<Member[], number>({
       query(peerId) {
-        return extendFetchArgs({
-          url: `getMembersForChat/${peerId}`,
+        return extendFetchArgs<IApi.IDutyApi.GetMembersForChatRequest>({
+          url: `getMembersForChat`,
+          body: {
+            chatId: peerId,
+          },
         });
       },
-      transformResponse(data: MessagesGetConversationMembersResponse) {
+      transformResponse(data: IApi.IDutyApi.GetMembersForChatResponse) {
         const { profiles } = data;
 
         if (!profiles) {
@@ -86,22 +89,56 @@ export const dutyApi = createApi({
           .sort((a, b) => a.label.localeCompare(b.label));
       },
     }),
-    getDutyConfig: builder.query<IConfig.IConfig['duty'], void>({
+    getDutyDays: builder.query<IApi.IDutyApi.GetDaysResponse, void>({
       query() {
-        return extendFetchArgs({
-          url: 'getConfig',
+        return extendFetchArgs<IApi.IDutyApi.GetDaysRequest>({
+          url: 'getDays',
+          body: {},
         });
       },
     }),
-    updateSchedule: builder.mutation<void, IDuty.Schedule>({
-      query(schedule) {
-        return extendFetchArgs({
+    getDutyScheduleForChat: builder.query<
+      IApi.IDutyApi.GetScheduleForChatResponse,
+      number
+    >({
+      query(chatId) {
+        return extendFetchArgs<IApi.IDutyApi.GetScheduleForChatRequest>({
+          url: 'getScheduleForChat',
           body: {
-            schedule,
+            chatId,
           },
-          url: 'updateSchedule',
         });
       },
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(({ firstName, lastName }, idx) => ({
+                type: 'Schedule' as const,
+                id: `${firstName}-${lastName}-${idx}`,
+              })),
+              'Schedule',
+            ]
+          : ['Schedule'],
+    }),
+    getDutySchedule: builder.query<IApi.IDutyApi.GetScheduleResponse, void>({
+      query() {
+        return extendFetchArgs<IApi.IDutyApi.GetScheduleRequest>({
+          url: 'getSchedule',
+          body: {},
+        });
+      },
+    }),
+    updateChatSchedule: builder.mutation<
+      IApi.IDutyApi.UpdateChatScheduleResponse,
+      Omit<IApi.IDutyApi.UpdateChatScheduleRequest, 'token'>
+    >({
+      query(body) {
+        return extendFetchArgs<IApi.IDutyApi.UpdateChatScheduleRequest>({
+          body,
+          url: 'updateChatSchedule',
+        });
+      },
+      invalidatesTags: ['Schedule'],
     }),
   }),
 });
@@ -109,6 +146,7 @@ export const dutyApi = createApi({
 export const {
   useGetDutyChatsQuery,
   useGetDutyMembersForChatQuery,
-  useGetDutyConfigQuery,
-  useUpdateScheduleMutation,
+  useGetDutyDaysQuery,
+  useUpdateChatScheduleMutation,
+  useGetDutyScheduleForChatQuery,
 } = dutyApi;

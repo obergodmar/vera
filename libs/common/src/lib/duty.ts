@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import {
+  IsArray,
   IsNumber,
   IsOptional,
   IsString,
@@ -35,8 +36,7 @@ export namespace IDuty {
 }
 
 export class DutyConfigModel implements IDuty.IDuty {
-  @ValidateNested({ each: true })
-  @IsNumber()
+  @IsArray()
   chats!: number[];
 
   @ValidateNested({ each: true })
@@ -48,7 +48,7 @@ export class DutyConfigModel implements IDuty.IDuty {
   schedule!: IDuty.Schedule[];
 }
 
-class DayModel implements IDuty.Day {
+export class DayModel implements IDuty.Day {
   @IsString()
   shortName!: string;
 
@@ -62,7 +62,7 @@ class DayModel implements IDuty.Day {
   dayNumber!: number;
 }
 
-class ScheduleModel implements IDuty.Schedule {
+export class ScheduleModel implements IDuty.Schedule {
   @IsNumber()
   chatId!: number;
 

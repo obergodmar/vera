@@ -1,6 +1,11 @@
-import { Body, Controller, Inject, Param, Post } from '@nestjs/common';
-import { IApi, IDuty, ROUTES } from '@vera-reforged/common';
+import { Body, Controller, Inject, Post } from '@nestjs/common';
+import { IApi, ROUTES } from '@vera-reforged/common';
 
+import {
+  GetMembersFotChatDto,
+  GetScheduleForChatDto,
+  UpdateChatScheduleDto,
+} from './duty.dto';
 import { DutyService } from './duty.service';
 
 @Controller(ROUTES.duty.prefix)
@@ -10,38 +15,38 @@ export class DutyController {
   ) {}
 
   @Post('getChats')
-  public getChats(): Promise<IApi.IDutyApi['getChats']['response']> {
+  public getChats(): Promise<IApi.IDutyApi.GetChatsResponse> {
     return this.dutyService.getChats();
   }
 
-  @Post('getMembersForChat/:chatId')
+  @Post('getMembersForChat')
   public async getMembersForChat(
-    @Param('chatId') chatId: number
-  ): Promise<IApi.IDutyApi['getMembersForChat']['response']> {
-    return this.dutyService.getMembersForChat(chatId);
+    @Body() data: GetMembersFotChatDto
+  ): Promise<IApi.IDutyApi.GetMembersForChatResponse> {
+    return this.dutyService.getMembersForChat(data.chatId);
   }
 
   @Post('getDays')
-  public getDays(): IApi.IDutyApi['getDays']['response'] {
+  public getDays(): IApi.IDutyApi.GetDaysResponse {
     return this.dutyService.getDays();
   }
 
   @Post('getSchedule')
-  public getSchedule(): IApi.IDutyApi['getSchedule']['response'] {
+  public getSchedule(): IApi.IDutyApi.GetScheduleResponse {
     return this.dutyService.getSchedule();
   }
 
-  @Post('getScheduleForChat/:chatId')
+  @Post('getScheduleForChat')
   public getScheduleForChat(
-    @Param('chatId') chatId: number
-  ): IApi.IDutyApi['getScheduleForChat']['response'] {
-    return this.dutyService.getScheduleForChat(chatId);
+    @Body() data: GetScheduleForChatDto
+  ): IApi.IDutyApi.GetScheduleForChatResponse {
+    return this.dutyService.getScheduleForChat(data.chatId);
   }
 
-  @Post('updateSchedule')
-  public addDuty(
-    @Body('schedule') schedule: IDuty.Schedule[]
-  ): IApi.IDutyApi['updateSchedule']['response'] {
-    return this.dutyService.updateSchedule(schedule);
+  @Post('updateChatSchedule')
+  public updateChatSchedule(
+    @Body() data: UpdateChatScheduleDto
+  ): IApi.IDutyApi.UpdateChatScheduleResponse {
+    return this.dutyService.updateChatSchedule(data.chatId, data.schedule);
   }
 }

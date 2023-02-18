@@ -13,15 +13,20 @@ import { authorization, logOff } from './reducers/authorization';
 import { duty } from './reducers/duty';
 import { dutyApi } from './services/duty-api';
 import { loginApi } from './services/login-api';
+import { createSnackbar } from './snackbar-store';
 
 const { MODE } = import.meta.env;
 const isDev = MODE !== 'production';
+
+const snackbar = createSnackbar();
 
 const rtkQueryErrorLogger: ThunkMiddleware = () => (dispatch) => (action) => {
   if (isRejectedWithValue(action)) {
     if (action?.payload?.originalStatus === 401) {
       dispatch(logOff());
     }
+
+    snackbar({ message: action?.error?.data?.error || 'Произошла ошибка' });
   }
 
   return dispatch(action);

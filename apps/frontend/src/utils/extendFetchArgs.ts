@@ -1,20 +1,26 @@
 import { ResponseHandler } from '@reduxjs/toolkit/dist/query/fetchBaseQuery';
+import { IApi } from '@vera-reforged/common';
 
 import { getToken } from './getToken';
 
-type ExtendFetchArgs = {
+type ExtendFetchArgs<Request extends IApi.IDutyApi.Requests> = {
   url: string;
-  body?: any;
+  body: Omit<Request, 'token'>;
   responseHandler?: ResponseHandler;
 };
 
-export function extendFetchArgs({
-  body: extendedBody = {},
+export function extendFetchArgs<Request extends IApi.IDutyApi.Requests>({
+  body: extendedBody,
   ...rest
-}: ExtendFetchArgs) {
-  const body = {
-    token: getToken(),
+}: ExtendFetchArgs<Request>) {
+  let token = getToken();
+  if (!token) {
+    token = '';
+  }
+
+  const body: IApi.IDutyApi.Requests = {
     ...extendedBody,
+    token,
   };
 
   return {
@@ -23,6 +29,6 @@ export function extendFetchArgs({
     headers: {
       'Content-Type': 'application/json',
     },
-    body,
+    body: body as any,
   };
 }

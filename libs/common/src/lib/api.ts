@@ -6,42 +6,49 @@ import {
 import { IDuty } from './duty';
 
 export namespace IApi {
-  export interface IDutyApi {
-    getChats: {
-      request: void;
-      response: MessagesGetConversationsByIdResponse;
-    };
+  export type TokenRequest<T = Record<string, any>> = {
+    token: string;
+  } & T;
 
-    getMembersForChat: {
-      request: number /** Param chatId */;
-      response: MessagesGetConversationMembersResponse;
-    };
+  export type WithChatId<T = Record<string, any>> = {
+    chatId: number;
+  } & T;
 
-    getDays: {
-      request: void;
-      response: IDuty.Day[];
-    };
-
-    getScheduleForChat: {
-      request: number /** Param chatId */;
-      response: IDuty.Schedule | null;
-    };
-
-    getSchedule: {
-      request: void;
-      response: IDuty.Schedule[];
-    };
-
-    updateSchedule: {
-      request: {
-        schedule: IDuty.Schedule[];
-      };
-      response: IStatusResponse;
-    };
-  }
-
-  export interface IStatusResponse {
+  export type StatusResponse = {
     success?: boolean;
     error?: string;
+  };
+
+  export namespace IDutyApi {
+    export type Requests =
+      | GetChatsRequest
+      | GetMembersForChatRequest
+      | GetDaysRequest
+      | GetScheduleForChatRequest
+      | GetScheduleRequest
+      | UpdateChatScheduleRequest;
+
+    export type GetChatsRequest = TokenRequest;
+    export type GetChatsResponse = MessagesGetConversationsByIdResponse;
+
+    export type GetMembersForChatRequest = TokenRequest<WithChatId>;
+    export type GetMembersForChatResponse =
+      MessagesGetConversationMembersResponse;
+
+    export type GetDaysRequest = TokenRequest;
+    export type GetDaysResponse = IDuty.Day[];
+
+    export type GetScheduleForChatRequest = TokenRequest<WithChatId>;
+    export type GetScheduleForChatResponse = IDuty.Schedule[] | null;
+
+    export type GetScheduleRequest = TokenRequest;
+    export type GetScheduleResponse = IDuty.Schedule[];
+
+    export type UpdateChatScheduleRequest = TokenRequest<
+      WithChatId<{
+        schedule: IDuty.Schedule[];
+      }>
+    >;
+    export type UpdateChatScheduleResponse = StatusResponse;
   }
 }

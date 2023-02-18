@@ -14,7 +14,7 @@ import { TimePicker } from '../time-picker';
 import { MemberPicker } from './member-picker';
 
 type Props = {
-  duty: IDuty.Duty;
+  duty: IDuty.Schedule;
   shiftNumber: number;
   dayNumber: number;
 };
@@ -34,7 +34,7 @@ export const Shift: FC<Props> = ({ duty, shiftNumber, dayNumber }) => {
 
   const { timeTo, timeFrom, tag } = duty;
 
-  const handleEditShift = (values: Partial<IDuty.Duty>) => {
+  const handleEditShift = (values: Partial<IDuty.Schedule>) => {
     dispatch(editShift({ shiftNumber, shift: values, dayNumber }));
   };
 
@@ -50,24 +50,22 @@ export const Shift: FC<Props> = ({ duty, shiftNumber, dayNumber }) => {
         top={
           <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
             <Text>Смена {shiftNumber + 1}</Text>
-            {shiftNumber > 0 && (
-              <TextTooltip text="Удалить смену">
-                <IconButton
-                  style={{
-                    maxHeight: '20px',
-                    width: '20px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                  onClick={() =>
-                    dispatch(removeShift({ shiftNumber, dayNumber }))
-                  }
-                >
-                  <Icon12Delete />
-                </IconButton>
-              </TextTooltip>
-            )}
+            <TextTooltip text="Удалить смену">
+              <IconButton
+                style={{
+                  maxHeight: '20px',
+                  width: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                onClick={() =>
+                  dispatch(removeShift({ shiftNumber, dayNumber }))
+                }
+              >
+                <Icon12Delete />
+              </IconButton>
+            </TextTooltip>
           </div>
         }
         style={{

@@ -15,10 +15,10 @@ import { TextTooltip } from '@vkontakte/vkui/dist/components/TextTooltip/TextToo
 import { FC, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { setCurrentChatId, setDutyFromConfig } from '../../data/reducers/duty';
+import { setCurrentChatId, setDutyDays } from '../../data/reducers/duty';
 import {
   useGetDutyChatsQuery,
-  useGetDutyConfigQuery,
+  useGetDutyDaysQuery,
 } from '../../data/services/duty-api';
 import { RootState } from '../../data/store';
 import { Days } from './days';
@@ -26,26 +26,23 @@ import { Days } from './days';
 export const Panel: FC = () => {
   const dispatch = useDispatch();
 
-  const {
-    isLoading: isConfigLoading,
-    data: configResponse,
-    // refetch: refetchConfig,
-  } = useGetDutyConfigQuery();
+  const { isLoading: isDaysLoading, data: days } = useGetDutyDaysQuery();
 
   useEffect(() => {
-    if (configResponse) {
-      dispatch(setDutyFromConfig(configResponse));
+    if (days) {
+      dispatch(setDutyDays(days));
     }
-  }, [configResponse, dispatch]);
+  }, [days, dispatch]);
 
   const {
     isLoading: isChatsLoading,
-    data: chats,
+    data: chats = [],
     refetch: refetchChats,
   } = useGetDutyChatsQuery();
+
   const chatId = useSelector((state: RootState) => state.duty.currentChatId);
 
-  if (isConfigLoading || !configResponse || isChatsLoading || !chats) {
+  if (isDaysLoading || isChatsLoading) {
     return <PanelSpinner />;
   }
 
