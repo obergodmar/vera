@@ -49,7 +49,7 @@ export const Content: FC = () => {
         onClose={closeModal}
         icon={<Icon56DeleteOutline />}
         header="Подтверждение удаления изменений"
-        subheader="В текущей сессии все изменения во всех чатах будут сброшены. Продолжить?"
+        subheader="В текущей сессии для выбранного чата все изменения будут сброшены. Продолжить?"
         actions={
           <ButtonGroup stretched>
             <Button

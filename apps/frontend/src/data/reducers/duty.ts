@@ -91,6 +91,10 @@ export const duty = createSlice({
         );
       }
 
+      if ('tag' in shift) {
+        shift.tag = shift.tag?.replace('#', '');
+      }
+
       const currentSchedule = state.schedule[state.currentChatId];
       const shiftIndex = findScheduleShiftIndex(
         currentSchedule,

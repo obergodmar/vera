@@ -1,86 +1,109 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Draft } from '@reduxjs/toolkit';
-import { IDuty } from '@vera-reforged/common';
+import {
+  filterScheduleByChatAndTag,
+  filterScheduleByDayAndTime,
+  getTimeInMinutes,
+  IDuty,
+  isTimeToNextDay,
+} from '@vera-reforged/common';
 
 import produce from 'immer';
+import { pipe } from 'ramda';
+import { MessageContext } from 'vk-io';
 
 import { ConfigService } from '../config/config.service';
+import { LoggerService } from '../logger/logger.service';
 import { VkApiService } from '../vk-api/vk-api.service';
 
 @Injectable()
 export class DutyService {
   public constructor(
     @Inject(VkApiService) private readonly api: VkApiService,
-    @Inject(ConfigService) private readonly config: ConfigService
+    @Inject(ConfigService) private readonly config: ConfigService,
+    @Inject(LoggerService) private readonly logger: LoggerService
   ) {
-    this.api.botService.bot.hear(/duty/, (msg: any) => {
-      // const currentDuty = getDuty(msg.peerId);
-      //
-      // let message = 'duty отсутствует';
-      //
-      // if (currentDuty) {
-      //   const { username, label, time, dayNumber } = currentDuty;
-      //
-      //   const [firstName] = label.split(' ');
-      //   const date = new Date();
-      //
-      //   const month = date.getMonth() + 1;
-      //   const day = date.getDate();
-      //   const weekDay = date.getDay();
-      //
-      //   const tomorrow = new Date(date);
-      //   tomorrow.setDate(day + 1);
-      //
-      //   const tomorrowMonth = tomorrow.getMonth() + 1;
-      //   const tomorrowDay = tomorrow.getDate();
-      //
-      //   const yesterday = new Date(date);
-      //   yesterday.setDate(day - 1);
-      //
-      //   const yesterdayMonth = yesterday.getMonth() + 1;
-      //   const yesterdayDay = yesterday.getDate();
-      //   const yesterdayWeekDay = yesterday.getDay();
-      //
-      //   const fromYesterdayToToday = dayNumber === yesterdayWeekDay;
-      //   const fromTodayToYesterday = dayNumber === weekDay;
-      //
-      //   let dayFrom = '';
-      //   let monthFrom = '';
-      //
-      //   let dayTo = '';
-      //   let monthTo = '';
-      //
-      //   if (fromYesterdayToToday) {
-      //     dayFrom = addLeadingZero(yesterdayDay);
-      //     monthFrom = addLeadingZero(yesterdayMonth);
-      //
-      //     dayTo = addLeadingZero(day);
-      //     monthTo = addLeadingZero(month);
-      //   } else if (fromTodayToYesterday) {
-      //     dayFrom = addLeadingZero(day);
-      //     monthFrom = addLeadingZero(month);
-      //
-      //     dayTo = addLeadingZero(tomorrowDay);
-      //     monthTo = addLeadingZero(tomorrowMonth);
-      //   }
-      //
-      //   message = `@${username} (${firstName}) c ${
-      //     time || '00:00'
-      //   } ${dayFrom}.${monthFrom} до ${time || '00:00'} ${dayTo}.${monthTo}.`;
-      // }
-      //
-      // this.botService.vk.api.messages.send({
-      //   peer_id: msg.peerId,
-      //   message,
-      //   random_id: 0,
-      // });
-      //
-      // this.botService.vk.api.messages.send({
-      //   peer_id: 900033,
-      //   message: `Айди беседы, где запросили duty ${msg.peerId}`,
-      //   random_id: 0,
-      // });
-    });
+    this.api.botService.bot.hear(
+      /duty(\s#[a-zA-Z0-9]+)?/,
+      (msg: MessageContext) => {
+        const { peerType, peerId, $match } = msg;
+        const [, tag] = $match || [];
+
+        this.addChatIfDoesntExist.call(this, peerId, peerType);
+
+        const schedule = pipe(
+          this.filterScheduleForChatAndTag.bind(this),
+          this.filterScheduleForCurrentDayAndTime.call(this)
+        )(peerId, tag);
+
+        // const currentDuty = getDuty(msg.peerId);
+        //
+        // let message = 'duty отсутствует';
+        //
+        // if (currentDuty) {
+        //   const { username, label, time, dayNumber } = currentDuty;
+        //
+        //   const [firstName] = label.split(' ');
+        //   const date = new Date();
+        //
+        //   const month = date.getMonth() + 1;
+        //   const day = date.getDate();
+        //   const weekDay = date.getDay();
+        //
+        //   const tomorrow = new Date(date);
+        //   tomorrow.setDate(day + 1);
+        //
+        //   const tomorrowMonth = tomorrow.getMonth() + 1;
+        //   const tomorrowDay = tomorrow.getDate();
+        //
+        //   const yesterday = new Date(date);
+        //   yesterday.setDate(day - 1);
+        //
+        //   const yesterdayMonth = yesterday.getMonth() + 1;
+        //   const yesterdayDay = yesterday.getDate();
+        //   const yesterdayWeekDay = yesterday.getDay();
+        //
+        //   const fromYesterdayToToday = dayNumber === yesterdayWeekDay;
+        //   const fromTodayToYesterday = dayNumber === weekDay;
+        //
+        //   let dayFrom = '';
+        //   let monthFrom = '';
+        //
+        //   let dayTo = '';
+        //   let monthTo = '';
+        //
+        //   if (fromYesterdayToToday) {
+        //     dayFrom = addLeadingZero(yesterdayDay);
+        //     monthFrom = addLeadingZero(yesterdayMonth);
+        //
+        //     dayTo = addLeadingZero(day);
+        //     monthTo = addLeadingZero(month);
+        //   } else if (fromTodayToYesterday) {
+        //     dayFrom = addLeadingZero(day);
+        //     monthFrom = addLeadingZero(month);
+        //
+        //     dayTo = addLeadingZero(tomorrowDay);
+        //     monthTo = addLeadingZero(tomorrowMonth);
+        //   }
+        //
+        //   message = `@${username} (${firstName}) c ${
+        //     time || '00:00'
+        //   } ${dayFrom}.${monthFrom} до ${time || '00:00'} ${dayTo}.${monthTo}.`;
+        // }
+        //
+        // this.botService.vk.api.messages.send({
+        //   peer_id: msg.peerId,
+        //   message,
+        //   random_id: 0,
+        // });
+        //
+        // this.botService.vk.api.messages.send({
+        //   peer_id: 900033,
+        //   message: `Айди беседы, где запросили duty ${msg.peerId}`,
+        //   random_id: 0,
+        // });
+      }
+    );
   }
 
   public async getChats() {
@@ -115,10 +138,6 @@ export class DutyService {
     return schedule.filter((duties) => duties.chatId === chatId);
   }
 
-  public addChat(chatId: number) {
-    this.updateConfig(({ chats }) => chats.push(chatId));
-  }
-
   public updateChatSchedule(chatId: number, chatSchedule: IDuty.Schedule[]) {
     const status = this.updateConfig((duty) => {
       const othersSchedule = duty.schedule.filter(
@@ -139,6 +158,44 @@ export class DutyService {
     };
   }
 
+  private filterScheduleForCurrentDayAndTime(
+    schedule: IDuty.Schedule[]
+  ): IDuty.Schedule[] {
+    const { dayNumber, hours, minutes } = getDayAndTime();
+
+    const currentTimeInMinutes = hours * 60 + minutes;
+
+    return filterScheduleByDayAndTime(
+      schedule,
+      dayNumber,
+      currentTimeInMinutes
+    );
+  }
+
+  private filterScheduleForChatAndTag(chatId: number, tag: string | null) {
+    const { schedule }: IDuty.IDuty = this.getConfig();
+
+    return filterScheduleByChatAndTag(schedule, chatId, tag);
+  }
+
+  private addChatIfDoesntExist(chatId: number, peerType: string) {
+    if (peerType === 'chat') {
+      this.logger.log(`DutyService: В чате ${chatId} запросили duty`);
+
+      this.updateConfig((duty) => {
+        if (!duty.chats.includes(chatId)) {
+          duty.chats.push(chatId);
+        }
+      });
+
+      return;
+    }
+
+    this.logger.log(
+      `DutyService: Пир ${chatId} запросил duty в персональном чате`
+    );
+  }
+
   private getConfig() {
     const { duty } = this.config.getConfig();
 
@@ -150,6 +207,21 @@ export class DutyService {
       config.duty = produce(config.duty, recipe);
     });
   }
+}
+
+function getDayAndTime() {
+  const date = new Date();
+
+  const dayNumber = date.getDay();
+
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+
+  return {
+    dayNumber,
+    hours,
+    minutes,
+  };
 }
 
 // function getDuty(peerId: number) {

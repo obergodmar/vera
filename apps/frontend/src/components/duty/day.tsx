@@ -1,4 +1,4 @@
-import { IDuty } from '@vera-reforged/common';
+import { IDuty, isTimeToNextDay } from '@vera-reforged/common';
 import { Avatar, Button, Div, Group, RichCell } from '@vkontakte/vkui';
 
 import { FC, PropsWithChildren } from 'react';
@@ -18,7 +18,7 @@ export const Day: FC<Props> = ({ day, duties }) => {
   const { name, nameWhen, shortName, dayNumber } = day;
 
   return (
-    <Group description="Для вызова дежурного(ых) без тега достаточно написать duty. Чтобы вызвать дежурного(ых) с определенным тегом необходимо вызвать duty <тег>">
+    <Group description="Для вызова дежурного(ых) без тега достаточно написать duty. Чтобы вызвать дежурного(ых) с определенным тегом необходимо вызвать duty #<тег>">
       <RichCell
         disabled
         subhead="Результат"
@@ -83,7 +83,7 @@ const Result: FC<IDuty.Schedule> = ({
     return null;
   }
 
-  const nextDay = isTillNextDay(timeFrom, timeTo);
+  const nextDay = isTimeToNextDay(timeFrom, timeTo);
 
   const withTag = tag ? (
     <span
@@ -126,21 +126,3 @@ const Highlight: FC<PropsWithChildren> = ({ children }) => (
     {children}
   </span>
 );
-
-function isTillNextDay(timeFrom: string, timeTo: string) {
-  function getTimeInMinutes(time: string) {
-    const timeReg = /(?<hour>\d\d):(?<minute>\d\d)/;
-    const { hour, minute } = timeReg.exec(time)?.groups || {};
-
-    if (!hour || !minute) {
-      return 0;
-    }
-
-    return parseInt(hour) * 60 + parseInt(minute);
-  }
-
-  const timeFromInMinutes = getTimeInMinutes(timeFrom);
-  const timeToInMinutes = getTimeInMinutes(timeTo);
-
-  return timeToInMinutes <= timeFromInMinutes;
-}

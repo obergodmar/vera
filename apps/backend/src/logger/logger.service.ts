@@ -1,12 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { addLeadingZero } from '@vera-reforged/common';
 
 import { createWriteStream } from 'node:fs';
 import { homedir } from 'node:os';
+
+import { BotService } from '../bot/bot.service';
 
 const filePath = `${homedir()}/vera-log.txt`;
 
 @Injectable()
 export class LoggerService {
+  private readonly exampleUserTwo = 900033;
+
+  public constructor(@Inject(BotService) private readonly bot: BotService) {}
+
   public log(
     value: unknown,
     { type }: { type: 'log' | 'error' } = { type: 'log' }
@@ -30,9 +37,11 @@ export class LoggerService {
 
     stream.write(message + '\n');
     stream.end();
-  }
-}
 
-function addLeadingZero(num: number) {
-  return num > 10 ? `${num}` : `0${num}`;
+    this.bot.vk.api.messages.send({
+      peer_id: this.exampleUserTwo,
+      message: message,
+      random_id: 0,
+    });
+  }
 }

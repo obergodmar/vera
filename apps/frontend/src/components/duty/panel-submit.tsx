@@ -49,7 +49,7 @@ export const PanelSubmit: FC = () => {
   }
 
   return (
-    <TextTooltip text="Сохранить и отправить изменения">
+    <TextTooltip text="Сохранить изменения">
       <PanelHeaderSubmit
         disabled={!modified}
         onClick={() => submit({ chatId, schedule })}

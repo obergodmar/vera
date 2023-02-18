@@ -16,6 +16,8 @@
     "build": "concurrently -p \"[{name}]\" -n \"frontend,backend\" -c \"bgGreen.bold,bgCyan.bold\" \"npm run build:frontend\" \"npm run build:backend\"",
     "prepare": "husky install",
     "eslint:fix": "eslint --fix",
+    "test:backend": "NODE_OPTIONS=\"--experimental-vm-modules\" nx test backend",
+    "test:common": "nx test common",
     "deploy": "node scripts/deploy.js"
   },
   "lint-staged": {
@@ -77,7 +79,7 @@
     "@nrwl/cli": "15.7.0-beta.0",
     "@nrwl/cypress": "15.7.0-beta.0",
     "@nrwl/eslint-plugin-nx": "15.7.0-beta.0",
-    "@nrwl/jest": "15.7.0-beta.0",
+    "@nrwl/jest": "^15.7.2",
     "@nrwl/js": "^15.7.0-beta.0",
     "@nrwl/linter": "15.7.0-beta.0",
     "@nrwl/nest": "15.7.0-beta.0",
