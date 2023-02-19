@@ -82,6 +82,8 @@ export class DutyService {
   public async getChats() {
     const { chats } = this.getConfig();
 
+    this.logger.log('DutyService: Были запрошены чаты Веры');
+
     if (!chats.length) {
       return { items: [] };
     }
@@ -96,6 +98,8 @@ export class DutyService {
   public getDays() {
     const { days } = this.getConfig();
 
+    this.logger.log('DutyService: Были получены настройки дней дежурства');
+
     return days;
   }
 
@@ -107,6 +111,10 @@ export class DutyService {
 
   public getScheduleForChat(chatId: number) {
     const { schedule } = this.getConfig();
+
+    this.logger.log(
+      `DutyService: Было получено расписание дежурства для чата ${chatId}`
+    );
 
     return schedule.filter((duties) => duties.chatId === chatId);
   }
