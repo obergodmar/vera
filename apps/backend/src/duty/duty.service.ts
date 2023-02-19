@@ -12,6 +12,7 @@ import {
 import produce from 'immer';
 import { pipe } from 'ramda';
 import { MessageContext } from 'vk-io';
+import { MessagesConversation } from 'vk-io/lib/api/schemas/objects';
 
 import { ConfigService } from '../config/config.service';
 import { LoggerService } from '../logger/logger.service';
@@ -19,6 +20,8 @@ import { VkApiService } from '../vk-api/vk-api.service';
 
 @Injectable()
 export class DutyService {
+  private chats: MessagesConversation[];
+
   public constructor(
     @Inject(VkApiService) private readonly api: VkApiService,
     @Inject(ConfigService) private readonly config: ConfigService,
@@ -75,20 +78,28 @@ export class DutyService {
     });
 
     this.logger.log(
-      `DutyService: запросили duty в ${peerId}.\nОтправленное сообщение: ${message}`
+      `DutyService: A duty was requested in ${peerId}.\nMessage was sent: ${message}`
     );
   }
 
   public async getChats() {
     const { chats } = this.getConfig();
 
-    this.logger.log('DutyService: Были запрошены чаты Веры');
+    this.logger.log('DutyService: Vera chats were requested');
 
     if (!chats.length) {
       return { items: [] };
     }
 
-    return this.api.getConversationsById(chats);
+    const convos = await this.api.getConversationsById(chats);
+
+    this.chats =
+      convos.items?.filter(({ peer: { type } }) => type === 'chat') || [];
+
+    return {
+      ...convos,
+      items: this.chats,
+    };
   }
 
   public async getMembersForChat(chatId: number) {
@@ -98,7 +109,7 @@ export class DutyService {
   public getDays() {
     const { days } = this.getConfig();
 
-    this.logger.log('DutyService: Были получены настройки дней дежурства');
+    this.logger.log('DutyService: Duty days were requested');
 
     return days;
   }
@@ -113,7 +124,9 @@ export class DutyService {
     const { schedule } = this.getConfig();
 
     this.logger.log(
-      `DutyService: Было получено расписание дежурства для чата ${chatId}`
+      `DutyService: Duty schedule for chat ${this.getChatNameFromCache(
+        chatId
+      )} was requested`
     );
 
     return schedule.filter((duties) => duties.chatId === chatId);
@@ -129,18 +142,30 @@ export class DutyService {
     });
 
     if (typeof status === 'string') {
-      this.logger.log(`DutyService: В ${chatId} произошла ошибка: ${status}`);
+      this.logger.log(
+        `DutyService: An error occurred in ${this.getChatNameFromCache(
+          chatId
+        )}: ${status}`
+      );
 
       return {
         error: status,
       };
     }
 
-    this.logger.log(`DutyService: В ${chatId} произведено изменение дежурства`);
+    this.logger.log(
+      `DutyService: Changes were made in ${this.getChatNameFromCache(chatId)}`
+    );
 
     return {
       success: true,
     };
+  }
+
+  private getChatNameFromCache(chatId: number) {
+    const chatName = this.chats?.find(({ peer: { id } }) => id === chatName);
+
+    return chatName ? `${chatName}(${chatId})` : chatId;
   }
 
   private filterScheduleForCurrentDayAndTime(
@@ -167,7 +192,11 @@ export class DutyService {
     const { chats } = this.getConfig();
 
     if (peerType === 'chat') {
-      this.logger.log(`DutyService: В чате ${chatId} запросили duty`);
+      this.logger.log(
+        `DutyService: A duty was requested in ${this.getChatNameFromCache(
+          chatId
+        )}`
+      );
 
       if (!chats.includes(chatId)) {
         this.api.botService.vk.api.messages.send({
@@ -188,7 +217,7 @@ export class DutyService {
     }
 
     this.logger.log(
-      `DutyService: Пир ${chatId} запросил duty в персональном чате`
+      `DutyService: A duty was requested by peer ${chatId} in personal chat`
     );
   }
 

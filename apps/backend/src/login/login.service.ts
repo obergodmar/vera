@@ -31,7 +31,7 @@ export class LoginService {
         'REMOVED_PASSWORD_HASH'
       );
     } catch (e) {
-      this.logger.log('LoginService: Не удалось проверить пароль по хэшу');
+      this.logger.log("LoginService: Couldn't compare password by hash");
 
       throw new HttpException(
         {
@@ -42,9 +42,7 @@ export class LoginService {
     }
 
     if (!match) {
-      this.logger.log(
-        'LoginService: Неудачная попытка авторизации: неверный пароль'
-      );
+      this.logger.log("LoginService: Couldn't authenticate: wrong password");
 
       throw new HttpException(
         {
@@ -54,7 +52,7 @@ export class LoginService {
       );
     }
 
-    this.logger.log('LoginService: Успешная авторизация');
+    this.logger.log('LoginService: Authenticated successfully');
 
     return {
       token: 'REMOVED_AUTH_TOKEN',
