@@ -1,11 +1,16 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 
 import { compare } from 'bcrypt';
 
+import { LoggerService } from '../logger/logger.service';
 import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class LoginService {
+  public constructor(
+    @Inject(LoggerService) private readonly logger: LoggerService
+  ) {}
+
   public async authorize(authorizeDto: LoginDto) {
     const { password } = authorizeDto;
 
@@ -26,6 +31,8 @@ export class LoginService {
         'REMOVED_PASSWORD_HASH'
       );
     } catch (e) {
+      this.logger.log('LoginService: Не удалось проверить пароль по хэшу');
+
       throw new HttpException(
         {
           error: 'Проблема на сервере',
@@ -35,6 +42,10 @@ export class LoginService {
     }
 
     if (!match) {
+      this.logger.log(
+        'LoginService: Неудачная попытка авторизации: неверный пароль'
+      );
+
       throw new HttpException(
         {
           error: 'Неверный пароль',
@@ -42,6 +53,8 @@ export class LoginService {
         HttpStatus.UNAUTHORIZED
       );
     }
+
+    this.logger.log('LoginService: Успешная авторизация');
 
     return {
       token: 'REMOVED_AUTH_TOKEN',
