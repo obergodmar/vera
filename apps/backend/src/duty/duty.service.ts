@@ -20,7 +20,7 @@ import { VkApiService } from '../vk-api/vk-api.service';
 
 @Injectable()
 export class DutyService {
-  private chats: MessagesConversation[];
+  private chats: MessagesConversation[] = [];
 
   public constructor(
     @Inject(VkApiService) private readonly api: VkApiService,
@@ -163,9 +163,10 @@ export class DutyService {
   }
 
   private getChatNameFromCache(chatId: number) {
-    const chatName = this.chats?.find(({ peer: { id } }) => id === chatName);
+    const chatName = this.chats.find(({ peer: { id } }) => id === chatId)
+      ?.chat_settings?.title;
 
-    return chatName ? `${chatName}(${chatId})` : chatId;
+    return chatName ? `${chatName} (${chatId})` : chatId;
   }
 
   private filterScheduleForCurrentDayAndTime(
