@@ -101,7 +101,7 @@ export const Panel: FC = () => {
         </FormLayoutGroup>
       </Group>
 
-      {chatId && <Days peerId={chatId} />}
+      {!!chatId && <Days peerId={chatId} />}
     </>
   );
 };

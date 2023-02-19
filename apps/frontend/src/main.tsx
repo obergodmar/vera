@@ -25,7 +25,7 @@ root.render(
   <StrictMode>
     <Provider store={store}>
       <HelmetProvider>
-        <ConfigProvider appearance="light" webviewType={WebviewType.INTERNAL}>
+        <ConfigProvider webviewType={WebviewType.INTERNAL}>
           <AdaptivityProvider sizeY={SizeType.COMPACT}>
             <BrowserRouter>
               <AppRoot>
