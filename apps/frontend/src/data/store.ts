@@ -26,7 +26,9 @@ const rtkQueryErrorLogger: ThunkMiddleware = () => (dispatch) => (action) => {
       dispatch(logOff());
     }
 
-    snackbar({ message: action?.error?.data?.error || 'Произошла ошибка' });
+    snackbar({
+      message: action?.payload?.data?.error || 'Произошла ошибка',
+    });
   }
 
   return dispatch(action);

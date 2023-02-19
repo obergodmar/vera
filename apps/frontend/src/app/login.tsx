@@ -19,7 +19,6 @@ import { VERA_AVATAR_100 } from '../data/constants';
 import { authorize, logOff } from '../data/reducers/authorization';
 import { useAuthorizeMutation } from '../data/services/login-api';
 import { useSnackbar } from '../hooks/useSnackbar';
-import { isFetchBaseQueryError } from '../utils/isFetchBaseQueryError';
 
 export const Login: FC = () => {
   const navigate = useNavigate();
@@ -38,17 +37,6 @@ export const Login: FC = () => {
       );
 
       navigate('/', { replace: true });
-    }
-
-    if (
-      authorizeResult.status === 'rejected' &&
-      isFetchBaseQueryError(authorizeResult.error)
-    ) {
-      console.log(authorizeResult);
-      snackbar({
-        // @ts-expect-error data error exists
-        message: authorizeResult.error.data?.error || 'Ошибка',
-      });
     }
   }, [authorizeResult, dispatch, navigate, snackbar]);
 
