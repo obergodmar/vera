@@ -66,3 +66,62 @@ export function filterScheduleByDayAndTime(
     return false;
   });
 }
+
+export function getDayMonthTime() {
+  const date = new Date();
+
+  const dayNumber = date.getDay();
+
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+
+  return {
+    dayNumber,
+    hours,
+    minutes,
+    day,
+    month,
+  };
+}
+
+export function getNextDayMonth() {
+  const date = new Date();
+  const tomorrow = new Date(date);
+  tomorrow.setDate(date.getDate() + 1);
+
+  const day = tomorrow.getDate();
+  const month = tomorrow.getMonth() + 1;
+
+  return {
+    day,
+    month,
+  };
+}
+
+export function getDutyMessage(schedule: IDuty.Schedule[]): string {
+  return schedule.reduce(
+    (acc, { firstName, timeFrom, timeTo, tag, peerId }) => {
+      const withTimeFrom = timeFrom ? ` с ${timeFrom}` : '';
+      const withTimeTo = timeTo ? ` до ${timeTo}` : '';
+      const withTag = tag ? `#${tag} ` : '';
+
+      const withPrev = acc ? `${acc}\n` : '';
+
+      const { day, month } = getDayMonthTime();
+      const { day: tomorrowDay, month: tomorrowMonth } = getNextDayMonth();
+
+      const withDayMonthFrom = `${addLeadingZero(day)}.${addLeadingZero(
+        month
+      )}`;
+      const withDayMonthTo = isTimeToNextDay(timeFrom, timeTo)
+        ? `${addLeadingZero(tomorrowDay)}.${addLeadingZero(tomorrowMonth)}`
+        : withDayMonthFrom;
+
+      return `${withPrev}${withTag}@${peerId} (${firstName})${withTimeFrom} ${withDayMonthFrom}${withTimeTo} ${withDayMonthTo}`;
+    },
+    ''
+  );
+}

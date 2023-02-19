@@ -18,10 +18,10 @@ export const Day: FC<Props> = ({ day, duties }) => {
   const { name, nameWhen, shortName, dayNumber } = day;
 
   return (
-    <Group description="Для вызова дежурного(ых) без тега достаточно написать duty. Чтобы вызвать дежурного(ых) с определенным тегом необходимо вызвать duty #<тег>">
+    <Group description="Для вызова дежурного(ых) без тега достаточно написать duty. Чтобы вызвать дежурного(ых) с определенным тегом необходимо вызвать duty <тег>">
       <RichCell
         disabled
-        subhead="Результат"
+        subhead={duties?.length ? `Дежурства ${nameWhen}` : undefined}
         name={name}
         before={
           <Avatar

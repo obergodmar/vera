@@ -3,9 +3,10 @@ import { Draft } from '@reduxjs/toolkit';
 import {
   filterScheduleByChatAndTag,
   filterScheduleByDayAndTime,
+  getDayMonthTime,
+  getDutyMessage,
   getTimeInMinutes,
   IDuty,
-  isTimeToNextDay,
 } from '@vera-reforged/common';
 
 import produce from 'immer';
@@ -23,86 +24,58 @@ export class DutyService {
     @Inject(ConfigService) private readonly config: ConfigService,
     @Inject(LoggerService) private readonly logger: LoggerService
   ) {
-    this.api.botService.bot.hear(
-      /duty(\s#[a-zA-Z0-9]+)?/,
-      (msg: MessageContext) => {
-        const { peerType, peerId, $match } = msg;
-        const [, tag] = $match || [];
+    this.api.botService.bot.hear(/duty(\s#?\w+)?/, (msg: MessageContext) => {
+      const { peerType, peerId, $match } = msg;
+      const [, hashtag] = $match || [];
 
-        this.addChatIfDoesntExist.call(this, peerId, peerType);
+      const tag = hashtag?.replace(/\s?#?/, '') || null;
 
-        const schedule = pipe(
-          this.filterScheduleForChatAndTag.bind(this),
-          this.filterScheduleForCurrentDayAndTime.call(this)
-        )(peerId, tag);
+      this.addChatIfDoesntExist.call(this, peerId, peerType);
 
-        // const currentDuty = getDuty(msg.peerId);
-        //
-        // let message = 'duty отсутствует';
-        //
-        // if (currentDuty) {
-        //   const { username, label, time, dayNumber } = currentDuty;
-        //
-        //   const [firstName] = label.split(' ');
-        //   const date = new Date();
-        //
-        //   const month = date.getMonth() + 1;
-        //   const day = date.getDate();
-        //   const weekDay = date.getDay();
-        //
-        //   const tomorrow = new Date(date);
-        //   tomorrow.setDate(day + 1);
-        //
-        //   const tomorrowMonth = tomorrow.getMonth() + 1;
-        //   const tomorrowDay = tomorrow.getDate();
-        //
-        //   const yesterday = new Date(date);
-        //   yesterday.setDate(day - 1);
-        //
-        //   const yesterdayMonth = yesterday.getMonth() + 1;
-        //   const yesterdayDay = yesterday.getDate();
-        //   const yesterdayWeekDay = yesterday.getDay();
-        //
-        //   const fromYesterdayToToday = dayNumber === yesterdayWeekDay;
-        //   const fromTodayToYesterday = dayNumber === weekDay;
-        //
-        //   let dayFrom = '';
-        //   let monthFrom = '';
-        //
-        //   let dayTo = '';
-        //   let monthTo = '';
-        //
-        //   if (fromYesterdayToToday) {
-        //     dayFrom = addLeadingZero(yesterdayDay);
-        //     monthFrom = addLeadingZero(yesterdayMonth);
-        //
-        //     dayTo = addLeadingZero(day);
-        //     monthTo = addLeadingZero(month);
-        //   } else if (fromTodayToYesterday) {
-        //     dayFrom = addLeadingZero(day);
-        //     monthFrom = addLeadingZero(month);
-        //
-        //     dayTo = addLeadingZero(tomorrowDay);
-        //     monthTo = addLeadingZero(tomorrowMonth);
-        //   }
-        //
-        //   message = `@${username} (${firstName}) c ${
-        //     time || '00:00'
-        //   } ${dayFrom}.${monthFrom} до ${time || '00:00'} ${dayTo}.${monthTo}.`;
-        // }
-        //
-        // this.botService.vk.api.messages.send({
-        //   peer_id: msg.peerId,
-        //   message,
-        //   random_id: 0,
-        // });
-        //
-        // this.botService.vk.api.messages.send({
-        //   peer_id: 900033,
-        //   message: `Айди беседы, где запросили duty ${msg.peerId}`,
-        //   random_id: 0,
-        // });
-      }
+      const schedule = pipe<
+        [peerId: number, tag: string | null],
+        IDuty.Schedule[],
+        IDuty.Schedule[]
+      >(
+        this.filterScheduleForChatAndTag.bind(this),
+        this.filterScheduleForCurrentDayAndTime.bind(this)
+      )(peerId, tag);
+
+      this.announceDuty.call(this, peerId, schedule, tag);
+    });
+  }
+
+  private announceDuty(
+    peerId: number,
+    schedule: IDuty.Schedule[],
+    tag: string | null
+  ) {
+    const sortedSchedule = produce(schedule, (draft) => {
+      draft.sort((a, b) => {
+        const timeA = getTimeInMinutes(a.timeFrom);
+        const timeB = getTimeInMinutes(b.timeFrom);
+
+        return timeA - timeB;
+      });
+    });
+
+    let message;
+
+    if (sortedSchedule.length === 0) {
+      const withTag = tag ? `#${tag} ` : '';
+      message = `${withTag}Нет дежурства в данное время`;
+    } else {
+      message = getDutyMessage(sortedSchedule);
+    }
+
+    this.api.botService.vk.api.messages.send({
+      peer_id: peerId,
+      message,
+      random_id: 0,
+    });
+
+    this.logger.log(
+      `DutyService: запросили duty в ${peerId}.\nОтправленное сообщение: ${message}`
     );
   }
 
@@ -148,10 +121,14 @@ export class DutyService {
     });
 
     if (typeof status === 'string') {
+      this.logger.log(`DutyService: В ${chatId} произошла ошибка: ${status}`);
+
       return {
         error: status,
       };
     }
+
+    this.logger.log(`DutyService: В ${chatId} произведено изменение дежурства`);
 
     return {
       success: true,
@@ -161,7 +138,7 @@ export class DutyService {
   private filterScheduleForCurrentDayAndTime(
     schedule: IDuty.Schedule[]
   ): IDuty.Schedule[] {
-    const { dayNumber, hours, minutes } = getDayAndTime();
+    const { dayNumber, hours, minutes } = getDayMonthTime();
 
     const currentTimeInMinutes = hours * 60 + minutes;
 
@@ -179,8 +156,19 @@ export class DutyService {
   }
 
   private addChatIfDoesntExist(chatId: number, peerType: string) {
+    const { chats } = this.getConfig();
+
     if (peerType === 'chat') {
       this.logger.log(`DutyService: В чате ${chatId} запросили duty`);
+
+      if (!chats.includes(chatId)) {
+        this.api.botService.vk.api.messages.send({
+          peer_id: chatId,
+          message:
+            'Возможность установки дежурства включена. Настройка доступна на https://vera.example.com',
+          random_id: 0,
+        });
+      }
 
       this.updateConfig((duty) => {
         if (!duty.chats.includes(chatId)) {
@@ -208,87 +196,3 @@ export class DutyService {
     });
   }
 }
-
-function getDayAndTime() {
-  const date = new Date();
-
-  const dayNumber = date.getDay();
-
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
-
-  return {
-    dayNumber,
-    hours,
-    minutes,
-  };
-}
-
-// function getDuty(peerId: number) {
-//   const date = new Date();
-//   const day = date.getDay();
-//   const hours = date.getHours();
-//   const minutes = date.getMinutes();
-//
-//   const config = getConfig();
-//   const {
-//     duty: { chats },
-//   } = config;
-//
-//   if (!chats.includes(peerId)) {
-//     chats.push(peerId);
-//     writeConfig(config);
-//   }
-//
-//   const schedule = dutiesSchedule.schedule[peerId];
-//
-//   if (!schedule) {
-//     return undefined;
-//   }
-//
-//   const { duties, days } = schedule;
-//   const workingDays = days.filter(({ checked }) => checked);
-//   const workingDuties = duties
-//     .slice(0, workingDays.length)
-//     .map((item, idx) => ({
-//       ...item,
-//       dayNumber: workingDays[idx].value,
-//       time: workingDays[idx].time,
-//     }));
-//
-//   return workingDuties.find(({ dayNumber, time }) => {
-//     let [hh, mm]: (number | string)[] = time?.split(':') ?? ['00', '00'];
-//
-//     if (!hh || !mm) {
-//       return dayNumber !== day;
-//     }
-//
-//     hh = parseInt(hh);
-//     mm = parseInt(mm);
-//
-//     const sameDay = dayNumber === day;
-//     const nextDay = dayNumber === day - 1;
-//
-//     if (sameDay && hours > hh) {
-//       return true;
-//     }
-//
-//     if (sameDay && hours === hh && minutes > mm) {
-//       return true;
-//     }
-//
-//     if (nextDay && hours < hh) {
-//       return true;
-//     }
-//
-//     if (nextDay && hours === hh && minutes < mm) {
-//       return true;
-//     }
-//
-//     return false;
-//   });
-// }
-//
-// function addLeadingZero(num: number) {
-//   return num > 10 ? `${num}` : `0${num}`;
-// }
