@@ -120,7 +120,7 @@ export function getDutyMessage(schedule: IDuty.Schedule[]): string {
         ? `${addLeadingZero(tomorrowDay)}.${addLeadingZero(tomorrowMonth)}`
         : withDayMonthFrom;
 
-      return `${withPrev}${withTag}@${peerId} (${firstName})${withTimeFrom} ${withDayMonthFrom}${withTimeTo} ${withDayMonthTo}`;
+      return `${withPrev}${withTag}@id${peerId} (${firstName})${withTimeFrom} ${withDayMonthFrom}${withTimeTo} ${withDayMonthTo}`;
     },
     ''
   );

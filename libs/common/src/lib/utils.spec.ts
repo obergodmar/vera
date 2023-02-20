@@ -167,7 +167,7 @@ describe('utils testing', () => {
       const schedule = getSingleScheduleWithoutTagSameDay();
 
       expect(getDutyMessage(schedule)).toBe(
-        '@900033 (ТестДва) с 15:00 28.02 до 22:00 28.02'
+        '@id900033 (ТестДва) с 15:00 28.02 до 22:00 28.02'
       );
     });
 
@@ -178,7 +178,7 @@ describe('utils testing', () => {
       const schedule = getSingleScheduleWithoutTagNextDay();
 
       expect(getDutyMessage(schedule)).toBe(
-        '@900033 (ТестДва) с 22:00 28.02 до 15:00 01.03'
+        '@id900033 (ТестДва) с 22:00 28.02 до 15:00 01.03'
       );
     });
 
@@ -189,7 +189,7 @@ describe('utils testing', () => {
       const schedule = getSingleScheduleWithTag();
 
       expect(getDutyMessage(schedule)).toBe(
-        '#web @900033 (ТестДва) с 22:00 28.02 до 15:00 01.03'
+        '#web @id900033 (ТестДва) с 22:00 28.02 до 15:00 01.03'
       );
     });
 
@@ -199,7 +199,7 @@ describe('utils testing', () => {
 
       const schedule = getSortedSchedule();
       expect(getDutyMessage(schedule)).toBe(
-        '#web @900033 (ТестДва) с 22:00 28.02 до 15:00 01.03\n#web @900011 (ТестТри) с 23:45 28.02 до 23:20 01.03\n#web @900026 (TestOne) с 00:00 28.02 до 23:59 28.02'
+        '#web @id900033 (ТестДва) с 22:00 28.02 до 15:00 01.03\n#web @id900011 (ТестТри) с 23:45 28.02 до 23:20 01.03\n#web @id900026 (TestOne) с 00:00 28.02 до 23:59 28.02'
       );
     });
   });
