@@ -51,6 +51,7 @@ export const MemberPicker: FC<Props> = ({ duties, members, onChange }) => {
 
           return (
             <Chip
+              style={{ maxWidth: '70%' }}
               value={value}
               before={<Avatar size={20} src={avatar} />}
               {...rest}

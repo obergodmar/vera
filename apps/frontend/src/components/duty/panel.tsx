@@ -61,6 +61,7 @@ export const Panel: FC = () => {
           >
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
               <Select
+                style={{ flexGrow: 1 }}
                 value={chatId}
                 onChange={(e) => {
                   const id = Number(e.target.value);

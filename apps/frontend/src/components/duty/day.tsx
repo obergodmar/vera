@@ -1,7 +1,14 @@
 import { IDuty, isTimeToNextDay } from '@vera-reforged/common';
-import { Avatar, Button, Div, Group, RichCell } from '@vkontakte/vkui';
+import {
+  Avatar,
+  Button,
+  Div,
+  Group,
+  RichCell,
+  useAdaptivityWithJSMediaQueries,
+} from '@vkontakte/vkui';
 
-import { FC, PropsWithChildren } from 'react';
+import { FC, HTMLAttributes, PropsWithChildren } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { createShift } from '../../data/reducers/duty';
@@ -79,12 +86,13 @@ const Result: FC<IDuty.Schedule> = ({
   timeTo,
   tag,
 }) => {
+  const { isDesktop } = useAdaptivityWithJSMediaQueries();
+
   if (!firstName || !lastName) {
     return null;
   }
 
   const nextDay = isTimeToNextDay(timeFrom, timeTo);
-
   const withTag = tag ? (
     <span
       style={{
@@ -98,16 +106,30 @@ const Result: FC<IDuty.Schedule> = ({
     </span>
   ) : null;
 
+  const withDutyWord = isDesktop ? 'дежурит ' : '';
+
   return (
     <div
       style={{
+        display: 'flex',
+        alignItems: 'center',
         padding: '4px 0',
+        gap: '5px',
       }}
     >
       C <Highlight>{timeFrom || '00:00'}</Highlight> до{' '}
       <Highlight>{timeTo || '23:59'}</Highlight>{' '}
-      {nextDay ? 'следующего дня ' : ''}дежурит{' '}
-      <Highlight>
+      {nextDay ? 'следующего дня ' : ''}
+      {withDutyWord}
+      <Highlight
+        style={{
+          maxWidth: '100%',
+          overflow: 'hidden',
+          whiteSpace: 'nowrap',
+          textOverflow: 'ellipsis',
+          verticalAlign: 'bottom',
+        }}
+      >
         {firstName} {lastName}
       </Highlight>
       {withTag}
@@ -115,13 +137,19 @@ const Result: FC<IDuty.Schedule> = ({
   );
 };
 
-const Highlight: FC<PropsWithChildren> = ({ children }) => (
+const Highlight: FC<PropsWithChildren<HTMLAttributes<HTMLSpanElement>>> = ({
+  children,
+  style,
+  ...props
+}) => (
   <span
     style={{
       display: 'inline-block',
       padding: '1px 2px',
       borderBottom: '1px solid var(--vkui--color_stroke_accent)',
+      ...style,
     }}
+    {...props}
   >
     {children}
   </span>
