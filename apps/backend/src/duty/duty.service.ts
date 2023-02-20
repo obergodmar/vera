@@ -18,6 +18,8 @@ import { ConfigService } from '../config/config.service';
 import { LoggerService } from '../logger/logger.service';
 import { VkApiService } from '../vk-api/vk-api.service';
 
+const GROUPS_CHATS = ['chat', 'group'];
+
 @Injectable()
 export class DutyService {
   private chats: MessagesConversation[] = [];
@@ -94,7 +96,9 @@ export class DutyService {
     const convos = await this.api.getConversationsById(chats);
 
     this.chats =
-      convos.items?.filter(({ peer: { type } }) => type === 'chat') || [];
+      convos.items?.filter(({ peer: { type } }) =>
+        GROUPS_CHATS.includes(type)
+      ) || [];
 
     return {
       ...convos,
@@ -192,7 +196,7 @@ export class DutyService {
   private addChatIfDoesntExist(chatId: number, peerType: string) {
     const { chats } = this.getConfig();
 
-    if (peerType === 'chat') {
+    if (GROUPS_CHATS.includes(peerType)) {
       this.logger.log(
         `DutyService: A duty was requested in ${this.getChatNameFromCache(
           chatId
@@ -202,8 +206,7 @@ export class DutyService {
       if (!chats.includes(chatId)) {
         this.api.botService.vk.api.messages.send({
           peer_id: chatId,
-          message:
-            'Возможность установки дежурства включена. Настройка доступна на https://vera.example.com',
+          message: 'Возможность установки дежурства включена',
           random_id: 0,
         });
       }

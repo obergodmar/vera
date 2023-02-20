@@ -27,28 +27,26 @@ export const dutyApi = createApi({
       },
       transformResponse(data: IApi.IDutyApi.GetChatsResponse) {
         return (
-          data.items
-            ?.filter(({ peer: { type } }) => type === 'chat')
-            .reduce((acc: CustomSelectOptionInterface[], item) => {
-              const {
-                chat_settings,
-                peer: { id },
-              } = item;
+          data.items?.reduce((acc: CustomSelectOptionInterface[], item) => {
+            const {
+              chat_settings,
+              peer: { id },
+            } = item;
 
-              if (!chat_settings) {
-                return acc;
-              }
-              const { title, photo } = chat_settings;
-
-              acc.push({
-                label: title,
-                value: id,
-                avatar: photo?.photo_100,
-                description: id,
-              });
-
+            if (!chat_settings) {
               return acc;
-            }, []) || []
+            }
+            const { title, photo } = chat_settings;
+
+            acc.push({
+              label: title,
+              value: id,
+              avatar: photo?.photo_100,
+              description: id,
+            });
+
+            return acc;
+          }, []) || []
         );
       },
     }),
