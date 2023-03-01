@@ -1,3 +1,5 @@
+import produce from 'immer';
+
 import { IDuty } from './duty';
 
 export function addLeadingZero(num: number): string {
@@ -33,6 +35,13 @@ export function filterScheduleByChatAndTag(
 
     return chatMatch && tagMatch;
   });
+}
+
+export function filterScheduleByDay(
+  schedule: IDuty.Schedule[],
+  dayNumber: number
+): IDuty.Schedule[] {
+  return schedule.filter((duty) => duty.dayNumber === dayNumber);
 }
 
 export function filterScheduleByDayAndTime(
@@ -101,9 +110,12 @@ export function getNextDayMonth() {
   };
 }
 
-export function getDutyMessage(schedule: IDuty.Schedule[]): string {
+export function getDutyMessage(
+  schedule: IDuty.Schedule[],
+  mention = true
+): string {
   return schedule.reduce(
-    (acc, { firstName, timeFrom, timeTo, tag, peerId }) => {
+    (acc, { firstName, lastName, timeFrom, timeTo, tag, peerId }) => {
       const withTimeFrom = timeFrom ? ` с ${timeFrom}` : '';
       const withTimeTo = timeTo ? ` до ${timeTo}` : '';
       const withTag = tag ? `#${tag} ` : '';
@@ -120,8 +132,43 @@ export function getDutyMessage(schedule: IDuty.Schedule[]): string {
         ? `${addLeadingZero(tomorrowDay)}.${addLeadingZero(tomorrowMonth)}`
         : withDayMonthFrom;
 
-      return `${withPrev}${withTag}@id${peerId} (${firstName})${withTimeFrom} ${withDayMonthFrom}${withTimeTo} ${withDayMonthTo}`;
+      const dutyName = mention
+        ? `@id${peerId} (${firstName})`
+        : `${firstName} ${lastName}`;
+
+      return `${withPrev}${withTag}${dutyName}${withTimeFrom} ${withDayMonthFrom}${withTimeTo} ${withDayMonthTo}`;
     },
     ''
   );
+}
+
+export function getAnnounceDutyMessage(
+  schedule: IDuty.Schedule[],
+  tag: string | null,
+  noDutyAtCurrentTime: boolean
+) {
+  const sortedSchedule = produce(schedule, (draft) => {
+    draft.sort((a, b) => {
+      const timeA = getTimeInMinutes(a.timeFrom);
+      const timeB = getTimeInMinutes(b.timeFrom);
+
+      return timeA - timeB;
+    });
+  });
+
+  const withTag = tag ? `#${tag} ` : '';
+  const noDutyMessage = `${withTag}Нет дежурств в данное время`;
+
+  let message;
+
+  if (sortedSchedule.length === 0) {
+    message = noDutyMessage;
+  } else if (noDutyAtCurrentTime) {
+    const nextDutiesMessage = getDutyMessage(sortedSchedule, false);
+    message = `${noDutyMessage}\n\nДежурства сегодня:\n${nextDutiesMessage}`;
+  } else {
+    message = getDutyMessage(sortedSchedule);
+  }
+
+  return message;
 }

@@ -2,15 +2,14 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Draft } from '@reduxjs/toolkit';
 import {
   filterScheduleByChatAndTag,
+  filterScheduleByDay,
   filterScheduleByDayAndTime,
+  getAnnounceDutyMessage,
   getDayMonthTime,
-  getDutyMessage,
-  getTimeInMinutes,
   IDuty,
 } from '@vera-reforged/common';
 
 import produce from 'immer';
-import { pipe } from 'ramda';
 import { MessageContext } from 'vk-io';
 import { MessagesConversation } from 'vk-io/lib/api/schemas/objects';
 
@@ -37,41 +36,35 @@ export class DutyService {
 
       this.addChatIfDoesntExist.call(this, peerId, peerType);
 
-      const schedule = pipe<
-        [peerId: number, tag: string | null],
-        IDuty.Schedule[],
-        IDuty.Schedule[]
-      >(
-        this.filterScheduleForChatAndTag.bind(this),
-        this.filterScheduleForCurrentDayAndTime.bind(this)
-      )(peerId, tag);
+      const chatAndTagSchedule = this.filterScheduleForChatAndTag.call(
+        this,
+        peerId,
+        tag
+      );
 
-      this.announceDuty.call(this, peerId, schedule, tag);
+      const currentTimeDuties = this.filterScheduleForCurrentDayAndTime.call(
+        this,
+        chatAndTagSchedule
+      );
+
+      const { schedule, noDutyAtCurrentTime } =
+        this.filterScheduleIfNoDutyAtCurrentTime.call(
+          this,
+          currentTimeDuties,
+          chatAndTagSchedule
+        );
+
+      this.announceDuty.call(this, peerId, schedule, tag, noDutyAtCurrentTime);
     });
   }
 
   private announceDuty(
     peerId: number,
     schedule: IDuty.Schedule[],
-    tag: string | null
+    tag: string | null,
+    noDutyAtCurrentTime: boolean
   ) {
-    const sortedSchedule = produce(schedule, (draft) => {
-      draft.sort((a, b) => {
-        const timeA = getTimeInMinutes(a.timeFrom);
-        const timeB = getTimeInMinutes(b.timeFrom);
-
-        return timeA - timeB;
-      });
-    });
-
-    let message;
-
-    if (sortedSchedule.length === 0) {
-      const withTag = tag ? `#${tag} ` : '';
-      message = `${withTag}Нет дежурства в данное время`;
-    } else {
-      message = getDutyMessage(sortedSchedule);
-    }
+    const message = getAnnounceDutyMessage(schedule, tag, noDutyAtCurrentTime);
 
     this.api.botService.vk.api.messages.send({
       peer_id: peerId,
@@ -185,6 +178,28 @@ export class DutyService {
       dayNumber,
       currentTimeInMinutes
     );
+  }
+
+  private filterScheduleIfNoDutyAtCurrentTime(
+    currentSchedule: IDuty.Schedule[],
+    schedule: IDuty.Schedule[]
+  ): {
+    schedule: IDuty.Schedule[];
+    noDutyAtCurrentTime: boolean;
+  } {
+    const { dayNumber } = getDayMonthTime();
+
+    if (currentSchedule.length === 0) {
+      return {
+        schedule: filterScheduleByDay(schedule, dayNumber),
+        noDutyAtCurrentTime: true,
+      };
+    }
+
+    return {
+      schedule: currentSchedule,
+      noDutyAtCurrentTime: false,
+    };
   }
 
   private filterScheduleForChatAndTag(chatId: number, tag: string | null) {

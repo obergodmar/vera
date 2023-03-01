@@ -218,7 +218,7 @@ export const getSingleScheduleWithTag = (): IDuty.Schedule[] => [
   },
 ];
 
-export const getSortedSchedule = (): IDuty.Schedule[] => [
+export const getUnsortedSchedule = (): IDuty.Schedule[] => [
   {
     chatId: 2000010050,
     dayNumber: 1,
