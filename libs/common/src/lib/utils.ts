@@ -39,9 +39,21 @@ export function filterScheduleByChatAndTag(
 
 export function filterScheduleByDay(
   schedule: IDuty.Schedule[],
-  dayNumber: number
+  dayNumber: number,
+currentTimeInMinutes: number
 ): IDuty.Schedule[] {
-  return schedule.filter((duty) => duty.dayNumber === dayNumber);
+  return schedule.filter((duty) => {
+    const nextDay = isTimeToNextDay(duty.timeFrom, duty.timeTo);
+
+    const timeStopInMinutes = getTimeInMinutes(duty.timeTo);
+
+    if (nextDay) {
+      return duty.dayNumber === dayNumber
+    }
+
+    return timeStopInMinutes > currentTimeInMinutes && duty.dayNumber === dayNumber
+
+  });
 }
 
 export function filterScheduleByDayAndTime(

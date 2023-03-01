@@ -14,7 +14,7 @@ import {
   getSchedule,
   getScheduleResultForAsd,
   getScheduleResultForQa,
-  getScheduleResultForWeb,
+  getScheduleResultForWeb, getScheduleWithDifferentTime,
   getSingleScheduleWithoutTagNextDay,
   getSingleScheduleWithoutTagSameDay,
   getSingleScheduleWithTag,
@@ -83,16 +83,31 @@ describe('utils testing', () => {
   });
 
   describe('filterScheduleByDay', () => {
-    const scheduleForWeb = getScheduleResultForWeb();
+    const schedule = getScheduleWithDifferentTime();
+    const scheduleNextDay = getUnsortedSchedule();
 
-    it('should be an empty array because no duty on wednesday', () => {
-      expect(filterScheduleByDay(scheduleForWeb, 3)).toStrictEqual([]);
+    it('should be an empty array because no duty on tuesday', () => {
+      expect(filterScheduleByDay(schedule, 2, 50)).toStrictEqual([]);
     });
 
-    it('should be a duty on monday', () => {
-      expect(filterScheduleByDay(scheduleForWeb, 1)).toStrictEqual([
-        scheduleForWeb[0],
+    it('should be duties on monday', () => {
+      expect(filterScheduleByDay(schedule, 1, 840)).toStrictEqual(schedule);
+    });
+
+    it('should be a duty on monday only after 22:00', () => {
+      expect(filterScheduleByDay(schedule, 1, 1330)).toStrictEqual([
+        schedule[1],
       ]);
+    });
+
+    it('should be no duty on monday after 23:45', () => {
+      expect(filterScheduleByDay(schedule, 1, 1426)).toStrictEqual([
+      ]);
+    });
+
+
+    it('should be duties on monday after 23:45', () => {
+      expect(filterScheduleByDay(scheduleNextDay, 1, 1426)).toStrictEqual(scheduleNextDay);
     });
   });
 

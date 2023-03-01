@@ -187,11 +187,13 @@ export class DutyService {
     schedule: IDuty.Schedule[];
     noDutyAtCurrentTime: boolean;
   } {
-    const { dayNumber } = getDayMonthTime();
+    const { dayNumber, hours, minutes } = getDayMonthTime();
+
+    const currentTimeInMinutes = hours * 60 + minutes;
 
     if (currentSchedule.length === 0) {
       return {
-        schedule: filterScheduleByDay(schedule, dayNumber),
+        schedule: filterScheduleByDay(schedule, dayNumber, currentTimeInMinutes),
         noDutyAtCurrentTime: true,
       };
     }
