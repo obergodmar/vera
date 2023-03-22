@@ -7,16 +7,21 @@ import {
   ModalRoot,
   Panel,
   PanelHeader,
+  PanelHeaderBack,
   SplitCol,
   SplitLayout,
+  useAdaptivityConditionalRender,
+  useAdaptivityWithJSMediaQueries,
   View,
+  ViewWidth,
 } from '@vkontakte/vkui';
 
 import { FC, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
-import { Panels, panels } from '../components/panels';
+import { Navigation } from '../components/navigation';
+import { PanelItem, panels } from '../components/panels';
 import { VERA_AVATAR_50 } from '../data/constants';
 import { resetSchedule } from '../data/reducers/duty';
 import { ModalProvider, modalsIds } from '../hooks/useModal';
@@ -26,19 +31,38 @@ export const Content: FC = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
+  const { viewWidth } = useAdaptivityConditionalRender();
+  const { viewWidth: width } = useAdaptivityWithJSMediaQueries();
+
   const [activeModal, setActiveModal] = useState<modalsIds | null>(null);
   const [activePanel, setActivePanel] = useState(panels[0]);
 
   useEffect(() => {
     const pathnamePanel = pathname.replace('/', '');
-    const panel = panels.find((panel) => panel.value === pathnamePanel);
+
+    let panel: PanelItem | undefined;
+    if (pathnamePanel === 'navigation') {
+      panel = {
+        content: <Navigation />,
+        label: 'Раздел',
+        value: 'navigation',
+      };
+    } else {
+      panel = panels.find((panel) => panel.value === pathnamePanel);
+    }
 
     if (!panel) {
       navigate(`/${panels[0].value}`);
     } else {
       setActivePanel(panel);
     }
-  }, [activePanel, navigate, pathname]);
+  }, [navigate, pathname]);
+
+  useEffect(() => {
+    if (activePanel.value === 'navigation' && width >= ViewWidth.TABLET) {
+      navigate(`/${panels[0].value}`);
+    }
+  }, [activePanel, navigate, width]);
 
   const closeModal = () => setActiveModal(null);
 
@@ -88,14 +112,39 @@ export const Content: FC = () => {
         header={<PanelHeader separator={false} shadow />}
         modal={modal}
       >
-        <Panels />
+        {viewWidth.tabletPlus && (
+          <SplitCol
+            className={viewWidth.tabletPlus.className}
+            fixed
+            width={280}
+            maxWidth={280}
+          >
+            <Panel>
+              <PanelHeader />
+              <Navigation />
+            </Panel>
+          </SplitCol>
+        )}
 
-        <SplitCol width="100%" maxWidth="560px" stretchedOnMobile autoSpaced>
+        <SplitCol
+          width="100%"
+          maxWidth="560px"
+          stretchedOnMobile
+          autoSpaced
+          animate={false}
+        >
           <View activePanel={value}>
             <Panel id={value}>
               <PanelHeader
                 shadow
-                before={<Avatar size={36} src={VERA_AVATAR_50} />}
+                before={
+                  width >= ViewWidth.TABLET ||
+                  activePanel.value === 'navigation' ? (
+                    <Avatar size={36} src={VERA_AVATAR_50} />
+                  ) : (
+                    <PanelHeaderBack onClick={() => navigate('/navigation')} />
+                  )
+                }
                 after={
                   (cancel || submit || edit) && (
                     <div style={{ display: 'flex' }}>

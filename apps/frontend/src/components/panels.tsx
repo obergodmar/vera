@@ -1,14 +1,4 @@
-import {
-  Cell,
-  Group,
-  Panel,
-  PanelHeader,
-  SplitCol,
-  useAdaptivityConditionalRender,
-} from '@vkontakte/vkui';
-
-import { FC, ReactNode } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { ReactNode } from 'react';
 
 import { Panel as DutyPanel } from './duty/panel';
 import { PanelCancel } from './duty/panel-cancel';
@@ -41,56 +31,10 @@ export const panels: PanelItem[] = [
 ];
 
 export type PanelItem = {
-  value: 'mentions' | 'commands' | 'hello-messages' | 'duty';
+  value: 'navigation' | 'mentions' | 'commands' | 'hello-messages' | 'duty';
   label: string;
   content: ReactNode;
   edit?: ReactNode;
   cancel?: ReactNode;
   submit?: ReactNode;
-};
-
-export const Panels: FC = () => {
-  const { pathname } = useLocation();
-  const navigate = useNavigate();
-  const { viewWidth } = useAdaptivityConditionalRender();
-
-  const activePanel = pathname.replace('/', '');
-
-  return (
-    <>
-      {viewWidth.tabletPlus && (
-        <SplitCol
-          className={viewWidth.tabletPlus.className}
-          fixed
-          width={280}
-          maxWidth={280}
-        >
-          <Panel>
-            <PanelHeader />
-
-            <Group>
-              {panels.map((panel) => (
-                <Cell
-                  key={panel.value}
-                  disabled={activePanel === panel.value}
-                  style={
-                    activePanel === panel.value
-                      ? {
-                          backgroundColor:
-                            'var(--vkui--color_background_secondary)',
-                          borderRadius: 8,
-                        }
-                      : {}
-                  }
-                  onClick={() => navigate(`/${panel.value}`)}
-                >
-                  {panel.label}
-                </Cell>
-              ))}
-            </Group>
-          </Panel>
-        </SplitCol>
-      )}
-    </>
-  );
 };

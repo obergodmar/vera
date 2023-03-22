@@ -14,6 +14,7 @@ import { BrowserRouter } from 'react-router-dom';
 
 import '@vkontakte/vkui/dist/vkui.css';
 import 'reflect-metadata';
+import './styles.css';
 
 import App from './app/app';
 import { store } from './data/store';

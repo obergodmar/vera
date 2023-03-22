@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Draft } from '@reduxjs/toolkit';
 import { ConfigModel, IConfig } from '@vera-reforged/common';
 
-import { classToPlain, plainToClass } from 'class-transformer';
+import { plainToClass } from 'class-transformer';
 import { validateSync } from 'class-validator';
 import produce from 'immer';
 import { readFileSync, writeFileSync } from 'node:fs';
