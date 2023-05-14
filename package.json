@@ -18,7 +18,9 @@
     "eslint:fix": "eslint --fix",
     "test:backend": "NODE_OPTIONS=\"--experimental-vm-modules\" nx test backend",
     "test:common": "nx test common",
-    "deploy": "node scripts/deploy.js"
+    "deploy": "node scripts/deploy.js",
+    "deploy:frontend": "node scripts/deploy.js frontend",
+    "deploy:backend": "node scripts/deploy.js backend"
   },
   "lint-staged": {
     "**/*.{ts,tsx,js,jsx}": "yarn eslint:fix"

@@ -1,14 +1,18 @@
 const os = require('node:os');
 const fs = require('node:fs');
 const path = require('node:path');
+const { argv } = require('node:process');
 const { NodeSSH } = require('node-ssh');
 
-const distPath = path.join(`${__dirname}/../dist`);
-if (isDirEmpty(distPath)) {
+const [, , app] = argv;
+const appDist = `dist${app ? `/apps/${app}` : ''}`;
+
+const localDistPath = path.join(`${__dirname}/../${appDist}`);
+if (isDirEmpty(localDistPath)) {
   throw Error('dist directory is empty');
 }
 const remotePath = '/home/deploy/vera-reforged';
-const remoteDistPath = '/home/deploy/vera-reforged/dist';
+const remoteDistPath = `${remotePath}/${appDist}`;
 
 const vera = {
   name: 'Vera',
@@ -28,16 +32,15 @@ async function deploy({ name, ...options }) {
   const ssh = new NodeSSH();
 
   const failedTransfers = [];
-  const successfulTransfers = [];
 
   return new Promise(async (resolve, reject) => {
     try {
       await ssh.connect(options);
 
-      await ssh.execCommand('rm -rf dist', { cwd: remotePath });
+      await ssh.execCommand(`rm -rf ${appDist}`, { cwd: remotePath });
       console.log(`[${name}] Dist directory has been cleared`);
 
-      const status = await ssh.putDirectory(distPath, remoteDistPath, {
+      const status = await ssh.putDirectory(localDistPath, remoteDistPath, {
         recursive: true,
         concurrency: 10,
         tick: (localPath, remotePath, error) => {
@@ -47,8 +50,6 @@ async function deploy({ name, ...options }) {
             failedTransfers.push(localPath);
           } else {
             console.log(`[${name}] Success transfer: ${localPath}`);
-
-            successfulTransfers.push(localPath);
           }
         },
       });
