@@ -28,8 +28,6 @@ export class DutyService {
     @Inject(ConfigService) private readonly config: ConfigService,
     @Inject(LoggerService) private readonly logger: LoggerService
   ) {
-    return;
-
     this.api.botService.bot.hear(/duty(\s#?\w+)?/, (msg: MessageContext) => {
       const { peerType, peerId, $match } = msg;
       const [, hashtag] = $match || [];
