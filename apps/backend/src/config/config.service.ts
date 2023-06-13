@@ -7,6 +7,7 @@ import { validateSync } from 'class-validator';
 import produce from 'immer';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
+import { check, lock, unlock } from 'proper-lockfile';
 
 import { LoggerService } from '../logger/logger.service';
 import { initialConfig } from './initial-config';
@@ -67,10 +68,14 @@ function readConfig() {
   return validateConfig(JSON.parse(fileContent));
 }
 
-function writeConfig(config: IConfig.IConfig) {
+async function writeConfig(config: IConfig.IConfig) {
   const validatedConfig = validateConfig(config);
 
+  const release = await lock(filePath);
+
   writeFileSync(filePath, JSON.stringify(validatedConfig));
+
+  release();
 }
 
 export function validateConfig(config: object): IConfig.IConfig {
