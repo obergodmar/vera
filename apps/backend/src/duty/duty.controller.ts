@@ -46,7 +46,7 @@ export class DutyController {
   @Post('updateChatSchedule')
   public updateChatSchedule(
     @Body() data: UpdateChatScheduleDto
-  ): IApi.IDutyApi.UpdateChatScheduleResponse {
+  ): Promise<IApi.IDutyApi.UpdateChatScheduleResponse> {
     return this.dutyService.updateChatSchedule(data.chatId, data.schedule);
   }
 }

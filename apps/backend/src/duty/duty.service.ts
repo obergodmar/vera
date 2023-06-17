@@ -129,8 +129,11 @@ export class DutyService {
     return schedule.filter((duties) => duties.chatId === chatId);
   }
 
-  public updateChatSchedule(chatId: number, chatSchedule: IDuty.Schedule[]) {
-    const status = this.updateConfig((duty) => {
+  public async updateChatSchedule(
+    chatId: number,
+    chatSchedule: IDuty.Schedule[]
+  ) {
+    const status = await this.updateConfig((duty) => {
       const othersSchedule = duty.schedule.filter(
         (duty) => duty.chatId !== chatId
       );
@@ -193,7 +196,11 @@ export class DutyService {
 
     if (currentSchedule.length === 0) {
       return {
-        schedule: filterScheduleByDay(schedule, dayNumber, currentTimeInMinutes),
+        schedule: filterScheduleByDay(
+          schedule,
+          dayNumber,
+          currentTimeInMinutes
+        ),
         noDutyAtCurrentTime: true,
       };
     }
@@ -248,7 +255,9 @@ export class DutyService {
     return duty;
   }
 
-  private updateConfig(recipe: (duty: Draft<IDuty.IDuty>) => void) {
+  private async updateConfig(
+    recipe: (duty: Draft<IDuty.IDuty>) => void
+  ): Promise<true | string> {
     return this.config.updateConfig((config) => {
       config.duty = produce(config.duty, recipe);
     });

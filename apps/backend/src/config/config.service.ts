@@ -96,7 +96,7 @@ export class ConfigService {
       const errorText = JSON.stringify(e);
 
       this.logger.log(`ConfigService: ${errorText}`, { type: 'error' });
-      this.logger.log('ConfigService: unlock config file due to a error');
+      this.logger.log('ConfigService: unlock config file due to an error');
       try {
         unlockSync(filePath);
       } catch {
