@@ -19,10 +19,12 @@ export class ConfigService {
   private config: IConfig.IConfig;
   constructor(@Inject(LoggerService) private readonly logger: LoggerService) {
     try {
+      logger.log('ConfigService: Checking if Lock exists');
       unlockSync(filePath);
-      logger.log(`ConfigService: Checking if ${filePath}.lock exists`);
+
+      logger.log(`ConfigService: Unlock ${filePath}`);
     } catch {
-      logger.log(`ConfigService: ${filePath} doesn't exists`);
+      logger.log(`ConfigService: Lock file doesn't exists`);
     }
 
     try {
