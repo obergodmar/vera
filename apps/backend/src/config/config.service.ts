@@ -1,13 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Draft } from '@reduxjs/toolkit';
-import { ConfigModel, IConfig } from '@vera-reforged/common';
+import { ConfigModel, IConfig, sleep } from '@vera-reforged/common';
 
 import { plainToClass } from 'class-transformer';
 import { validateSync } from 'class-validator';
 import produce from 'immer';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { check, lock, unlock } from 'proper-lockfile';
+import { check, lock, unlockSync } from 'proper-lockfile';
 
 import { LoggerService } from '../logger/logger.service';
 import { initialConfig } from './initial-config';
@@ -19,6 +19,8 @@ export class ConfigService {
   private config: IConfig.IConfig;
   constructor(@Inject(LoggerService) private readonly logger: LoggerService) {
     try {
+      unlockSync(filePath);
+
       this.config = readConfig();
       logger.log(`ConfigService: ${filePath} was loaded successfully`);
     } catch (e) {
@@ -37,25 +39,58 @@ export class ConfigService {
     return this.config;
   }
 
-  public updateConfig(recipe: (config: Draft<IConfig.IConfig>) => void) {
-    const newConfig = produce(this.config, recipe);
+  public async updateConfig(
+    recipe: (config: Draft<IConfig.IConfig>) => void
+  ): Promise<true | string> {
+    const newConfig = produce(this.getConfig(), recipe);
 
-    return this.writeConfig(newConfig);
+    try {
+      const validConfig = validateConfig(newConfig);
+
+      return this.writeConfig(validConfig);
+    } catch (e: unknown) {
+      this.logger.log("ConfigService: config didn't passed checks", {
+        type: 'error',
+      });
+      this.logger.log(`ConfigService: config is invalid!, ${e}`, {
+        type: 'error',
+      });
+
+      return 'Invalid config';
+    }
   }
 
-  private writeConfig(newConfig: IConfig.IConfig): true | string {
+  private async writeConfig(
+    newConfig: IConfig.IConfig
+  ): Promise<true | string> {
     try {
+      const isLocked = await check(filePath);
+
+      if (isLocked) {
+        this.logger.log('ConfigService: config is locked. Awaiting 500ms');
+        await sleep(500);
+
+        return this.writeConfig(newConfig);
+      }
+
+      const release = await lock(filePath);
+      this.logger.log('ConfigService: lock config file for an update');
+
       writeConfig(newConfig);
+      this.config = newConfig;
 
       this.logger.log('ConfigService: config file was updated');
 
-      this.config = newConfig;
+      release();
+      this.logger.log('ConfigService: unlock config file');
 
       return true;
     } catch (e) {
       const errorText = JSON.stringify(e);
 
       this.logger.log(`ConfigService: ${errorText}`, { type: 'error' });
+      this.logger.log('ConfigService: unlock config file due to a error');
+      unlockSync(filePath);
 
       return errorText;
     }
@@ -68,14 +103,10 @@ function readConfig() {
   return validateConfig(JSON.parse(fileContent));
 }
 
-async function writeConfig(config: IConfig.IConfig) {
-  const validatedConfig = validateConfig(config);
+function writeConfig(config: IConfig.IConfig) {
+  const configAsString = JSON.stringify(config);
 
-  const release = await lock(filePath);
-
-  writeFileSync(filePath, JSON.stringify(validatedConfig));
-
-  release();
+  writeFileSync(filePath, configAsString);
 }
 
 export function validateConfig(config: object): IConfig.IConfig {
