@@ -20,7 +20,12 @@ export class ConfigService {
   constructor(@Inject(LoggerService) private readonly logger: LoggerService) {
     try {
       unlockSync(filePath);
+      logger.log(`ConfigService: Checking if ${filePath}.lock exists`);
+    } catch {
+      logger.log(`ConfigService: ${filePath} doesn't exists`);
+    }
 
+    try {
       this.config = readConfig();
       logger.log(`ConfigService: ${filePath} was loaded successfully`);
     } catch (e) {
@@ -90,7 +95,11 @@ export class ConfigService {
 
       this.logger.log(`ConfigService: ${errorText}`, { type: 'error' });
       this.logger.log('ConfigService: unlock config file due to a error');
-      unlockSync(filePath);
+      try {
+        unlockSync(filePath);
+      } catch {
+        this.logger.log("ConfigService: lock file doesn't exists ");
+      }
 
       return errorText;
     }
