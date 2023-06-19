@@ -1,6 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Draft } from '@reduxjs/toolkit';
-import { ConfigModel, IConfig, sleep } from '@vera-reforged/common';
+import {
+  ConfigModel,
+  IConfig,
+  isDeepEqual,
+  sleep,
+} from '@vera-reforged/common';
 
 import { plainToClass } from 'class-transformer';
 import { validateSync } from 'class-validator';
@@ -49,7 +54,12 @@ export class ConfigService {
   public async updateConfig(
     recipe: (config: Draft<IConfig.IConfig>) => void
   ): Promise<true | string> {
-    const newConfig = produce(this.getConfig(), recipe);
+    const currentConfig = this.getConfig();
+    const newConfig = produce(currentConfig, recipe);
+
+    if (isDeepEqual(currentConfig, newConfig)) {
+      return true;
+    }
 
     try {
       const validConfig = validateConfig(newConfig);
