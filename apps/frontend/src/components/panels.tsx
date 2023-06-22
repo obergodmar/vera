@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 import { Panel as DutyPanel } from './duty/panel';
 import { PanelCancel } from './duty/panel-cancel';
 import { PanelSubmit } from './duty/panel-submit';
+import { Panel as HelloMessagesPanel } from './hello-messages/panel';
 import { NotImplementedPanel } from './not-implemented-panel';
 
 export const panels: PanelItem[] = [
@@ -16,7 +17,7 @@ export const panels: PanelItem[] = [
   {
     value: 'hello-messages',
     label: 'Приветственные сообщения',
-    content: <NotImplementedPanel />,
+    content: <HelloMessagesPanel />,
   },
   {
     value: 'commands',

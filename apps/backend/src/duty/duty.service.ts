@@ -28,34 +28,34 @@ export class DutyService {
     @Inject(ConfigService) private readonly config: ConfigService,
     @Inject(LoggerService) private readonly logger: LoggerService
   ) {
-    this.api.botService.bot.hear(/duty(\s#?\w+)?/, (msg: MessageContext) => {
-      const { peerType, peerId, $match } = msg;
-      const [, hashtag] = $match || [];
-
-      const tag = hashtag?.replace(/\s?#?/, '') || null;
-
-      this.addChatIfDoesntExist.call(this, peerId, peerType);
-
-      const chatAndTagSchedule = this.filterScheduleForChatAndTag.call(
-        this,
-        peerId,
-        tag
-      );
-
-      const currentTimeDuties = this.filterScheduleForCurrentDayAndTime.call(
-        this,
-        chatAndTagSchedule
-      );
-
-      const { schedule, noDutyAtCurrentTime } =
-        this.filterScheduleIfNoDutyAtCurrentTime.call(
-          this,
-          currentTimeDuties,
-          chatAndTagSchedule
-        );
-
-      this.announceDuty.call(this, peerId, schedule, tag, noDutyAtCurrentTime);
-    });
+    // this.api.botService.bot.hear(/duty(\s#?\w+)?/, (msg: MessageContext) => {
+    //   const { peerType, peerId, $match } = msg;
+    //   const [, hashtag] = $match || [];
+    //
+    //   const tag = hashtag?.replace(/\s?#?/, '') || null;
+    //
+    //   this.addChatIfDoesntExist.call(this, peerId, peerType);
+    //
+    //   const chatAndTagSchedule = this.filterScheduleForChatAndTag.call(
+    //     this,
+    //     peerId,
+    //     tag
+    //   );
+    //
+    //   const currentTimeDuties = this.filterScheduleForCurrentDayAndTime.call(
+    //     this,
+    //     chatAndTagSchedule
+    //   );
+    //
+    //   const { schedule, noDutyAtCurrentTime } =
+    //     this.filterScheduleIfNoDutyAtCurrentTime.call(
+    //       this,
+    //       currentTimeDuties,
+    //       chatAndTagSchedule
+    //     );
+    //
+    //   this.announceDuty.call(this, peerId, schedule, tag, noDutyAtCurrentTime);
+    // });
   }
 
   private announceDuty(
