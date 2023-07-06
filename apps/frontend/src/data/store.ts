@@ -12,6 +12,7 @@ import { getToken } from '../utils/getToken';
 import { authorization, logOff } from './reducers/authorization';
 import { duty } from './reducers/duty';
 import { dutyApi } from './services/duty-api';
+import { helloMessagesApi } from './services/hello-messages-api';
 import { loginApi } from './services/login-api';
 import { createSnackbar } from './snackbar-store';
 
@@ -48,13 +49,15 @@ export const store = configureStore({
   reducer: {
     [authorization.name]: authorization.reducer,
     [duty.name]: duty.reducer,
-    [dutyApi.reducerPath]: dutyApi.reducer,
     [loginApi.reducerPath]: loginApi.reducer,
+    [dutyApi.reducerPath]: dutyApi.reducer,
+    [helloMessagesApi.reducerPath]: helloMessagesApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       loginApi.middleware,
       dutyApi.middleware,
+      helloMessagesApi.middleware,
       rtkQueryErrorLogger,
       middleware,
       ...(isDev ? devMiddlewares : [])

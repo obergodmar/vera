@@ -1,4 +1,5 @@
 import produce from 'immer';
+import { MessagesConversation } from 'vk-io/lib/api/schemas/objects';
 
 import { IDuty } from './duty';
 
@@ -40,7 +41,7 @@ export function filterScheduleByChatAndTag(
 export function filterScheduleByDay(
   schedule: IDuty.Schedule[],
   dayNumber: number,
-currentTimeInMinutes: number
+  currentTimeInMinutes: number
 ): IDuty.Schedule[] {
   return schedule.filter((duty) => {
     const nextDay = isTimeToNextDay(duty.timeFrom, duty.timeTo);
@@ -48,11 +49,12 @@ currentTimeInMinutes: number
     const timeStopInMinutes = getTimeInMinutes(duty.timeTo);
 
     if (nextDay) {
-      return duty.dayNumber === dayNumber
+      return duty.dayNumber === dayNumber;
     }
 
-    return timeStopInMinutes > currentTimeInMinutes && duty.dayNumber === dayNumber
-
+    return (
+      timeStopInMinutes > currentTimeInMinutes && duty.dayNumber === dayNumber
+    );
   });
 }
 
@@ -183,4 +185,21 @@ export function getAnnounceDutyMessage(
   }
 
   return message;
+}
+
+export const GROUPS_CHATS = ['chat', 'group'];
+export function filterByGroupChat(
+  convos?: MessagesConversation[]
+): MessagesConversation[] {
+  if (!convos?.length) {
+    return [];
+  }
+
+  return convos.filter((convo) => {
+    if ('peer' in convo) {
+      return GROUPS_CHATS.includes(convo['peer']?.type);
+    }
+
+    return false;
+  });
 }

@@ -31,10 +31,8 @@ export class LoggerService {
     const stringValues = value.toString();
 
     const message = `[${type.toUpperCase()}] ${day}.${month}.${year} ${hours}:${minutes}:${seconds}  ${stringValues}`;
-    console.log(message);
 
     const stream = createWriteStream(filePath, { flags: 'a' });
-
     stream.write(message + '\n');
     stream.end();
 
@@ -43,5 +41,7 @@ export class LoggerService {
       message: message,
       random_id: 0,
     });
+
+    console.log(message);
   }
 }

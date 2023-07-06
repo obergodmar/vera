@@ -37,6 +37,7 @@
     "@nestjs/platform-express": "10.0.5",
     "@nestjs/serve-static": "^3.0.0",
     "@nestjs/swagger": "7.1.1",
+    "@nestjs/typeorm": "^10.0.0",
     "@reduxjs/toolkit": "1.9.3",
     "@vk-io/hear": "^1.1.0",
     "@vkontakte/api-schema-typescript": "^1.5131.2",
@@ -51,6 +52,7 @@
     "cron": "^1.8.2",
     "mongodb": "^4.11.0",
     "mongoose": "^6.6.7",
+    "mysql2": "^3.5.0",
     "nanoid": "^4.0.0",
     "plausible-tracker": "^0.3.8",
     "proper-lockfile": "^4.1.2",
@@ -68,6 +70,7 @@
     "regenerator-runtime": "0.13.7",
     "rxjs": "^7.0.0",
     "tslib": "^2.3.0",
+    "typeorm": "^0.3.17",
     "vk-call": "^2.2.0",
     "vk-io": "^4.3.1"
   },

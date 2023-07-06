@@ -12,4 +12,8 @@ export const ROUTES = {
     prefix: 'config',
     baseUrl: '/api/config',
   },
+  helloMessages: {
+    prefix: 'hello-messages',
+    baseUrl: '/api/hello-messages',
+  },
 } as const;

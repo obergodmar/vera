@@ -1,7 +1,5 @@
-import {
-  MessagesGetConversationMembersResponse,
-  MessagesGetConversationsByIdResponse,
-} from 'vk-io/lib/api/schemas/responses';
+import { MessagesConversation } from 'vk-io/lib/api/schemas/objects';
+import { MessagesGetConversationMembersResponse } from 'vk-io/lib/api/schemas/responses';
 
 import { IDuty } from './duty';
 
@@ -19,6 +17,11 @@ export namespace IApi {
     error?: string;
   };
 
+  export type ConversationsList = {
+    count: number;
+    items: MessagesConversation[];
+  };
+
   export namespace IDutyApi {
     export type Requests =
       | GetChatsRequest
@@ -29,7 +32,7 @@ export namespace IApi {
       | UpdateChatScheduleRequest;
 
     export type GetChatsRequest = TokenRequest;
-    export type GetChatsResponse = MessagesGetConversationsByIdResponse;
+    export type GetChatsResponse = ConversationsList;
 
     export type GetMembersForChatRequest = TokenRequest<WithChatId>;
     export type GetMembersForChatResponse =
@@ -50,5 +53,12 @@ export namespace IApi {
       }>
     >;
     export type UpdateChatScheduleResponse = StatusResponse;
+  }
+
+  export namespace IHelloMessagesApi {
+    export type Requests = GetChatsRequest;
+
+    export type GetChatsRequest = TokenRequest;
+    export type GetChatsResponse = ConversationsList;
   }
 }

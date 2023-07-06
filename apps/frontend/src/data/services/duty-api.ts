@@ -4,6 +4,7 @@ import { CustomSelectOptionInterface } from '@vkontakte/vkui';
 import { ChipOption } from '@vkontakte/vkui/dist/components/Chip/Chip';
 
 import { extendFetchArgs } from '../../utils/extendFetchArgs';
+import { transformConvosToSelectOptions } from '../../utils/transformConvosToSelectOptions';
 
 export type Member = ChipOption & {
   peerId: number;
@@ -25,30 +26,7 @@ export const dutyApi = createApi({
           body: {},
         });
       },
-      transformResponse(data: IApi.IDutyApi.GetChatsResponse) {
-        return (
-          data.items?.reduce((acc: CustomSelectOptionInterface[], item) => {
-            const {
-              chat_settings,
-              peer: { id },
-            } = item;
-
-            if (!chat_settings) {
-              return acc;
-            }
-            const { title, photo } = chat_settings;
-
-            acc.push({
-              label: title,
-              value: id,
-              avatar: photo?.photo_100,
-              description: id,
-            });
-
-            return acc;
-          }, []) || []
-        );
-      },
+      transformResponse: transformConvosToSelectOptions,
     }),
     getDutyMembersForChat: builder.query<Member[], number>({
       query(peerId) {

@@ -1,23 +1,23 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Draft } from '@reduxjs/toolkit';
 import {
+  filterByGroupChat,
   filterScheduleByChatAndTag,
   filterScheduleByDay,
   filterScheduleByDayAndTime,
   getAnnounceDutyMessage,
   getDayMonthTime,
+  GROUPS_CHATS,
+  IApi,
   IDuty,
 } from '@vera-reforged/common';
 
 import produce from 'immer';
-import { MessageContext } from 'vk-io';
 import { MessagesConversation } from 'vk-io/lib/api/schemas/objects';
 
 import { ConfigService } from '../config/config.service';
 import { LoggerService } from '../logger/logger.service';
 import { VkApiService } from '../vk-api/vk-api.service';
-
-const GROUPS_CHATS = ['chat', 'group'];
 
 @Injectable()
 export class DutyService {
@@ -77,24 +77,21 @@ export class DutyService {
     );
   }
 
-  public async getChats() {
+  public async getChats(): Promise<IApi.IDutyApi.GetChatsResponse> {
     const { chats } = this.getConfig();
 
     this.logger.log('DutyService: Vera chats were requested');
 
     if (!chats.length) {
-      return { items: [] };
+      return { items: [], count: 0 };
     }
 
     const convos = await this.api.getConversationsById(chats);
 
-    this.chats =
-      convos.items?.filter(({ peer: { type } }) =>
-        GROUPS_CHATS.includes(type)
-      ) || [];
+    this.chats = filterByGroupChat(convos.items);
 
     return {
-      ...convos,
+      count: this.chats.length,
       items: this.chats,
     };
   }
