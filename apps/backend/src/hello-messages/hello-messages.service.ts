@@ -5,7 +5,7 @@ import { filterByGroupChat, IApi } from '@vera-reforged/common';
 import { Repository } from 'typeorm';
 import { MessagesConversation } from 'vk-io/lib/api/schemas/objects';
 
-import { Convo } from '../database/convo.entity';
+import { Convo } from '../convo/convo.entity';
 import { LoggerService } from '../logger/logger.service';
 import { VkApiService } from '../vk-api/vk-api.service';
 import { HelloMessage } from './hello-messages.entity';

@@ -187,7 +187,12 @@ export function getAnnounceDutyMessage(
   return message;
 }
 
-export const GROUPS_CHATS = ['chat', 'group'];
+export function isGroupChat(peerType?: string): boolean {
+  const GROUPS_CHATS = ['chat', 'group'];
+
+  return GROUPS_CHATS.includes(peerType || '');
+}
+
 export function filterByGroupChat(
   convos?: MessagesConversation[]
 ): MessagesConversation[] {
@@ -197,7 +202,7 @@ export function filterByGroupChat(
 
   return convos.filter((convo) => {
     if ('peer' in convo) {
-      return GROUPS_CHATS.includes(convo['peer']?.type);
+      return isGroupChat(convo['peer']?.type);
     }
 
     return false;

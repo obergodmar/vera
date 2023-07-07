@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { Convo } from '../convo/convo.entity';
 import { HelloMessage } from '../hello-messages/hello-messages.entity';
-import { Convo } from './convo.entity';
 
 @Module({
   imports: [

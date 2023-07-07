@@ -7,9 +7,9 @@ import {
   filterScheduleByDayAndTime,
   getAnnounceDutyMessage,
   getDayMonthTime,
-  GROUPS_CHATS,
   IApi,
   IDuty,
+  isGroupChat,
 } from '@vera-reforged/common';
 
 import produce from 'immer';
@@ -217,7 +217,7 @@ export class DutyService {
   private addChatIfDoesntExist(chatId: number, peerType: string) {
     const { chats } = this.getConfig();
 
-    if (GROUPS_CHATS.includes(peerType)) {
+    if (isGroupChat(peerType)) {
       this.logger.log(
         `DutyService: A duty was requested in ${this.getChatNameFromCache(
           chatId
