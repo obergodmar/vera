@@ -14,24 +14,27 @@ export type Member = ChipOption & {
   screenName: string;
 };
 
+const { baseUrl, endpoints } = ROUTES.duty;
+const tag = 'Schedule' as const;
+
 export const dutyApi = createApi({
-  baseQuery: fetchBaseQuery({ baseUrl: ROUTES.duty.baseUrl }),
+  baseQuery: fetchBaseQuery({ baseUrl }),
   reducerPath: 'dutyApi',
-  tagTypes: ['Schedule'],
+  tagTypes: [tag],
   endpoints: (builder) => ({
-    getDutyChats: builder.query<CustomSelectOptionInterface[], void>({
+    [endpoints.getChats]: builder.query<CustomSelectOptionInterface[], void>({
       query() {
         return extendFetchArgs<IApi.IDutyApi.GetChatsRequest>({
-          url: 'getChats',
+          url: endpoints.getChats,
           body: {},
         });
       },
       transformResponse: transformConvosToSelectOptions,
     }),
-    getDutyMembersForChat: builder.query<Member[], number>({
+    [endpoints.getMembersForChat]: builder.query<Member[], number>({
       query(peerId) {
         return extendFetchArgs<IApi.IDutyApi.GetMembersForChatRequest>({
-          url: `getMembersForChat`,
+          url: endpoints.getMembersForChat,
           body: {
             chatId: peerId,
           },
@@ -65,21 +68,21 @@ export const dutyApi = createApi({
           .sort((a, b) => a.label.localeCompare(b.label));
       },
     }),
-    getDutyDays: builder.query<IApi.IDutyApi.GetDaysResponse, void>({
+    [endpoints.getDays]: builder.query<IApi.IDutyApi.GetDaysResponse, void>({
       query() {
         return extendFetchArgs<IApi.IDutyApi.GetDaysRequest>({
-          url: 'getDays',
+          url: endpoints.getDays,
           body: {},
         });
       },
     }),
-    getDutyScheduleForChat: builder.query<
+    [endpoints.getScheduleForChat]: builder.query<
       IApi.IDutyApi.GetScheduleForChatResponse,
       number
     >({
       query(chatId) {
         return extendFetchArgs<IApi.IDutyApi.GetScheduleForChatRequest>({
-          url: 'getScheduleForChat',
+          url: endpoints.getScheduleForChat,
           body: {
             chatId,
           },
@@ -89,40 +92,43 @@ export const dutyApi = createApi({
         result
           ? [
               ...result.map(({ firstName, lastName }, idx) => ({
-                type: 'Schedule' as const,
+                type: tag,
                 id: `${firstName}-${lastName}-${idx}`,
               })),
-              'Schedule',
+              tag,
             ]
-          : ['Schedule'],
+          : [tag],
     }),
-    getDutySchedule: builder.query<IApi.IDutyApi.GetScheduleResponse, void>({
+    [endpoints.getSchedule]: builder.query<
+      IApi.IDutyApi.GetScheduleResponse,
+      void
+    >({
       query() {
         return extendFetchArgs<IApi.IDutyApi.GetScheduleRequest>({
-          url: 'getSchedule',
+          url: endpoints.getSchedule,
           body: {},
         });
       },
     }),
-    updateChatSchedule: builder.mutation<
+    [endpoints.updateChatSchedule]: builder.mutation<
       IApi.IDutyApi.UpdateChatScheduleResponse,
       Omit<IApi.IDutyApi.UpdateChatScheduleRequest, 'token'>
     >({
       query(body) {
         return extendFetchArgs<IApi.IDutyApi.UpdateChatScheduleRequest>({
           body,
-          url: 'updateChatSchedule',
+          url: endpoints.updateChatSchedule,
         });
       },
-      invalidatesTags: ['Schedule'],
+      invalidatesTags: [tag],
     }),
   }),
 });
 
 export const {
-  useGetDutyChatsQuery,
-  useGetDutyMembersForChatQuery,
-  useGetDutyDaysQuery,
+  useGetChatsQuery,
+  useGetDaysQuery,
+  useGetMembersForChatQuery,
+  useGetScheduleForChatQuery,
   useUpdateChatScheduleMutation,
-  useGetDutyScheduleForChatQuery,
 } = dutyApi;

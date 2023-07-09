@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { isGroupChat } from '@vera-reforged/common';
+import { filterByGroupChat, IApi, isGroupChat } from '@vera-reforged/common';
 
 import { Repository } from 'typeorm';
 import { MessageContext } from 'vk-io';
@@ -56,5 +56,33 @@ export class ConvoService {
         );
       }
     }
+  }
+
+  public async getChats(): Promise<IApi.ConversationsList> {
+    let convoIds: number[] = [];
+    try {
+      const convos = await this.convoRepository.find();
+
+      convoIds = convos.map((convo) => convo.id);
+    } catch (e) {
+      this.logger.log(`ConvoService: convoRepository error: ${e}`, {
+        type: 'error',
+      });
+    }
+
+    if (!convoIds.length) {
+      return {
+        count: 0,
+        items: [],
+      };
+    }
+
+    const chats = await this.api.getConversationsById(convoIds);
+    const items = filterByGroupChat(chats.items);
+
+    return {
+      count: items.length,
+      items,
+    };
   }
 }

@@ -1,17 +1,32 @@
-import { Controller, Inject, Post } from '@nestjs/common';
+import { Body, Controller, Inject, Post } from '@nestjs/common';
 import { IApi, ROUTES } from '@vera-reforged/common';
 
+import { UpdateHelloMessageDto } from './hello-messages.dto';
 import { HelloMessagesService } from './hello-messages.service';
 
-@Controller(ROUTES.helloMessages.prefix)
+const { prefix, endpoints } = ROUTES.helloMessages;
+
+@Controller(prefix)
 export class HelloMessagesController {
   public constructor(
     @Inject(HelloMessagesService)
     private readonly hlService: HelloMessagesService
   ) {}
 
-  @Post('getChats')
+  @Post(endpoints.getChats)
   public getChats(): Promise<IApi.IHelloMessagesApi.GetChatsResponse> {
     return this.hlService.getChats();
+  }
+
+  @Post(endpoints.getHelloMessages)
+  public getHelloMessages(): Promise<IApi.IHelloMessagesApi.GetHelloMessagesResponse> {
+    return this.hlService.getHelloMessages();
+  }
+
+  @Post(endpoints.updateHelloMessage)
+  public updateHelloMessage(
+    @Body() data: UpdateHelloMessageDto
+  ): Promise<IApi.IHelloMessagesApi.UpdateHelloMessageResponse> {
+    return this.hlService.updateHelloMessage(data.chatId, data.message);
   }
 }

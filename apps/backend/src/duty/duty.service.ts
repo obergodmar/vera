@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Draft } from '@reduxjs/toolkit';
 import {
-  filterByGroupChat,
   filterScheduleByChatAndTag,
   filterScheduleByDay,
   filterScheduleByDayAndTime,
@@ -16,6 +15,7 @@ import produce from 'immer';
 import { MessagesConversation } from 'vk-io/lib/api/schemas/objects';
 
 import { ConfigService } from '../config/config.service';
+import { ConvoService } from '../convo/convo.service';
 import { LoggerService } from '../logger/logger.service';
 import { VkApiService } from '../vk-api/vk-api.service';
 
@@ -26,7 +26,8 @@ export class DutyService {
   public constructor(
     @Inject(VkApiService) private readonly api: VkApiService,
     @Inject(ConfigService) private readonly config: ConfigService,
-    @Inject(LoggerService) private readonly logger: LoggerService
+    @Inject(LoggerService) private readonly logger: LoggerService,
+    @Inject(ConvoService) private readonly convoService: ConvoService
   ) {
     // this.api.botService.bot.hear(/duty(\s#?\w+)?/, (msg: MessageContext) => {
     //   const { peerType, peerId, $match } = msg;
@@ -78,22 +79,9 @@ export class DutyService {
   }
 
   public async getChats(): Promise<IApi.IDutyApi.GetChatsResponse> {
-    const { chats } = this.getConfig();
-
     this.logger.log('DutyService: Vera chats were requested');
 
-    if (!chats.length) {
-      return { items: [], count: 0 };
-    }
-
-    const convos = await this.api.getConversationsById(chats);
-
-    this.chats = filterByGroupChat(convos.items);
-
-    return {
-      count: this.chats.length,
-      items: this.chats,
-    };
+    return this.convoService.getChats();
   }
 
   public async getMembersForChat(chatId: number) {

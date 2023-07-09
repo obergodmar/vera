@@ -5,20 +5,33 @@ import { CustomSelectOptionInterface } from '@vkontakte/vkui';
 import { extendFetchArgs } from '../../utils/extendFetchArgs';
 import { transformConvosToSelectOptions } from '../../utils/transformConvosToSelectOptions';
 
+const { baseUrl, endpoints } = ROUTES.helloMessages;
+
 export const helloMessagesApi = createApi({
-  baseQuery: fetchBaseQuery({ baseUrl: ROUTES.helloMessages.baseUrl }),
+  baseQuery: fetchBaseQuery({ baseUrl }),
   reducerPath: 'helloMessagesApi',
   endpoints: (builder) => ({
-    getChats: builder.query<CustomSelectOptionInterface[], void>({
+    [endpoints.getChats]: builder.query<CustomSelectOptionInterface[], void>({
       query() {
         return extendFetchArgs<IApi.IHelloMessagesApi.GetChatsRequest>({
-          url: 'getChats',
+          url: endpoints.getChats,
           body: {},
         });
       },
       transformResponse: transformConvosToSelectOptions,
     }),
+    [endpoints.getHelloMessages]: builder.query<
+      IApi.IHelloMessagesApi.GetHelloMessagesResponse,
+      void
+    >({
+      query() {
+        return extendFetchArgs<IApi.IHelloMessagesApi.GetHelloMessagesRequest>({
+          url: endpoints.getHelloMessages,
+          body: {},
+        });
+      },
+    }),
   }),
 });
 
-export const { useGetChatsQuery } = helloMessagesApi;
+export const { useGetChatsQuery, useGetHelloMessagesQuery } = helloMessagesApi;

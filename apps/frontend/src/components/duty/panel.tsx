@@ -5,8 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { setCurrentChatId, setDutyDays } from '../../data/reducers/duty';
 import {
-  useGetDutyChatsQuery,
-  useGetDutyDaysQuery,
+  useGetChatsQuery,
+  useGetDaysQuery,
 } from '../../data/services/duty-api';
 import { RootState } from '../../data/store';
 import { ConvoSearch } from '../convo-search';
@@ -16,7 +16,7 @@ import { Days } from './days';
 export const Panel: FC = () => {
   const dispatch = useDispatch();
 
-  const { isLoading: isDaysLoading, data: days } = useGetDutyDaysQuery();
+  const { isLoading: isDaysLoading, data: days } = useGetDaysQuery();
 
   useEffect(() => {
     if (days) {
@@ -28,7 +28,7 @@ export const Panel: FC = () => {
     isLoading: isChatsLoading,
     data: chats = [],
     refetch: refetchChats,
-  } = useGetDutyChatsQuery();
+  } = useGetChatsQuery();
 
   const chatId = useSelector((state: RootState) => state.duty.currentChatId);
 

@@ -9,6 +9,6 @@ import { ConvoService } from './convo.service';
 @Module({
   imports: [VkApiModule, LoggerModule, TypeOrmModule.forFeature([Convo])],
   providers: [ConvoService],
-  exports: [TypeOrmModule],
+  exports: [TypeOrmModule, ConvoService],
 })
 export class ConvoModule {}

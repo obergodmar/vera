@@ -5,8 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { setCurrentSchedule } from '../../data/reducers/duty';
 import {
-  useGetDutyMembersForChatQuery,
-  useGetDutyScheduleForChatQuery,
+  useGetMembersForChatQuery,
+  useGetScheduleForChatQuery,
 } from '../../data/services/duty-api';
 import { RootState } from '../../data/store';
 import { ChatMembersProvider } from '../../hooks/useChatMembers';
@@ -20,8 +20,8 @@ export const Days: FC<Props> = memo(({ peerId }) => {
   const dispatch = useDispatch();
 
   const { isLoading: isMembersLoading, data: members = [] } =
-    useGetDutyMembersForChatQuery(peerId);
-  const { data: schedule, isFetching } = useGetDutyScheduleForChatQuery(peerId);
+    useGetMembersForChatQuery(peerId);
+  const { data: schedule, isFetching } = useGetScheduleForChatQuery(peerId);
 
   const days = useSelector((state: RootState) => state.duty.days);
   const duties = useSelector((state: RootState) => state.duty.schedule[peerId]);

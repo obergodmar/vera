@@ -2,11 +2,21 @@ export const ROUTES = {
   duty: {
     prefix: 'duty',
     baseUrl: '/api/duty',
+    endpoints: {
+      getChats: 'getChats',
+      getMembersForChat: 'getMembersForChat',
+      getDays: 'getDays',
+      getScheduleForChat: 'getScheduleForChat',
+      getSchedule: 'getSchedule',
+      updateChatSchedule: 'updateChatSchedule',
+    },
   },
   login: {
     prefix: 'login',
     baseUrl: '/api',
-    url: '/login',
+    endpoints: {
+      login: 'login',
+    },
   },
   config: {
     prefix: 'config',
@@ -15,5 +25,10 @@ export const ROUTES = {
   helloMessages: {
     prefix: 'hello-messages',
     baseUrl: '/api/hello-messages',
+    endpoints: {
+      getChats: 'getChats',
+      getHelloMessages: 'getHelloMessages',
+      updateHelloMessage: 'updateHelloMessage',
+    },
   },
 } as const;

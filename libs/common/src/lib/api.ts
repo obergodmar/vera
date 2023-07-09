@@ -56,9 +56,23 @@ export namespace IApi {
   }
 
   export namespace IHelloMessagesApi {
-    export type Requests = GetChatsRequest;
+    export type Requests = GetChatsRequest | GetHelloMessagesRequest;
 
     export type GetChatsRequest = TokenRequest;
     export type GetChatsResponse = ConversationsList;
+
+    export type GetHelloMessagesRequest = TokenRequest;
+    export type GetHelloMessagesResponse = ConversationsList & {
+      items: ConvoListWithMessages[];
+    };
+
+    export type UpdateHelloMessageRequest = TokenRequest<WithChatId> & {
+      message: string;
+    };
+    export type UpdateHelloMessageResponse = StatusResponse;
+
+    export type ConvoListWithMessages = MessagesConversation & {
+      helloMessage?: string;
+    };
   }
 }

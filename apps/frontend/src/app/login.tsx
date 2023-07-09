@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { VERA_AVATAR_100 } from '../data/constants';
 import { authorize, logOff } from '../data/reducers/authorization';
-import { useAuthorizeMutation } from '../data/services/login-api';
+import { useLoginMutation } from '../data/services/login-api';
 import { useSnackbar } from '../hooks/useSnackbar';
 
 export const Login: FC = () => {
@@ -26,19 +26,19 @@ export const Login: FC = () => {
   const dispatch = useDispatch();
   const [password, setPassword] = useState('');
 
-  const [authorizeRequest, authorizeResult] = useAuthorizeMutation();
+  const [loginRequest, loginResult] = useLoginMutation();
 
   useEffect(() => {
-    if (authorizeResult.status === 'fulfilled' && authorizeResult.data.token) {
+    if (loginResult.status === 'fulfilled' && loginResult.data.token) {
       dispatch(
         authorize({
-          token: authorizeResult.data.token,
+          token: loginResult.data.token,
         })
       );
 
       navigate('/', { replace: true });
     }
-  }, [authorizeResult, dispatch, navigate, snackbar]);
+  }, [loginResult, dispatch, navigate, snackbar]);
 
   useEffect(() => {
     dispatch(logOff());
@@ -63,11 +63,11 @@ export const Login: FC = () => {
                     value={password}
                     onChange={({ target: { value } }) => setPassword(value)}
                     onKeyDown={({ key }) => {
-                      if (key !== 'Enter' || authorizeResult.isLoading) {
+                      if (key !== 'Enter' || loginResult.isLoading) {
                         return;
                       }
 
-                      authorizeRequest(password);
+                      loginRequest(password);
                     }}
                   />
 
@@ -75,7 +75,7 @@ export const Login: FC = () => {
                     style={{ top: '10px' }}
                     size="m"
                     stretched
-                    onClick={() => authorizeRequest(password)}
+                    onClick={() => loginRequest(password)}
                   >
                     Авторизоваться
                   </Button>

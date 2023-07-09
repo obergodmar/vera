@@ -1,17 +1,10 @@
 import { IApi, ScheduleModel } from '@vera-reforged/common';
 
 import { Type } from 'class-transformer';
-import { IsNumber, ValidateNested } from 'class-validator';
+import { ValidateNested } from 'class-validator';
 
+import { WithChatIdDto } from '../convo/convo.dto';
 import { TokenDto } from '../login/dto/token.dto';
-
-class WithChatIdDto
-  extends TokenDto
-  implements IApi.TokenRequest<IApi.WithChatId>
-{
-  @IsNumber()
-  chatId!: number;
-}
 
 export class GetChatsDto
   extends TokenDto
