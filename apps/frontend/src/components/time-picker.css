@@ -52,6 +52,12 @@
   color: var(--vkui--color_text_subhead);
 }
 
+.react-time-picker__inputGroup__leadingZero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .react-time-picker__inputGroup__input {
   min-width: 0.54em;
   position: relative;
