@@ -11,3 +11,7 @@ export class WithChatIdDto
   @IsNumber()
   chatId!: number;
 }
+
+export class GetChatsDto
+  extends TokenDto
+  implements IApi.IConvoApi.GetChatsRequest {}

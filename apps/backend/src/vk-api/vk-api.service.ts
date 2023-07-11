@@ -3,6 +3,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   MessagesGetConversationMembersResponse,
   MessagesGetConversationsByIdResponse,
+  UsersGetResponse,
 } from 'vk-io/lib/api/schemas/responses';
 
 import { BotService } from '../bot/bot.service';
@@ -28,6 +29,13 @@ export class VkApiService {
   ): Promise<MessagesGetConversationMembersResponse> {
     return this.fetch('messages.getConversationMembers', {
       peer_id: chatId,
+    });
+  }
+
+  public async getUsers(peerIds: number[]): Promise<UsersGetResponse> {
+    return this.botService.vk.api.call('users.get', {
+      user_ids: peerIds.join(','),
+      fields: ['screen_name', 'photo_50'],
     });
   }
 

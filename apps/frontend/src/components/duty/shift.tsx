@@ -26,7 +26,7 @@ export const Shift: FC<Props> = ({ duty, shiftNumber, dayNumber }) => {
 
   const duties: Member[] = [
     duty.firstName !== '' && {
-      value: duty.peerId,
+      value: duty.userId,
       label: `${duty.firstName} ${duty.lastName}`,
       ...duty,
     },
@@ -82,14 +82,14 @@ export const Shift: FC<Props> = ({ duty, shiftNumber, dayNumber }) => {
             const [member, nextMember] = values;
 
             const {
-              peerId = shiftNumber,
+              userId = shiftNumber,
               firstName = '',
               lastName = '',
               avatar = '',
               screenName = '',
             } = nextMember || member || {};
             handleEditShift({
-              peerId,
+              userId,
               firstName,
               lastName,
               avatar,

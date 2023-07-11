@@ -16,11 +16,6 @@ export class DutyController {
     @Inject(DutyService) private readonly dutyService: DutyService
   ) {}
 
-  @Post(endpoints.getChats)
-  public getChats(): Promise<IApi.IDutyApi.GetChatsResponse> {
-    return this.dutyService.getChats();
-  }
-
   @Post(endpoints.getMembersForChat)
   public async getMembersForChat(
     @Body() data: GetMembersFotChatDto
@@ -28,20 +23,10 @@ export class DutyController {
     return this.dutyService.getMembersForChat(data.chatId);
   }
 
-  @Post(endpoints.getDays)
-  public getDays(): IApi.IDutyApi.GetDaysResponse {
-    return this.dutyService.getDays();
-  }
-
-  @Post(endpoints.getSchedule)
-  public getSchedule(): IApi.IDutyApi.GetScheduleResponse {
-    return this.dutyService.getSchedule();
-  }
-
   @Post(endpoints.getScheduleForChat)
-  public getScheduleForChat(
+  public async getScheduleForChat(
     @Body() data: GetScheduleForChatDto
-  ): IApi.IDutyApi.GetScheduleForChatResponse {
+  ): Promise<IApi.IDutyApi.GetScheduleForChatResponse> {
     return this.dutyService.getScheduleForChat(data.chatId);
   }
 

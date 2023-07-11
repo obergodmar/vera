@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Draft } from '@reduxjs/toolkit';
+import { InjectRepository } from '@nestjs/typeorm';
 import {
   filterScheduleByChatAndTag,
   filterScheduleByDay,
@@ -8,55 +8,59 @@ import {
   getDayMonthTime,
   IApi,
   IDuty,
-  isGroupChat,
 } from '@vera-reforged/common';
 
-import produce from 'immer';
-import { MessagesConversation } from 'vk-io/lib/api/schemas/objects';
+import { DataSource, Repository } from 'typeorm';
+import { MessageContext } from 'vk-io';
+import { UsersUserFull } from 'vk-io/lib/api/schemas/objects';
 
-import { ConfigService } from '../config/config.service';
-import { ConvoService } from '../convo/convo.service';
 import { LoggerService } from '../logger/logger.service';
 import { VkApiService } from '../vk-api/vk-api.service';
+import { Duty } from './duty.entity';
 
 @Injectable()
 export class DutyService {
-  private chats: MessagesConversation[] = [];
-
   public constructor(
+    private dataSource: DataSource,
+    @InjectRepository(Duty) private readonly dutyRepository: Repository<Duty>,
     @Inject(VkApiService) private readonly api: VkApiService,
-    @Inject(ConfigService) private readonly config: ConfigService,
-    @Inject(LoggerService) private readonly logger: LoggerService,
-    @Inject(ConvoService) private readonly convoService: ConvoService
+    @Inject(LoggerService) private readonly logger: LoggerService
   ) {
-    // this.api.botService.bot.hear(/duty(\s#?\w+)?/, (msg: MessageContext) => {
-    //   const { peerType, peerId, $match } = msg;
-    //   const [, hashtag] = $match || [];
-    //
-    //   const tag = hashtag?.replace(/\s?#?/, '') || null;
-    //
-    //   this.addChatIfDoesntExist.call(this, peerId, peerType);
-    //
-    //   const chatAndTagSchedule = this.filterScheduleForChatAndTag.call(
-    //     this,
-    //     peerId,
-    //     tag
-    //   );
-    //
-    //   const currentTimeDuties = this.filterScheduleForCurrentDayAndTime.call(
-    //     this,
-    //     chatAndTagSchedule
-    //   );
-    //
-    //   const { schedule, noDutyAtCurrentTime } =
-    //     this.filterScheduleIfNoDutyAtCurrentTime.call(
-    //       this,
-    //       currentTimeDuties,
-    //       chatAndTagSchedule
-    //     );
-    //
-    //   this.announceDuty.call(this, peerId, schedule, tag, noDutyAtCurrentTime);
-    // });
+    this.api.botService.bot.hear(
+      /duty(\s#?\w+)?/,
+      async (msg: MessageContext) => {
+        const { peerId, $match } = msg;
+        const [, hashtag] = $match || [];
+
+        const tag = hashtag?.replace(/\s?#?/, '') || null;
+
+        const chatAndTagSchedule = await this.filterScheduleForChatAndTag.call(
+          this,
+          peerId,
+          tag
+        );
+
+        const currentTimeDuties = this.filterScheduleForCurrentDayAndTime.call(
+          this,
+          chatAndTagSchedule
+        );
+
+        const { schedule, noDutyAtCurrentTime } =
+          this.filterScheduleIfNoDutyAtCurrentTime.call(
+            this,
+            currentTimeDuties,
+            chatAndTagSchedule
+          );
+
+        this.announceDuty.call(
+          this,
+          peerId,
+          schedule,
+          tag,
+          noDutyAtCurrentTime
+        );
+      }
+    );
   }
 
   private announceDuty(
@@ -78,80 +82,136 @@ export class DutyService {
     );
   }
 
-  public async getChats(): Promise<IApi.IDutyApi.GetChatsResponse> {
-    this.logger.log('DutyService: Vera chats were requested');
-
-    return this.convoService.getChats();
-  }
-
   public async getMembersForChat(chatId: number) {
     return this.api.getConversationMembers(chatId);
   }
 
-  public getDays() {
-    const { days } = this.getConfig();
-
-    this.logger.log('DutyService: Duty days were requested');
-
-    return days;
-  }
-
-  public getSchedule() {
-    const { schedule } = this.getConfig();
-
-    return schedule;
-  }
-
-  public getScheduleForChat(chatId: number) {
-    const { schedule } = this.getConfig();
-
+  public async getScheduleForChat(
+    chatId: number
+  ): Promise<IApi.IDutyApi.GetScheduleForChatResponse> {
     this.logger.log(
-      `DutyService: Duty schedule for chat ${this.getChatNameFromCache(
-        chatId
-      )} was requested`
+      `DutyService: Duty schedule for chat ${chatId} was requested`
     );
 
-    return schedule.filter((duties) => duties.chatId === chatId);
+    let dutyArray: Duty[] = [];
+
+    try {
+      dutyArray = await this.dutyRepository.findBy({ chatId });
+      this.logger.log(
+        `DutyService: Found ${dutyArray.length} duties for chat ${chatId}`
+      );
+    } catch (e) {
+      this.logger.log(
+        `DutyService: dutyRepository error when selecting for chat ${chatId}: ${e}`,
+        { type: 'error' }
+      );
+
+      return [];
+    }
+
+    if (!dutyArray.length) {
+      return [];
+    }
+
+    this.logger.log(`DutyService: Fetching users`);
+
+    const userIds = dutyArray.map((duty) => duty.userId);
+    let users: UsersUserFull[] = [];
+
+    try {
+      users = await this.api.getUsers(userIds);
+      this.logger.log(`DutyService: Fetch successfull`);
+    } catch (e) {
+      this.logger.log(`DutyService: Error when fetching users, ${e}`, {
+        type: 'error',
+      });
+
+      return [];
+    }
+
+    return dutyArray.reduce(
+      (acc, { chatId, userId, dayNumber, timeFrom, timeTo, tag }) => {
+        const user = users.find(({ id }) => id === userId);
+        if (!user) {
+          return acc;
+        }
+
+        const {
+          first_name: firstName,
+          last_name: lastName,
+          screen_name: screenName,
+          photo_50: avatar,
+        } = user;
+
+        return [
+          ...acc,
+          {
+            chatId,
+            userId,
+            firstName,
+            lastName,
+            avatar,
+            screenName,
+            dayNumber,
+            timeFrom,
+            timeTo,
+            tag,
+          },
+        ];
+      },
+      []
+    );
   }
 
   public async updateChatSchedule(
     chatId: number,
     chatSchedule: IDuty.Schedule[]
   ) {
-    const status = await this.updateConfig((duty) => {
-      const othersSchedule = duty.schedule.filter(
-        (duty) => duty.chatId !== chatId
-      );
+    let error: string;
 
-      duty.schedule = [...othersSchedule, ...chatSchedule];
-    });
+    const dutiesToInsert: Omit<Duty, 'id'>[] = chatSchedule.map(
+      ({ userId, chatId, dayNumber, timeFrom, timeTo, tag }) => ({
+        userId,
+        chatId,
+        dayNumber,
+        timeFrom,
+        timeTo,
+        tag,
+      })
+    );
+    this.logger.log(`DutyService: Starting transaction for chat ${chatId}`);
 
-    if (typeof status === 'string') {
-      this.logger.log(
-        `DutyService: An error occurred in ${this.getChatNameFromCache(
-          chatId
-        )}: ${status}`
-      );
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.startTransaction();
 
-      return {
-        error: status,
-      };
+    try {
+      await this.dutyRepository.delete({ chatId });
+
+      await this.dutyRepository.insert(dutiesToInsert);
+
+      this.logger.log(`DutyService: Changes were made in ${chatId}`);
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+
+      error = JSON.stringify(e);
+
+      this.logger.log(`DutyService: Transaction failed: ${e}`, {
+        type: 'error',
+      });
+    } finally {
+      await queryRunner.release();
     }
 
-    this.logger.log(
-      `DutyService: Changes were made in ${this.getChatNameFromCache(chatId)}`
-    );
+    if (error) {
+      return {
+        error,
+        success: false,
+      };
+    }
 
     return {
       success: true,
     };
-  }
-
-  private getChatNameFromCache(chatId: number) {
-    const chatName = this.chats.find(({ peer: { id } }) => id === chatId)
-      ?.chat_settings?.title;
-
-    return chatName ? `${chatName} (${chatId})` : chatId;
   }
 
   private filterScheduleForCurrentDayAndTime(
@@ -196,55 +256,12 @@ export class DutyService {
     };
   }
 
-  private filterScheduleForChatAndTag(chatId: number, tag: string | null) {
-    const { schedule }: IDuty.IDuty = this.getConfig();
+  private async filterScheduleForChatAndTag(
+    chatId: number,
+    tag: string | null
+  ): Promise<IDuty.Schedule[]> {
+    const schedule = await this.getScheduleForChat(chatId);
 
     return filterScheduleByChatAndTag(schedule, chatId, tag);
-  }
-
-  private addChatIfDoesntExist(chatId: number, peerType: string) {
-    const { chats } = this.getConfig();
-
-    if (isGroupChat(peerType)) {
-      this.logger.log(
-        `DutyService: A duty was requested in ${this.getChatNameFromCache(
-          chatId
-        )}`
-      );
-
-      if (!chats.includes(chatId)) {
-        this.api.botService.vk.api.messages.send({
-          peer_id: chatId,
-          message: 'Возможность установки дежурства включена',
-          random_id: 0,
-        });
-      }
-
-      this.updateConfig((duty) => {
-        if (!duty.chats.includes(chatId)) {
-          duty.chats.push(chatId);
-        }
-      });
-
-      return;
-    }
-
-    this.logger.log(
-      `DutyService: A duty was requested by peer ${chatId} in personal chat`
-    );
-  }
-
-  private getConfig() {
-    const { duty } = this.config.getConfig();
-
-    return duty;
-  }
-
-  private async updateConfig(
-    recipe: (duty: Draft<IDuty.IDuty>) => void
-  ): Promise<true | string> {
-    return this.config.updateConfig((config) => {
-      config.duty = produce(config.duty, recipe);
-    });
   }
 }

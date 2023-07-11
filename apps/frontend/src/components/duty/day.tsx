@@ -57,7 +57,7 @@ export const Day: FC<Props> = ({ day, duties }) => {
       >
         {duties.map((duty, idx) => (
           <Shift
-            key={`${duty.peerId}-shift-${idx}`}
+            key={`${duty.userId}-shift-${idx}`}
             duty={duty}
             shiftNumber={idx}
             dayNumber={dayNumber}

@@ -1,3 +1,4 @@
+import { IDuty } from '@vera-reforged/common';
 import { Spinner } from '@vkontakte/vkui';
 
 import { FC, memo, useEffect } from 'react';
@@ -13,21 +14,53 @@ import { ChatMembersProvider } from '../../hooks/useChatMembers';
 import { Day } from './day';
 
 type Props = {
-  peerId: number;
+  chatId: number;
 };
 
-export const Days: FC<Props> = memo(({ peerId }) => {
+const days: IDuty.Day[] = [
+  {
+    shortName: 'пн',
+    name: 'понедельник',
+    nameWhen: 'в понедельник',
+    dayNumber: 1,
+  },
+  {
+    shortName: 'вт',
+    name: 'вторник',
+    nameWhen: 'во вторник',
+    dayNumber: 2,
+  },
+  {
+    shortName: 'ср',
+    name: 'среда',
+    nameWhen: 'в среду',
+    dayNumber: 3,
+  },
+  {
+    shortName: 'чт',
+    name: 'четверг',
+    nameWhen: 'в четверг',
+    dayNumber: 4,
+  },
+  {
+    shortName: 'пт',
+    name: 'пятница',
+    nameWhen: 'в пятницу',
+    dayNumber: 5,
+  },
+];
+
+export const Days: FC<Props> = memo(({ chatId }) => {
   const dispatch = useDispatch();
 
   const { isLoading: isMembersLoading, data: members = [] } =
-    useGetMembersForChatQuery(peerId);
-  const { data: schedule, isFetching } = useGetScheduleForChatQuery(peerId);
+    useGetMembersForChatQuery(chatId);
+  const { data: schedule, isFetching } = useGetScheduleForChatQuery(chatId);
 
-  const days = useSelector((state: RootState) => state.duty.days);
-  const duties = useSelector((state: RootState) => state.duty.schedule[peerId]);
+  const duties = useSelector((state: RootState) => state.duty.schedule[chatId]);
 
   useEffect(() => {
-    if (!isFetching && schedule) {
+    if (!isFetching && schedule?.length) {
       dispatch(setCurrentSchedule(schedule));
     }
   }, [dispatch, isFetching, schedule]);

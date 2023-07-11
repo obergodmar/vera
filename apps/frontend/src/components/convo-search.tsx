@@ -27,10 +27,7 @@ export const ConvoSearch: FC<Props> = ({
 }) => {
   return (
     <FormLayoutGroup mode="horizontal" style={{ display: 'flex', gap: '10px' }}>
-      <FormItem
-        top="Чат"
-        bottom="Чтобы чат появился в списке, достаточно один раз написать duty в чат, где Вера установлена администратором"
-      >
+      <FormItem top="Чат">
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <Select
             searchable
@@ -58,7 +55,7 @@ export const ConvoSearch: FC<Props> = ({
           {refetchConvos && (
             <TextTooltip text="Обновить">
               <IconButton
-                aria-label="Обновить"
+                aria-label="Обновить список чатов"
                 onClick={refetchConvos}
                 style={{
                   minWidth: '44px',

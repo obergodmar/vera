@@ -1,9 +1,8 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IApi } from '@vera-reforged/common';
 
 import { Repository } from 'typeorm';
-import { MessagesConversation } from 'vk-io/lib/api/schemas/objects';
 
 import { ConvoService } from '../convo/convo.service';
 import { LoggerService } from '../logger/logger.service';
@@ -12,8 +11,6 @@ import { HelloMessage } from './hello-messages.entity';
 
 @Injectable()
 export class HelloMessagesService {
-  private chats: MessagesConversation[] = [];
-
   public constructor(
     @InjectRepository(HelloMessage)
     private readonly hlRepository: Repository<HelloMessage>,
@@ -22,24 +19,18 @@ export class HelloMessagesService {
     @Inject(ConvoService) private readonly convoService: ConvoService
   ) {}
 
-  public async getChats(): Promise<IApi.IHelloMessagesApi.GetChatsResponse> {
-    this.logger.log('HelloMessagesService: Vera chats were reqeusted');
-
-    const chatsResult = await this.convoService.getChats();
-    this.chats = chatsResult.items;
-
-    return chatsResult;
-  }
-
   public async getHelloMessages(): Promise<IApi.IHelloMessagesApi.GetHelloMessagesResponse> {
+    this.logger.log('HelloMessagesService : hello messages were requested');
+
     const messages = await this.hlRepository.find();
+    const convos = await this.convoService.getChats();
 
     const convosWithMessages = messages.reduce(
       (
         chats: IApi.IHelloMessagesApi.ConvoListWithMessages[],
         { chatId, message }
       ) => {
-        const chat = this.chats.find((chat) => chat.peer.id === chatId);
+        const chat = convos.items.find((chat) => chat.peer.id === chatId);
 
         if (chat) {
           chats.push({

@@ -1,13 +1,11 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { IApi, ROUTES } from '@vera-reforged/common';
-import { CustomSelectOptionInterface } from '@vkontakte/vkui';
 import { ChipOption } from '@vkontakte/vkui/dist/components/Chip/Chip';
 
 import { extendFetchArgs } from '../../utils/extendFetchArgs';
-import { transformConvosToSelectOptions } from '../../utils/transformConvosToSelectOptions';
 
 export type Member = ChipOption & {
-  peerId: number;
+  userId: number;
   firstName: string;
   lastName: string;
   avatar: string;
@@ -22,21 +20,12 @@ export const dutyApi = createApi({
   reducerPath: 'dutyApi',
   tagTypes: [tag],
   endpoints: (builder) => ({
-    [endpoints.getChats]: builder.query<CustomSelectOptionInterface[], void>({
-      query() {
-        return extendFetchArgs<IApi.IDutyApi.GetChatsRequest>({
-          url: endpoints.getChats,
-          body: {},
-        });
-      },
-      transformResponse: transformConvosToSelectOptions,
-    }),
     [endpoints.getMembersForChat]: builder.query<Member[], number>({
-      query(peerId) {
+      query(chatId) {
         return extendFetchArgs<IApi.IDutyApi.GetMembersForChatRequest>({
           url: endpoints.getMembersForChat,
           body: {
-            chatId: peerId,
+            chatId,
           },
         });
       },
@@ -50,30 +39,22 @@ export const dutyApi = createApi({
         return profiles
           .map(
             ({
-              id: peerId,
+              id: userId,
               photo_100: avatar = '',
               screen_name: screenName = '',
               first_name: firstName,
               last_name: lastName,
             }) => ({
               label: `${firstName} ${lastName}`,
-              value: peerId,
+              value: userId,
               avatar,
               screenName,
-              peerId,
+              userId,
               firstName,
               lastName,
             })
           )
           .sort((a, b) => a.label.localeCompare(b.label));
-      },
-    }),
-    [endpoints.getDays]: builder.query<IApi.IDutyApi.GetDaysResponse, void>({
-      query() {
-        return extendFetchArgs<IApi.IDutyApi.GetDaysRequest>({
-          url: endpoints.getDays,
-          body: {},
-        });
       },
     }),
     [endpoints.getScheduleForChat]: builder.query<
@@ -99,17 +80,6 @@ export const dutyApi = createApi({
             ]
           : [tag],
     }),
-    [endpoints.getSchedule]: builder.query<
-      IApi.IDutyApi.GetScheduleResponse,
-      void
-    >({
-      query() {
-        return extendFetchArgs<IApi.IDutyApi.GetScheduleRequest>({
-          url: endpoints.getSchedule,
-          body: {},
-        });
-      },
-    }),
     [endpoints.updateChatSchedule]: builder.mutation<
       IApi.IDutyApi.UpdateChatScheduleResponse,
       Omit<IApi.IDutyApi.UpdateChatScheduleRequest, 'token'>
@@ -126,8 +96,6 @@ export const dutyApi = createApi({
 });
 
 export const {
-  useGetChatsQuery,
-  useGetDaysQuery,
   useGetMembersForChatQuery,
   useGetScheduleForChatQuery,
   useUpdateChatScheduleMutation,

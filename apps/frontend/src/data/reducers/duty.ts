@@ -4,14 +4,12 @@ import { IDuty } from '@vera-reforged/common';
 type State = {
   currentChatId: number | undefined;
   currentSchedule: IDuty.Schedule[];
-  days: IDuty.Day[];
   schedule: Record<number, IDuty.Schedule[]>;
 };
 
 const initialState: State = {
   currentChatId: undefined,
   currentSchedule: [],
-  days: [],
   schedule: {},
 };
 
@@ -19,10 +17,6 @@ export const duty = createSlice({
   name: 'duty',
   initialState,
   reducers: {
-    setDutyDays(state, { payload }: PayloadAction<IDuty.Day[]>) {
-      state.days = payload;
-    },
-
     setCurrentChatId(state, { payload }: PayloadAction<number>) {
       state.currentChatId = payload;
     },
@@ -64,7 +58,7 @@ export const duty = createSlice({
         tag: '',
         timeTo: '23:59',
         timeFrom: '00:00',
-        peerId: length,
+        userId: length,
         avatar: '',
         firstName: '',
         screenName: '',
@@ -134,7 +128,6 @@ export const duty = createSlice({
 });
 
 export const {
-  setDutyDays,
   setCurrentChatId,
   setCurrentSchedule,
   resetSchedule,

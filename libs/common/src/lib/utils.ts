@@ -129,7 +129,7 @@ export function getDutyMessage(
   mention = true
 ): string {
   return schedule.reduce(
-    (acc, { firstName, lastName, timeFrom, timeTo, tag, peerId }) => {
+    (acc, { firstName, lastName, timeFrom, timeTo, tag, userId }) => {
       const withTimeFrom = timeFrom ? ` с ${timeFrom}` : '';
       const withTimeTo = timeTo ? ` до ${timeTo}` : '';
       const withTag = tag ? `#${tag} ` : '';
@@ -147,7 +147,7 @@ export function getDutyMessage(
         : withDayMonthFrom;
 
       const dutyName = mention
-        ? `@id${peerId} (${firstName})`
+        ? `@id${userId} (${firstName})`
         : `${firstName} ${lastName}`;
 
       return `${withPrev}${withTag}${dutyName}${withTimeFrom} ${withDayMonthFrom}${withTimeTo} ${withDayMonthTo}`;

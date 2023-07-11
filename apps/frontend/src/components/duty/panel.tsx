@@ -1,13 +1,10 @@
 import { Group, Header, PanelSpinner } from '@vkontakte/vkui';
 
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { setCurrentChatId, setDutyDays } from '../../data/reducers/duty';
-import {
-  useGetChatsQuery,
-  useGetDaysQuery,
-} from '../../data/services/duty-api';
+import { setCurrentChatId } from '../../data/reducers/duty';
+import { useGetChatsQuery } from '../../data/services/convo-api';
 import { RootState } from '../../data/store';
 import { ConvoSearch } from '../convo-search';
 import { ScrollToTop } from '../scroll-to-top';
@@ -15,14 +12,6 @@ import { Days } from './days';
 
 export const Panel: FC = () => {
   const dispatch = useDispatch();
-
-  const { isLoading: isDaysLoading, data: days } = useGetDaysQuery();
-
-  useEffect(() => {
-    if (days) {
-      dispatch(setDutyDays(days));
-    }
-  }, [days, dispatch]);
 
   const {
     isLoading: isChatsLoading,
@@ -32,7 +21,7 @@ export const Panel: FC = () => {
 
   const chatId = useSelector((state: RootState) => state.duty.currentChatId);
 
-  if (isDaysLoading || isChatsLoading) {
+  if (isChatsLoading) {
     return <PanelSpinner />;
   }
 
@@ -48,7 +37,7 @@ export const Panel: FC = () => {
         />
       </Group>
 
-      {!!chatId && <Days peerId={chatId} />}
+      {!!chatId && <Days chatId={chatId} />}
 
       <ScrollToTop />
     </>

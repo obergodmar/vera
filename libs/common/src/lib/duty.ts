@@ -1,16 +1,7 @@
-import { Type } from 'class-transformer';
-import {
-  IsArray,
-  IsNumber,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export namespace IDuty {
   export interface IDuty {
-    chats: number[];
-    days: Day[];
     schedule: Schedule[];
   }
 
@@ -23,7 +14,7 @@ export namespace IDuty {
 
   export type Schedule = {
     chatId: number;
-    peerId: number;
+    userId: number;
     firstName: string;
     lastName: string;
     avatar: string;
@@ -35,39 +26,12 @@ export namespace IDuty {
   };
 }
 
-export class DutyConfigModel implements IDuty.IDuty {
-  @IsArray()
-  chats!: number[];
-
-  @ValidateNested({ each: true })
-  @Type(() => DayModel)
-  days!: DayModel[];
-
-  @ValidateNested({ each: true })
-  @Type(() => ScheduleModel)
-  schedule!: IDuty.Schedule[];
-}
-
-export class DayModel implements IDuty.Day {
-  @IsString()
-  shortName!: string;
-
-  @IsString()
-  name!: string;
-
-  @IsString()
-  nameWhen!: string;
-
-  @IsNumber()
-  dayNumber!: number;
-}
-
 export class ScheduleModel implements IDuty.Schedule {
   @IsNumber()
   chatId!: number;
 
   @IsNumber()
-  peerId!: number;
+  userId!: number;
 
   @IsString()
   firstName!: string;

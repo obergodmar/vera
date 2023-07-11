@@ -60,6 +60,9 @@ export class ConvoService {
 
   public async getChats(): Promise<IApi.ConversationsList> {
     let convoIds: number[] = [];
+
+    this.logger.log('ConvoService: Vera chats requested');
+
     try {
       const convos = await this.convoRepository.find();
 

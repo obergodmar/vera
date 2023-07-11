@@ -11,6 +11,7 @@ import { ThunkMiddleware } from 'redux-thunk/es/types';
 import { getToken } from '../utils/getToken';
 import { authorization, logOff } from './reducers/authorization';
 import { duty } from './reducers/duty';
+import { convoApi } from './services/convo-api';
 import { dutyApi } from './services/duty-api';
 import { helloMessagesApi } from './services/hello-messages-api';
 import { loginApi } from './services/login-api';
@@ -50,12 +51,14 @@ export const store = configureStore({
     [authorization.name]: authorization.reducer,
     [duty.name]: duty.reducer,
     [loginApi.reducerPath]: loginApi.reducer,
+    [convoApi.reducerPath]: convoApi.reducer,
     [dutyApi.reducerPath]: dutyApi.reducer,
     [helloMessagesApi.reducerPath]: helloMessagesApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       loginApi.middleware,
+      convoApi.middleware,
       dutyApi.middleware,
       helloMessagesApi.middleware,
       rtkQueryErrorLogger,

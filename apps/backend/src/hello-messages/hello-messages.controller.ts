@@ -13,11 +13,6 @@ export class HelloMessagesController {
     private readonly hlService: HelloMessagesService
   ) {}
 
-  @Post(endpoints.getChats)
-  public getChats(): Promise<IApi.IHelloMessagesApi.GetChatsResponse> {
-    return this.hlService.getChats();
-  }
-
   @Post(endpoints.getHelloMessages)
   public getHelloMessages(): Promise<IApi.IHelloMessagesApi.GetHelloMessagesResponse> {
     return this.hlService.getHelloMessages();

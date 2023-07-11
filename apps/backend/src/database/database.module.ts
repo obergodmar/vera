@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { Convo } from '../convo/convo.entity';
+import { Duty } from '../duty/duty.entity';
 import { HelloMessage } from '../hello-messages/hello-messages.entity';
 
 @Module({
@@ -18,6 +19,7 @@ import { HelloMessage } from '../hello-messages/hello-messages.entity';
         /**
          * Functionality
          */
+        Duty,
         HelloMessage,
       ],
     }),

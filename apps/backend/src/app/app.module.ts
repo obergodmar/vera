@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 
-import { ConfigModule } from '../config/config.module';
 import { DatabaseModule } from '../database/database.module';
 import { DutyModule } from '../duty/duty.module';
 import { HelloMessagesModule } from '../hello-messages/hello-messages.module';
@@ -11,12 +10,11 @@ import { VkApiModule } from '../vk-api/vk-api.module';
 
 @Module({
   imports: [
-    VkApiModule,
     /**
      * Global Modules
      */
+    VkApiModule,
     LoggerModule,
-    ConfigModule,
     /**
      * Functionality
      */

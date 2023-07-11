@@ -6,10 +6,6 @@ import { ValidateNested } from 'class-validator';
 import { WithChatIdDto } from '../convo/convo.dto';
 import { TokenDto } from '../login/dto/token.dto';
 
-export class GetChatsDto
-  extends TokenDto
-  implements IApi.IDutyApi.GetChatsRequest {}
-
 export class GetMembersFotChatDto
   extends WithChatIdDto
   implements IApi.IDutyApi.GetMembersForChatRequest {}
