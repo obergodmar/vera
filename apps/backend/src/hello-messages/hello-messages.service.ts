@@ -56,11 +56,17 @@ export class HelloMessagesService {
     message: string
   ): Promise<IApi.StatusResponse> {
     this.logger.log(
-      `HelloMessagesService: Setting message ${message} to chat ${chatId}`
+      `HelloMessagesService: ${message ? 'Setting' : 'Deleting'} message${
+        message && ` ${message}`
+      } for chat ${chatId}`
     );
 
     try {
-      await this.hlRepository.upsert([{ chatId, message }], ['message']);
+      if (!message) {
+        await this.hlRepository.delete({ chatId });
+      } else {
+        await this.hlRepository.upsert([{ chatId, message }], ['chatId']);
+      }
     } catch (e) {
       this.logger.log(
         `HelloMessagesService: Error upserting new message into ${chatId}: ${e}`,

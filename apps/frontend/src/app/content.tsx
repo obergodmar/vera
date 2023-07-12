@@ -1,9 +1,5 @@
-import { Icon56DeleteOutline } from '@vkontakte/icons';
 import {
   Avatar,
-  Button,
-  ButtonGroup,
-  ModalCard,
   ModalRoot,
   Panel,
   PanelHeader,
@@ -20,10 +16,12 @@ import { FC, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
+import { ModalCancel } from '../components/modal-cancel';
 import { Navigation } from '../components/navigation';
 import { PanelItem, panels } from '../components/panels';
 import { VERA_AVATAR_50 } from '../data/constants';
 import { resetSchedule } from '../data/reducers/duty';
+import { resetHelloMessages } from '../data/reducers/hello-messages';
 import { ModalProvider, modalsIds } from '../hooks/useModal';
 
 export const Content: FC = () => {
@@ -68,38 +66,22 @@ export const Content: FC = () => {
 
   const modal = (
     <ModalRoot activeModal={activeModal} onClose={closeModal}>
-      <ModalCard
+      <ModalCancel
         id={modalsIds.resetSchedule}
-        onClose={closeModal}
-        icon={<Icon56DeleteOutline />}
-        header="Подтверждение удаления изменений"
-        subheader="В текущей сессии для выбранного чата все изменения будут сброшены. Продолжить?"
-        actions={
-          <ButtonGroup stretched>
-            <Button
-              size="l"
-              mode="primary"
-              appearance="negative"
-              stretched
-              onClick={() => {
-                dispatch(resetSchedule());
-                closeModal();
-              }}
-            >
-              Продолжить
-            </Button>
-            <Button
-              size="l"
-              mode="secondary"
-              appearance="neutral"
-              stretched
-              onClick={closeModal}
-            >
-              Отмена
-            </Button>
-          </ButtonGroup>
-        }
-      ></ModalCard>
+        onCancel={() => {
+          dispatch(resetSchedule());
+          closeModal();
+        }}
+        closeModal={closeModal}
+      />
+      <ModalCancel
+        id={modalsIds.resetHelloMessages}
+        onCancel={() => {
+          dispatch(resetHelloMessages());
+          closeModal();
+        }}
+        closeModal={closeModal}
+      />
     </ModalRoot>
   );
 

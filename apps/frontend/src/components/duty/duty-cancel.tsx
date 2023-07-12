@@ -16,7 +16,7 @@ export const DutyCancel: FC = () => {
 
   return (
     <PanelCancel
-      modified={modified}
+      disabled={!modified}
       onCancel={() => openModal(modalsIds.resetSchedule)}
     />
   );

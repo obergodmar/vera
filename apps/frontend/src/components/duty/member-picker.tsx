@@ -60,13 +60,29 @@ export const MemberPicker: FC<Props> = ({ duties, members, onChange }) => {
             </Chip>
           );
         }}
-        renderOption={({ option: { avatar, screenName }, ...otherProps }) => {
+        renderOption={({
+          option: { avatar, screenName, userId },
+          ...otherProps
+        }) => {
           return (
             <CustomSelectOption
               before={<Avatar size={20} src={avatar} />}
-              description={screenName}
+              description={`${screenName} (${userId})`}
               {...otherProps}
             />
+          );
+        }}
+        filterFn={(input = '', option) => {
+          if (!option) {
+            return false;
+          }
+
+          const { screenName, userId, label } = option;
+
+          return !!(
+            screenName.includes(input) ||
+            userId.toString().includes(input) ||
+            label?.includes(input)
           );
         }}
       />

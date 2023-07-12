@@ -50,6 +50,10 @@ export const ConvoSearch: FC<Props> = ({
                 description={description}
               />
             )}
+            filterFn={(value, option) =>
+              option.value?.toString().includes(value) ||
+              option.label?.toString().includes(value)
+            }
           />
 
           {refetchConvos && (

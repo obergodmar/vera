@@ -4,14 +4,14 @@ import { TextTooltip } from '@vkontakte/vkui/dist/components/TextTooltip/TextToo
 import { FC } from 'react';
 
 type Props = {
-  modified: boolean;
+  disabled?: boolean;
   onSubmit: () => void;
 };
 
-export const PanelSubmit: FC<Props> = ({ modified, onSubmit }) => {
+export const PanelSubmit: FC<Props> = ({ disabled = false, onSubmit }) => {
   return (
     <TextTooltip text="Сохранить изменения">
-      <PanelHeaderSubmit disabled={!modified} onClick={onSubmit} />
+      <PanelHeaderSubmit disabled={disabled} onClick={onSubmit} />
     </TextTooltip>
   );
 };

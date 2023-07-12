@@ -4,14 +4,14 @@ import { TextTooltip } from '@vkontakte/vkui/dist/components/TextTooltip/TextToo
 import { FC } from 'react';
 
 type Props = {
-  modified: boolean;
+  disabled?: boolean;
   onCancel: () => void;
 };
 
-export const PanelCancel: FC<Props> = ({ modified, onCancel }) => {
+export const PanelCancel: FC<Props> = ({ disabled = false, onCancel }) => {
   return (
     <TextTooltip text="Сбросить изменения">
-      <PanelHeaderClose disabled={!modified} onClick={onCancel} />
+      <PanelHeaderClose disabled={disabled} onClick={onCancel} />
     </TextTooltip>
   );
 };

@@ -6,6 +6,7 @@ const ModalContext = createContext<Open | undefined>(undefined);
 
 export const enum modalsIds {
   resetSchedule = 'resetSchedule',
+  resetHelloMessages = 'resetHelloMessages',
 }
 
 type Props = PropsWithChildren<{

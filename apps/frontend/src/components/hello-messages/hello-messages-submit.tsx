@@ -28,7 +28,7 @@ export const HelloMessagesSubmit: FC = () => {
   const snackbar = useSnackbar();
 
   const { updatedMessages, modified } = useSelector(chatHelloMessages);
-  const [submit, { data }] = useUpdateAllHelloMessagesMutation();
+  const [submit, { data, isLoading }] = useUpdateAllHelloMessagesMutation();
 
   useEffect(() => {
     if (data) {
@@ -39,7 +39,14 @@ export const HelloMessagesSubmit: FC = () => {
     }
   }, [data, snackbar]);
 
+  if (!modified) {
+    return null;
+  }
+
   return (
-    <PanelSubmit modified={modified} onSubmit={() => submit(updatedMessages)} />
+    <PanelSubmit
+      disabled={isLoading}
+      onSubmit={() => submit(updatedMessages)}
+    />
   );
 };

@@ -1,4 +1,4 @@
-import React, { FC, memo, PropsWithChildren } from 'react';
+import { FC, memo, PropsWithChildren } from 'react';
 
 import './snackbar-container.css';
 
@@ -16,7 +16,7 @@ export type SnackbarContainerProps = PropsWithChildren<{
 export const SnackbarContainer: FC<SnackbarContainerProps> = ({
   withPortal = true,
   portalProps = {
-    portalClassName: 'MEConfig SnackbarModal',
+    portalClassName: 'SnackbarModal',
   },
   children,
 }) => {

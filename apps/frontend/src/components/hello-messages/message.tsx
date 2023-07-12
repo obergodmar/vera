@@ -1,4 +1,6 @@
+import { createSelector } from '@reduxjs/toolkit';
 import { IApi } from '@vera-reforged/common';
+import { Icon24ErrorCircle } from '@vkontakte/icons';
 import {
   Avatar,
   Button,
@@ -7,33 +9,129 @@ import {
   Textarea,
 } from '@vkontakte/vkui';
 
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { updateMessage } from '../../data/reducers/hello-messages';
+import { useUpdateHelloMessageMutation } from '../../data/services/hello-messages-api';
+import { RootState } from '../../data/store';
+import { useSnackbar } from '../../hooks/useSnackbar';
 
 type Props = {
   chat: IApi.IHelloMessagesApi.ConvoListWithMessages;
 };
 
+export const chatMessageSelector = (chatId: number | undefined) =>
+  createSelector(
+    (state: RootState) => state.helloMessages.updatedMessages,
+    (messages) => {
+      if (chatId) {
+        return messages.find(({ chatId: id }) => id === chatId)?.message || '';
+      }
+
+      return '';
+    }
+  );
+
 export const Message: FC<Props> = ({ chat }) => {
-  const { helloMessage, peer, chat_settings = {} } = chat;
+  const {
+    helloMessage,
+    peer: { id: chatId },
+    chat_settings = {},
+  } = chat;
 
   const { title, photo = {} } = chat_settings;
   const avatar = photo?.photo_100;
 
+  const dispatch = useDispatch();
+
+  const message = useSelector(chatMessageSelector(chatId));
+  const [modified, setModified] = useState(message !== helloMessage);
+  const [deleted, setDeleted] = useState(false);
+
+  const [submit, { data, isLoading, reset, isError }] =
+    useUpdateHelloMessageMutation();
+  const snackbar = useSnackbar();
+
+  useEffect(() => {
+    if (data?.success) {
+      snackbar({
+        message: `Сообщения для "${title}" было ${
+          deleted ? 'удалено' : 'изменено'
+        }`,
+        before: <Icon24ErrorCircle fill="var(--vkui--color_icon_accent)" />,
+      });
+
+      setModified(false);
+    }
+
+    if (data?.error) {
+      setDeleted(false);
+    }
+  }, [data, snackbar, title, deleted]);
+
+  useEffect(() => reset);
+
+  useEffect(() => {
+    setModified(message !== helloMessage);
+  }, [helloMessage, message]);
+
   return (
     <RichCell
+      style={
+        deleted
+          ? {
+              opacity: '0.4',
+              pointerEvents: 'none',
+            }
+          : undefined
+      }
       disabled
-      caption={peer?.id}
-      bottom={<Textarea value={helloMessage} />}
+      caption={chatId}
+      bottom={
+        <Textarea
+          value={message}
+          onChange={({ target: { value } }) =>
+            dispatch(updateMessage({ chatId, message: value }))
+          }
+        />
+      }
       before={<Avatar initials={title[0]} src={avatar} />}
       actions={
-        <ButtonGroup mode="horizontal" gap="s" stretched>
-          <Button mode="primary" size="s">
-            Primary
-          </Button>
-          <Button mode="secondary" size="s">
-            Secondary
-          </Button>
-        </ButtonGroup>
+        modified && (
+          <ButtonGroup mode="horizontal" gap="s" stretched>
+            <Button
+              size="s"
+              loading={isLoading}
+              onClick={() => submit({ chatId, message })}
+            >
+              Обновить сообщение
+            </Button>
+            <Button
+              mode="secondary"
+              size="s"
+              onClick={() => {
+                dispatch(updateMessage({ chatId, message: helloMessage }));
+              }}
+            >
+              Сбросить изменение
+            </Button>
+          </ButtonGroup>
+        )
+      }
+      after={
+        <Button
+          appearance="negative"
+          mode="secondary"
+          size="s"
+          loading={isLoading}
+          onClick={() => {
+            submit({ chatId, message: '' });
+            setDeleted(true);
+          }}
+        >
+          Убрать
+        </Button>
       }
     >
       {title}

@@ -32,7 +32,7 @@ export const DutySubmit: FC = () => {
   const snackbar = useSnackbar();
 
   const { chatId, schedule, modified } = useSelector(chatSchedule);
-  const [submit, { data }] = useUpdateChatScheduleMutation();
+  const [submit, { data, isLoading }] = useUpdateChatScheduleMutation();
 
   useEffect(() => {
     if (data) {
@@ -49,7 +49,7 @@ export const DutySubmit: FC = () => {
 
   return (
     <PanelSubmit
-      modified={modified}
+      disabled={!modified || isLoading}
       onSubmit={() => submit({ chatId, schedule })}
     />
   );

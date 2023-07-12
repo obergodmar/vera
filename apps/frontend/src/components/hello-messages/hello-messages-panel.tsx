@@ -1,4 +1,3 @@
-import { createSelector } from '@reduxjs/toolkit';
 import { Group, Header, PanelSpinner } from '@vkontakte/vkui';
 
 import { FC, useEffect, useMemo } from 'react';
@@ -12,20 +11,8 @@ import { useGetChatsQuery } from '../../data/services/convo-api';
 import { useGetHelloMessagesQuery } from '../../data/services/hello-messages-api';
 import { RootState } from '../../data/store';
 import { ConvoSearch } from '../convo-search';
-import { Message } from './message';
+import { chatMessageSelector, Message } from './message';
 import { SelectedChat } from './selected-chat';
-
-const chatMessageSelector = (chatId: number | undefined) =>
-  createSelector(
-    (state: RootState) => state.helloMessages.updatedMessages,
-    (messages) => {
-      if (chatId) {
-        return messages.find(({ chatId: id }) => id === chatId)?.message || '';
-      }
-
-      return '';
-    }
-  );
 
 export const HelloMessagesPanel: FC = () => {
   const dispatch = useDispatch();
@@ -47,6 +34,12 @@ export const HelloMessagesPanel: FC = () => {
     [chatId, chats]
   );
   const message = useSelector(chatMessageSelector(chatId));
+  const currentMessage = useMemo(
+    () =>
+      helloMessages?.items.find(({ peer: { id } }) => id === chatId)
+        ?.helloMessage,
+    [chatId, helloMessages?.items]
+  );
 
   useEffect(() => {
     const items = helloMessages?.items.map(({ peer, helloMessage }) => ({
@@ -76,6 +69,7 @@ export const HelloMessagesPanel: FC = () => {
 
         {!!chatId && selectedChat && (
           <SelectedChat
+            currentMessage={currentMessage}
             message={message}
             chatTitle={selectedChat.label}
             chatId={chatId}
@@ -84,7 +78,7 @@ export const HelloMessagesPanel: FC = () => {
       </Group>
 
       {helloMessages?.items.map((chat) => (
-        <Group key={chat.id}>
+        <Group key={chat.peer.id}>
           <Message chat={chat} />
         </Group>
       ))}

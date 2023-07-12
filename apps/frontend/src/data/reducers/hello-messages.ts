@@ -3,8 +3,8 @@ import { IHelloMessages } from '@vera-reforged/common';
 
 type State = {
   currentChatId: number | undefined;
-  currentMessages: IHelloMessages.MessagePerChats[];
-  updatedMessages: IHelloMessages.MessagePerChats[];
+  currentMessages: IHelloMessages.MessagePerChat[];
+  updatedMessages: IHelloMessages.MessagePerChat[];
 };
 
 const initialState: State = {
@@ -23,7 +23,7 @@ export const helloMessages = createSlice({
 
     setCurrentMessages(
       state,
-      { payload }: PayloadAction<IHelloMessages.MessagePerChats[]>
+      { payload }: PayloadAction<IHelloMessages.MessagePerChat[]>
     ) {
       state.currentMessages = payload;
       state.updatedMessages = payload;
@@ -33,7 +33,7 @@ export const helloMessages = createSlice({
       state,
       {
         payload: { chatId, message },
-      }: PayloadAction<IHelloMessages.MessagePerChats>
+      }: PayloadAction<IHelloMessages.MessagePerChat>
     ) {
       const index = state.updatedMessages.findIndex(
         ({ chatId: id }) => id === chatId
@@ -44,8 +44,16 @@ export const helloMessages = createSlice({
         state.updatedMessages.push({ chatId, message });
       }
     },
+
+    resetHelloMessages(state) {
+      state.updatedMessages = state.currentMessages;
+    },
   },
 });
 
-export const { setCurrentMessages, setCurrentChatId, updateMessage } =
-  helloMessages.actions;
+export const {
+  setCurrentMessages,
+  setCurrentChatId,
+  updateMessage,
+  resetHelloMessages,
+} = helloMessages.actions;
