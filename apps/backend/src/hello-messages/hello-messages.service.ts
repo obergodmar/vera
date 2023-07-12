@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { IApi, IHelloMessages } from '@vera-reforged/common';
 
 import { DataSource, Repository } from 'typeorm';
+import { MessageContext } from 'vk-io';
 
 import { ConvoService } from '../convo/convo.service';
 import { LoggerService } from '../logger/logger.service';
@@ -18,37 +19,84 @@ export class HelloMessagesService {
     @Inject(VkApiService) private readonly api: VkApiService,
     @Inject(LoggerService) private readonly logger: LoggerService,
     @Inject(ConvoService) private readonly convoService: ConvoService
-  ) {}
+  ) {
+    this.api.botService.vk.updates.on(
+      'chat_invite_user',
+      async (context: MessageContext) => {
+        const { peerId } = context;
+
+        this.logger.log(
+          `HelloMessagesService: chat_invite_user update in ${peerId}`
+        );
+
+        try {
+          const helloMessage = await this.hlRepository.findOneBy({
+            chatId: peerId,
+          });
+          if (!helloMessage) {
+            return;
+          }
+
+          this.api.botService.vk.api.messages.send({
+            peer_id: peerId,
+            message: helloMessage.message,
+            random_id: 0,
+          });
+
+          this.logger.log(
+            `HelloMessagesService: Successfully answered to ${peerId} with ${helloMessage.message}`
+          );
+        } catch (e) {
+          this.logger.log(
+            `HelloMessagesService: Error when answering on update in ${peerId}: ${e}`,
+            { type: 'error' }
+          );
+        }
+      }
+    );
+  }
 
   public async getHelloMessages(): Promise<IApi.IHelloMessagesApi.GetHelloMessagesResponse> {
     this.logger.log('HelloMessagesService : hello messages were requested');
 
-    const messages = await this.hlRepository.find();
-    const convos = await this.convoService.getChats();
+    try {
+      const messages = await this.hlRepository.find();
+      const convos = await this.convoService.getChats();
 
-    const convosWithMessages = messages.reduce(
-      (
-        chats: IApi.IHelloMessagesApi.ConvoListWithMessages[],
-        { chatId, message }
-      ) => {
-        const chat = convos.items.find((chat) => chat.peer.id === chatId);
+      const convosWithMessages = messages.reduce(
+        (
+          chats: IApi.IHelloMessagesApi.ConvoListWithMessages[],
+          { chatId, message }
+        ) => {
+          const chat = convos.items.find((chat) => chat.peer.id === chatId);
 
-        if (chat) {
-          chats.push({
-            ...chat,
-            helloMessage: message,
-          });
-        }
+          if (chat) {
+            chats.push({
+              ...chat,
+              helloMessage: message,
+            });
+          }
 
-        return chats;
-      },
-      []
-    );
+          return chats;
+        },
+        []
+      );
 
-    return {
-      count: convosWithMessages.length,
-      items: convosWithMessages,
-    };
+      return {
+        count: convosWithMessages.length,
+        items: convosWithMessages,
+      };
+    } catch (e) {
+      this.logger.log(
+        `HelloMessagesService: error getting helloMessages: ${e}`,
+        { type: 'error' }
+      );
+
+      return {
+        count: 0,
+        items: [],
+      };
+    }
   }
 
   public async updateHelloMessage(

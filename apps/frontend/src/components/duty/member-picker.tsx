@@ -77,12 +77,14 @@ export const MemberPicker: FC<Props> = ({ duties, members, onChange }) => {
             return false;
           }
 
+          input = input.toLowerCase();
+
           const { screenName, userId, label } = option;
 
           return !!(
-            screenName.includes(input) ||
+            screenName.toLowerCase().includes(input) ||
             userId.toString().includes(input) ||
-            label?.includes(input)
+            label?.toLowerCase().includes(input)
           );
         }}
       />

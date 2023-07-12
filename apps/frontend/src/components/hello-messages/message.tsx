@@ -49,8 +49,7 @@ export const Message: FC<Props> = ({ chat }) => {
   const [modified, setModified] = useState(message !== helloMessage);
   const [deleted, setDeleted] = useState(false);
 
-  const [submit, { data, isLoading, reset, isError }] =
-    useUpdateHelloMessageMutation();
+  const [submit, { data, isLoading, reset }] = useUpdateHelloMessageMutation();
   const snackbar = useSnackbar();
 
   useEffect(() => {
