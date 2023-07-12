@@ -10,7 +10,7 @@ import { ConvoSearch } from '../convo-search';
 import { ScrollToTop } from '../scroll-to-top';
 import { Days } from './days';
 
-export const Panel: FC = () => {
+export const DutyPanel: FC = () => {
   const dispatch = useDispatch();
 
   const {

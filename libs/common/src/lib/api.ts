@@ -2,6 +2,7 @@ import { MessagesConversation } from 'vk-io/lib/api/schemas/objects';
 import { MessagesGetConversationMembersResponse } from 'vk-io/lib/api/schemas/responses';
 
 import { IDuty } from './duty';
+import { IHelloMessages } from './hello-messages';
 
 export namespace IApi {
   export type TokenRequest<T = Record<string, any>> = {
@@ -62,17 +63,23 @@ export namespace IApi {
     export type Requests = GetHelloMessagesRequest;
 
     export type GetHelloMessagesRequest = TokenRequest;
-    export type GetHelloMessagesResponse = ConversationsList & {
+    export type GetHelloMessagesResponse = {
+      count: number;
       items: ConvoListWithMessages[];
     };
 
     export type UpdateHelloMessageRequest = TokenRequest<WithChatId> & {
-      message: string;
+      message: IHelloMessages.Message;
     };
     export type UpdateHelloMessageResponse = StatusResponse;
 
+    export type UpdateAllHelloMessagesRequest = TokenRequest & {
+      updates: IHelloMessages.MessagePerChat[];
+    };
+    export type UpdateAllHelloMessagesResponse = StatusResponse;
+
     export type ConvoListWithMessages = MessagesConversation & {
-      helloMessage?: string;
+      helloMessage: IHelloMessages.Message;
     };
   }
 }

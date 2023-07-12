@@ -1,12 +1,15 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { IHelloMessages } from '@vera-reforged/common';
+
+import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
 @Entity()
+@Unique(['chatId'])
 export class HelloMessage {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  message: string;
+  message: IHelloMessages.Message;
 
   @Column()
   chatId: number;

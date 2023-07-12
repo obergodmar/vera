@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IApi } from '@vera-reforged/common';
+import { IApi, IHelloMessages } from '@vera-reforged/common';
 
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 
 import { ConvoService } from '../convo/convo.service';
 import { LoggerService } from '../logger/logger.service';
@@ -12,6 +12,7 @@ import { HelloMessage } from './hello-messages.entity';
 @Injectable()
 export class HelloMessagesService {
   public constructor(
+    private readonly dataSource: DataSource,
     @InjectRepository(HelloMessage)
     private readonly hlRepository: Repository<HelloMessage>,
     @Inject(VkApiService) private readonly api: VkApiService,
@@ -67,6 +68,53 @@ export class HelloMessagesService {
       );
       return {
         error: JSON.stringify(e),
+        success: false,
+      };
+    }
+
+    return {
+      success: true,
+    };
+  }
+
+  public async updateAllHelloMessages(
+    data: IHelloMessages.MessagePerChat[]
+  ): Promise<IApi.StatusResponse> {
+    this.logger.log(
+      'HelloMessagesService: Starting transaction for all messages in db'
+    );
+    let error: string;
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.startTransaction();
+
+    try {
+      const upserts = data.filter(({ message }) => !!message);
+      await this.hlRepository.upsert(upserts, ['chatId']);
+
+      const deletions = data
+        .filter(({ message }) => !message)
+        .map(({ chatId }) => this.hlRepository.delete({ chatId }));
+      await Promise.all(deletions);
+
+      this.logger.log(
+        'HelloMessagesService: Transaction successfull - changes were made'
+      );
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+
+      error = JSON.stringify(e);
+
+      this.logger.log(`HelloMessagesService: Transaction failed: ${e}`, {
+        type: 'error',
+      });
+    } finally {
+      await queryRunner.release();
+    }
+
+    if (error) {
+      return {
+        error,
         success: false,
       };
     }

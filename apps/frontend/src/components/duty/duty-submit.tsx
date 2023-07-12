@@ -1,8 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { IDuty } from '@vera-reforged/common';
 import { Icon24ErrorCircle } from '@vkontakte/icons';
-import { PanelHeaderSubmit } from '@vkontakte/vkui';
-import { TextTooltip } from '@vkontakte/vkui/dist/components/TextTooltip/TextTooltip';
 
 import { FC, useEffect } from 'react';
 import { useSelector } from 'react-redux';
@@ -12,6 +10,7 @@ import { equals } from 'ramda';
 import { useUpdateChatScheduleMutation } from '../../data/services/duty-api';
 import { RootState } from '../../data/store';
 import { useSnackbar } from '../../hooks/useSnackbar';
+import { PanelSubmit } from '../panel-submit';
 
 export const chatSchedule = createSelector(
   (state: RootState) => state.duty,
@@ -29,7 +28,7 @@ export const chatSchedule = createSelector(
   }
 );
 
-export const PanelSubmit: FC = () => {
+export const DutySubmit: FC = () => {
   const snackbar = useSnackbar();
 
   const { chatId, schedule, modified } = useSelector(chatSchedule);
@@ -49,11 +48,9 @@ export const PanelSubmit: FC = () => {
   }
 
   return (
-    <TextTooltip text="Сохранить изменения">
-      <PanelHeaderSubmit
-        disabled={!modified}
-        onClick={() => submit({ chatId, schedule })}
-      />
-    </TextTooltip>
+    <PanelSubmit
+      modified={modified}
+      onSubmit={() => submit({ chatId, schedule })}
+    />
   );
 };

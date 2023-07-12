@@ -1,9 +1,10 @@
 import { ReactNode } from 'react';
 
-import { Panel as DutyPanel } from './duty/panel';
-import { PanelCancel } from './duty/panel-cancel';
-import { PanelSubmit } from './duty/panel-submit';
-import { Panel as HelloMessagesPanel } from './hello-messages/panel';
+import { DutyCancel } from './duty/duty-cancel';
+import { DutyPanel } from './duty/duty-panel';
+import { DutySubmit } from './duty/duty-submit';
+import { HelloMessagesPanel } from './hello-messages/hello-messages-panel';
+import { HelloMessagesSubmit } from './hello-messages/hello-messages-submit';
 import { NotImplementedPanel } from './not-implemented-panel';
 
 export const panels: PanelItem[] = [
@@ -11,13 +12,14 @@ export const panels: PanelItem[] = [
     value: 'duty',
     label: 'Дежурные',
     content: <DutyPanel />,
-    submit: <PanelSubmit />,
-    cancel: <PanelCancel />,
+    submit: <DutySubmit />,
+    cancel: <DutyCancel />,
   },
   {
     value: 'hello-messages',
     label: 'Приветственные сообщения',
     content: <HelloMessagesPanel />,
+    submit: <HelloMessagesSubmit />,
   },
   {
     value: 'commands',

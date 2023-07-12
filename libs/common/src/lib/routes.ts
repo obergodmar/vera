@@ -32,6 +32,7 @@ export const ROUTES = {
     endpoints: {
       getHelloMessages: 'getHelloMessages',
       updateHelloMessage: 'updateHelloMessage',
+      updateAllHelloMessages: 'updateAllHelloMessages',
     },
   },
 } as const;
