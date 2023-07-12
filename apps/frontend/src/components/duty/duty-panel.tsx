@@ -27,7 +27,7 @@ export const DutyPanel: FC = () => {
 
   return (
     <>
-      <Group>
+      <Group description="Для вызова дежурного(ых) без тега достаточно написать duty. Чтобы вызвать дежурного(ых) с определенным тегом необходимо вызвать duty <тег>">
         <Header>Установка дежурства в чаты</Header>
         <ConvoSearch
           value={chatId}
