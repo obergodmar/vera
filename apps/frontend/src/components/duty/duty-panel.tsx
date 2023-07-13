@@ -22,7 +22,7 @@ export const DutyPanel: FC = () => {
   const chatId = useSelector((state: RootState) => state.duty.currentChatId);
 
   if (isChatsLoading) {
-    return <PanelSpinner />;
+    return <PanelSpinner>Дежурство загружается</PanelSpinner>;
   }
 
   return (

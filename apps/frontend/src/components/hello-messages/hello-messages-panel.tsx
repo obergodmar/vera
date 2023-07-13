@@ -53,7 +53,7 @@ export const HelloMessagesPanel: FC = () => {
   }, [dispatch, helloMessages]);
 
   if (isChatsLoading || isHelloMessagesLoading) {
-    return <PanelSpinner />;
+    return <PanelSpinner>Приветственные сообщения загружаются</PanelSpinner>;
   }
 
   return (

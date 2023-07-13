@@ -47,6 +47,7 @@ export const Message: FC<Props> = ({ chat }) => {
 
   const message = useSelector(chatMessageSelector(chatId));
   const [modified, setModified] = useState(message !== helloMessage);
+  const [confirmed, setConfirmed] = useState(false);
   const [deleted, setDeleted] = useState(false);
 
   const [submit, { data, isLoading, reset }] = useUpdateHelloMessageMutation();
@@ -66,6 +67,7 @@ export const Message: FC<Props> = ({ chat }) => {
 
     if (data?.error) {
       setDeleted(false);
+      setConfirmed(false);
     }
   }, [data, snackbar, title, deleted]);
 
@@ -121,15 +123,19 @@ export const Message: FC<Props> = ({ chat }) => {
       after={
         <Button
           appearance="negative"
-          mode="secondary"
+          mode={confirmed ? 'primary' : 'secondary'}
           size="s"
           loading={isLoading}
           onClick={() => {
-            submit({ chatId, message: '' });
-            setDeleted(true);
+            if (confirmed) {
+              submit({ chatId, message: '' });
+              setDeleted(true);
+            }
+
+            setConfirmed(true);
           }}
         >
-          Убрать
+          {confirmed ? 'Подвердить' : 'Убрать'}
         </Button>
       }
     >
