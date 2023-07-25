@@ -7,6 +7,7 @@ import { HelloMessagesCancel } from './hello-messages/hello-messages-cancel';
 import { HelloMessagesPanel } from './hello-messages/hello-messages-panel';
 import { HelloMessagesSubmit } from './hello-messages/hello-messages-submit';
 import { NotImplementedPanel } from './not-implemented-panel';
+import { ReactionsPanel } from './reactions/reactions-panel';
 
 export const panels: PanelItem[] = [
   {
@@ -24,19 +25,19 @@ export const panels: PanelItem[] = [
     cancel: <HelloMessagesCancel />,
   },
   {
-    value: 'commands',
-    label: 'Команды',
-    content: <NotImplementedPanel />,
+    value: 'reactions',
+    label: 'Реакции в сообщениях',
+    content: <ReactionsPanel />,
   },
   {
-    value: 'mentions',
-    label: 'Меншены',
+    value: 'commands',
+    label: 'Команды',
     content: <NotImplementedPanel />,
   },
 ];
 
 export type PanelItem = {
-  value: 'navigation' | 'mentions' | 'commands' | 'hello-messages' | 'duty';
+  value: 'navigation' | 'reactions' | 'commands' | 'hello-messages' | 'duty';
   label: string;
   content: ReactNode;
   edit?: ReactNode;

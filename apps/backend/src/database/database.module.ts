@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Convo } from '../convo/convo.entity';
 import { Duty } from '../duty/duty.entity';
 import { HelloMessage } from '../hello-messages/hello-messages.entity';
+import { Reaction } from '../reactions/reactions.entity';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { HelloMessage } from '../hello-messages/hello-messages.entity';
          */
         Duty,
         HelloMessage,
+        Reaction,
       ],
     }),
   ],

@@ -29,6 +29,8 @@ export class DutyService {
     this.api.botService.bot.hear(
       /duty(\s#?\w+)?/,
       async (msg: MessageContext) => {
+        return;
+
         const { peerId, $match } = msg;
         const [, hashtag] = $match || [];
 

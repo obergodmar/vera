@@ -23,6 +23,8 @@ export class HelloMessagesService {
     this.api.botService.vk.updates.on(
       'chat_invite_user',
       async (context: MessageContext) => {
+        return;
+
         const { peerId } = context;
 
         this.logger.log(
