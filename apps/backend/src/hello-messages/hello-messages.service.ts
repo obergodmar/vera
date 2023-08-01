@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IApi, IHelloMessages } from '@vera-reforged/common';
 
@@ -6,6 +7,7 @@ import { DataSource, Repository } from 'typeorm';
 import { MessageContext } from 'vk-io';
 
 import { ConvoService } from '../convo/convo.service';
+import { IEnvironment } from '../environments/env-type';
 import { LoggerService } from '../logger/logger.service';
 import { VkApiService } from '../vk-api/vk-api.service';
 import { HelloMessage } from './hello-messages.entity';
@@ -18,12 +20,18 @@ export class HelloMessagesService {
     private readonly hlRepository: Repository<HelloMessage>,
     @Inject(VkApiService) private readonly api: VkApiService,
     @Inject(LoggerService) private readonly logger: LoggerService,
-    @Inject(ConvoService) private readonly convoService: ConvoService
+    @Inject(ConvoService) private readonly convoService: ConvoService,
+    @Inject(ConfigService) private readonly config: ConfigService
   ) {
+    const isListenerOff =
+      this.config.get<IEnvironment['disableBotListener']>('disableBotListener');
+
     this.api.botService.vk.updates.on(
       'chat_invite_user',
       async (context: MessageContext) => {
-        return;
+        if (isListenerOff) {
+          return;
+        }
 
         const { peerId } = context;
 

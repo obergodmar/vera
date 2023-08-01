@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   filterScheduleByChatAndTag,
@@ -14,6 +15,7 @@ import { DataSource, Repository } from 'typeorm';
 import { MessageContext } from 'vk-io';
 import { UsersUserFull } from 'vk-io/lib/api/schemas/objects';
 
+import { IEnvironment } from '../environments/env-type';
 import { LoggerService } from '../logger/logger.service';
 import { VkApiService } from '../vk-api/vk-api.service';
 import { Duty } from './duty.entity';
@@ -24,12 +26,18 @@ export class DutyService {
     private dataSource: DataSource,
     @InjectRepository(Duty) private readonly dutyRepository: Repository<Duty>,
     @Inject(VkApiService) private readonly api: VkApiService,
-    @Inject(LoggerService) private readonly logger: LoggerService
+    @Inject(LoggerService) private readonly logger: LoggerService,
+    @Inject(ConfigService) private readonly config: ConfigService
   ) {
+    const isListenerOff =
+      this.config.get<IEnvironment['disableBotListener']>('disableBotListener');
+
     this.api.botService.bot.hear(
       /duty(\s#?\w+)?/,
       async (msg: MessageContext) => {
-        return;
+        if (isListenerOff) {
+          return;
+        }
 
         const { peerId, $match } = msg;
         const [, hashtag] = $match || [];
