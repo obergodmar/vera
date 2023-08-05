@@ -1,10 +1,10 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 
-import { BotModule } from '../bot/bot.module';
 import { VkApiService } from './vk-api.service';
 
+@Global()
 @Module({
-  imports: [BotModule],
+  imports: [],
   providers: [VkApiService],
   exports: [VkApiService],
 })

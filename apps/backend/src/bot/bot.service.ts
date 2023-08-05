@@ -1,10 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { createLog, VIM } from '@vera-reforged/common';
 import { HearManager } from '@vk-io/hear';
 
 import { VK } from 'vk-io';
 
 import { IEnvironment } from '../environments/env-type';
+import { logFS } from '../logger/log-fs';
 
 @Injectable()
 export class BotService {
@@ -29,8 +31,25 @@ export class BotService {
 
     this.vk.updates.on('message_new', this.bot.middleware);
 
+    const logInitStatus = createLog('[BotService]: Bot was launched');
+    logFS(logInitStatus);
+    this.vk.api.messages.send({
+      peer_id: VIM,
+      message: logInitStatus,
+      random_id: 0,
+    });
+
     this.vk.updates.startPolling().catch((e) => {
-      console.error(e);
+      const logPollingError = createLog(`[BotService]: Polling error, ${e}`, {
+        type: 'error',
+      });
+      logFS(logPollingError);
+
+      this.vk.api.messages.send({
+        peer_id: VIM,
+        message: logPollingError,
+        random_id: 0,
+      });
     });
   }
 }
