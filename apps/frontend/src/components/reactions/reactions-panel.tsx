@@ -1,11 +1,15 @@
 import { Group, Header, PanelSpinner } from '@vkontakte/vkui';
 
 import { FC } from 'react';
+import { useDispatch } from 'react-redux';
 
+import { setCurrentChatId } from '../../data/reducers/reactions';
 import { useGetChatsQuery } from '../../data/services/convo-api';
 import { ConvoSearch } from '../convo-search';
 
 export const ReactionsPanel: FC = () => {
+  const dispatch = useDispatch();
+
   const {
     isLoading: isChatsLoading,
     data: chats = [],
@@ -22,7 +26,7 @@ export const ReactionsPanel: FC = () => {
       <ConvoSearch
         value={undefined}
         convos={chats}
-        onChange={(id) => undefined}
+        onChange={(id) => dispatch(setCurrentChatId(id))}
         refetchConvos={refetchChats}
       />
     </Group>

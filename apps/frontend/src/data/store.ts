@@ -12,6 +12,7 @@ import { getToken } from '../utils/getToken';
 import { authorization, logOff } from './reducers/authorization';
 import { duty } from './reducers/duty';
 import { helloMessages } from './reducers/hello-messages';
+import { reactions } from './reducers/reactions';
 import { convoApi } from './services/convo-api';
 import { dutyApi } from './services/duty-api';
 import { helloMessagesApi } from './services/hello-messages-api';
@@ -52,6 +53,7 @@ export const store = configureStore({
     [authorization.name]: authorization.reducer,
     [duty.name]: duty.reducer,
     [helloMessages.name]: helloMessages.reducer,
+    [reactions.name]: reactions.reducer,
     [loginApi.reducerPath]: loginApi.reducer,
     [convoApi.reducerPath]: convoApi.reducer,
     [dutyApi.reducerPath]: dutyApi.reducer,
