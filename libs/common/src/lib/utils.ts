@@ -4,7 +4,7 @@ import { MessagesConversation } from 'vk-io/lib/api/schemas/objects';
 import { IDuty } from './duty';
 
 export function addLeadingZero(num: number): string {
-  return num > 10 ? `${num}` : `0${num}`;
+  return num >= 10 ? `${num}` : `0${num}`;
 }
 
 export function getTimeInMinutes(time: string) {
