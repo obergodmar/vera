@@ -11,8 +11,8 @@ import { useGetChatsQuery } from '../../data/services/convo-api';
 import { useGetHelloMessagesQuery } from '../../data/services/hello-messages-api';
 import { RootState } from '../../data/store';
 import { ConvoSearch } from '../convo-search';
+import { HelloMessagesChat } from './hello-messages-chat';
 import { chatMessageSelector, Message } from './message';
-import { SelectedChat } from './selected-chat';
 
 export const HelloMessagesPanel: FC = () => {
   const dispatch = useDispatch();
@@ -68,7 +68,7 @@ export const HelloMessagesPanel: FC = () => {
         />
 
         {!!chatId && selectedChat && (
-          <SelectedChat
+          <HelloMessagesChat
             currentMessage={currentMessage}
             message={message}
             chatTitle={selectedChat.label}

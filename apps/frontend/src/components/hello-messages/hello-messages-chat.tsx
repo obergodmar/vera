@@ -16,7 +16,7 @@ type Props = {
   message: IHelloMessages.Message;
 };
 
-export const SelectedChat: FC<Props> = ({
+export const HelloMessagesChat: FC<Props> = ({
   chatId,
   chatTitle,
   message,
