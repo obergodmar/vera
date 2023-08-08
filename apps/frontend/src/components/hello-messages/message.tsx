@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateMessage } from '../../data/reducers/hello-messages';
 import { useUpdateHelloMessageMutation } from '../../data/services/hello-messages-api';
 import { RootState } from '../../data/store';
+import { useConfirmation } from '../../hooks/useConfirmation';
 import { useSnackbar } from '../../hooks/useSnackbar';
 
 type Props = {
@@ -47,7 +48,7 @@ export const Message: FC<Props> = ({ chat }) => {
 
   const message = useSelector(chatMessageSelector(chatId));
   const [modified, setModified] = useState(message !== helloMessage);
-  const [confirmed, setConfirmed] = useState(false);
+  const { confirmed, setConfirmed, confirmationTimer } = useConfirmation(5);
   const [deleted, setDeleted] = useState(false);
 
   const [submit, { data, isLoading, reset }] = useUpdateHelloMessageMutation();
@@ -69,7 +70,7 @@ export const Message: FC<Props> = ({ chat }) => {
       setDeleted(false);
       setConfirmed(false);
     }
-  }, [data, snackbar, title, deleted]);
+  }, [data, snackbar, title, deleted, setConfirmed]);
 
   useEffect(() => reset);
 
@@ -135,7 +136,7 @@ export const Message: FC<Props> = ({ chat }) => {
             setConfirmed(true);
           }}
         >
-          {confirmed ? 'Подвердить' : 'Убрать'}
+          {confirmed ? `Подвердить (${confirmationTimer + 1}...)` : 'Убрать'}
         </Button>
       }
     >
