@@ -32,21 +32,16 @@ export const ReactionsChat: FC<Props> = ({
   const [submit, { data, isLoading, reset }] = useUpdateHelloMessageMutation();
   const snackbar = useSnackbar();
 
-  const [existed, setExisted] = useState(
-    typeof currentTrigger === 'string' && typeof currentReaction === 'string'
-  );
-
   useEffect(() => {
     if (data?.success) {
       snackbar({
-        message: `Реакция ${existed ? 'обновлена' : 'создана'}`,
+        message: 'Реакция создана',
         before: <Icon24ErrorCircle fill="var(--vkui--color_icon_accent)" />,
       });
 
       setModified(false);
-      setExisted(true);
     }
-  }, [data, existed, snackbar]);
+  }, [data, snackbar]);
 
   useEffect(() => reset);
 
@@ -54,19 +49,16 @@ export const ReactionsChat: FC<Props> = ({
     setModified(trigger !== currentTrigger || reaction !== currentReaction);
   }, [trigger, reaction, currentTrigger, currentReaction]);
 
-  useEffect(() => {
-    setExisted(
-      typeof currentTrigger === 'string' && typeof currentReaction === 'string'
-    );
-  }, [currentTrigger, currentReaction]);
-
   return (
     <div>
       <FormItem
         top="Триггер для вызова реакции Веры"
-        bottom="Можно использовать регулярные выражения, чтобы точно задать слово или фразу, на которое должна быть отправлена соответствующая реакция"
+        bottom="Можно использовать регулярные выражения, чтобы точно задать слово или фразу для получения соответствующей реакции"
       >
-        <Input value={trigger} />
+        <Input
+          value={trigger}
+          placeholder="Слово, фраза или /регулярное выражение/"
+        />
       </FormItem>
 
       <FormItem
@@ -74,7 +66,7 @@ export const ReactionsChat: FC<Props> = ({
         bottom="Вера отправляет это сообщение каждый раз, когда в выбранном чате появляется сообщение, содержащее фразу-триггер"
       >
         <Textarea
-          placeholder={`Добро пожаловать в чат ${chatTitle}`}
+          placeholder={`Сообщение-реакция для чата "${chatTitle}"`}
           value={reaction}
           onChange={({ target: { value } }) =>
             dispatch(updateMessage({ chatId, message: value }))
@@ -85,11 +77,11 @@ export const ReactionsChat: FC<Props> = ({
       <FormItem>
         <Button
           stretched
-          disabled={(!existed && (!trigger || !reaction)) || !modified}
+          disabled={!trigger || !reaction || !modified}
           loading={isLoading}
           onClick={() => undefined}
         >
-          {existed ? 'Обновить сообщение' : 'Создать сообщение'}
+          Создать сообщение
         </Button>
       </FormItem>
     </div>

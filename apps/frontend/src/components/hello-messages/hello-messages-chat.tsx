@@ -28,7 +28,9 @@ export const HelloMessagesChat: FC<Props> = ({
   const [submit, { data, isLoading, reset }] = useUpdateHelloMessageMutation();
   const snackbar = useSnackbar();
 
-  const [existed, setExisted] = useState(typeof currentMessage === 'string');
+  const [existed, setExisted] = useState(
+    currentMessage && typeof currentMessage === 'string'
+  );
 
   useEffect(() => {
     if (data?.success) {
@@ -59,7 +61,7 @@ export const HelloMessagesChat: FC<Props> = ({
         bottom="Вера будет отправлять это сообщение каждый раз, когда в чате появляется новый участник"
       >
         <Textarea
-          placeholder={`Добро пожаловать в чат ${chatTitle}`}
+          placeholder={`Добро пожаловать в чат "${chatTitle}"`}
           value={message}
           onChange={({ target: { value } }) =>
             dispatch(updateMessage({ chatId, message: value }))
