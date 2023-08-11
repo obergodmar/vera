@@ -3,6 +3,7 @@ import { MessagesGetConversationMembersResponse } from 'vk-io/lib/api/schemas/re
 
 import { IDuty } from './duty';
 import { IHelloMessages } from './hello-messages';
+import { IReactions } from './reactions';
 
 export namespace IApi {
   export type TokenRequest<T = Record<string, any>> = {
@@ -60,7 +61,10 @@ export namespace IApi {
   }
 
   export namespace IHelloMessagesApi {
-    export type Requests = GetHelloMessagesRequest;
+    export type Requests =
+      | GetHelloMessagesRequest
+      | UpdateHelloMessageRequest
+      | UpdateAllHelloMessagesRequest;
 
     export type GetHelloMessagesRequest = TokenRequest;
     export type GetHelloMessagesResponse = {
@@ -81,5 +85,24 @@ export namespace IApi {
     export type ConvoListWithMessages = MessagesConversation & {
       helloMessage: IHelloMessages.Message;
     };
+  }
+
+  export namespace IReactionsApi {
+    export type Requests = GetReactionsForChatRequest;
+
+    export type GetReactionsForChatRequest = TokenRequest<WithChatId>;
+    export type GetReactionsForChatResponse = {
+      count: number;
+      items: IReactions.ChatReaction[];
+    };
+
+    export type CreateReactionForChatRequest = TokenRequest<
+      Omit<IReactions.ChatReaction, 'id'>
+    >;
+    export type CreateReactionForChatResponse = StatusResponse;
+
+    export type UpdateReactionForChatRequest =
+      TokenRequest<IReactions.ChatReaction>;
+    export type UpdateReactionForChatResponse = StatusResponse;
   }
 }

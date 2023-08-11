@@ -35,4 +35,13 @@ export const ROUTES = {
       updateAllHelloMessages: 'updateAllHelloMessages',
     },
   },
+  reactions: {
+    prefix: 'reactions',
+    baseUrl: '/api/reactions',
+    endpoints: {
+      createReactionForChat: 'createReactionForChat',
+      getReactionsForChat: 'getReactionsForChat',
+      updateReactionsForChat: 'updateReactionsForChat',
+    },
+  },
 } as const;

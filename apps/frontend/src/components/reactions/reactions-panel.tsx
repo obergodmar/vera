@@ -5,8 +5,10 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { setCurrentChatId } from '../../data/reducers/reactions';
 import { useGetChatsQuery } from '../../data/services/convo-api';
+import { useGetReactionsForChatQuery } from '../../data/services/reactions-api';
 import { RootState } from '../../data/store';
 import { ConvoSearch } from '../convo-search';
+import { Reaction } from './reaction';
 import { ReactionsChat } from './reactions-chat';
 
 export const ReactionsPanel: FC = () => {
@@ -26,30 +28,37 @@ export const ReactionsPanel: FC = () => {
     [chatId, chats]
   );
 
-  if (isChatsLoading) {
+  const {
+    isLoading: isReactionsLoading,
+    data: reactions,
+    refetch: refetchReactions,
+  } = useGetReactionsForChatQuery({ chatId }, { skip: !chatId });
+
+  if (isChatsLoading || isReactionsLoading) {
     return <PanelSpinner>Реакции загружаются</PanelSpinner>;
   }
 
   return (
-    <Group>
-      <Header>Установка реакций</Header>
-      <ConvoSearch
-        value={undefined}
-        convos={chats}
-        onChange={(id) => dispatch(setCurrentChatId(id))}
-        refetchConvos={refetchChats}
-      />
-
-      {!!chatId && selectedChat && (
-        <ReactionsChat
-          trigger=""
-          reaction=""
-          currentTrigger=""
-          currentReaction=""
-          chatTitle={selectedChat.label}
-          chatId={chatId}
+    <>
+      <Group>
+        <Header>Установка реакций</Header>
+        <ConvoSearch
+          value={undefined}
+          convos={chats}
+          onChange={(id) => dispatch(setCurrentChatId(id))}
+          refetchConvos={refetchChats}
         />
-      )}
-    </Group>
+
+        {!!chatId && selectedChat && (
+          <ReactionsChat chatTitle={selectedChat.label} chatId={chatId} />
+        )}
+      </Group>
+
+      {reactions?.items.map((reaction) => (
+        <Group key={reaction.id}>
+          <Reaction {...reaction} />
+        </Group>
+      ))}
+    </>
   );
 };

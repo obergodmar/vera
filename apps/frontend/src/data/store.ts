@@ -17,6 +17,7 @@ import { convoApi } from './services/convo-api';
 import { dutyApi } from './services/duty-api';
 import { helloMessagesApi } from './services/hello-messages-api';
 import { loginApi } from './services/login-api';
+import { reactionsApi } from './services/reactions-api';
 import { createSnackbar } from './snackbar-store';
 
 const { MODE } = import.meta.env;
@@ -58,6 +59,7 @@ export const store = configureStore({
     [convoApi.reducerPath]: convoApi.reducer,
     [dutyApi.reducerPath]: dutyApi.reducer,
     [helloMessagesApi.reducerPath]: helloMessagesApi.reducer,
+    [reactionsApi.reducerPath]: reactionsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -65,6 +67,7 @@ export const store = configureStore({
       convoApi.middleware,
       dutyApi.middleware,
       helloMessagesApi.middleware,
+      reactionsApi.middleware,
       rtkQueryErrorLogger,
       middleware,
       ...(isDev ? devMiddlewares : [])

@@ -1,36 +1,23 @@
-import { IReactions } from '@vera-reforged/common';
 import { Icon24ErrorCircle } from '@vkontakte/icons';
 import { Button, FormItem, Input, Textarea } from '@vkontakte/vkui';
 
 import { FC, ReactNode, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
 
-import { updateMessage } from '../../data/reducers/hello-messages';
-import { useUpdateHelloMessageMutation } from '../../data/services/hello-messages-api';
+import { useCreateReactionForChatMutation } from '../../data/services/reactions-api';
 import { useSnackbar } from '../../hooks/useSnackbar';
 
 type Props = {
   chatId: number;
   chatTitle: string | ReactNode;
-  trigger?: IReactions.Trigger;
-  reaction?: IReactions.Reaction;
-  currentTrigger?: IReactions.Trigger;
-  currentReaction?: IReactions.Reaction;
 };
 
-export const ReactionsChat: FC<Props> = ({
-  chatId,
-  chatTitle,
-  trigger,
-  reaction,
-  currentTrigger,
-  currentReaction,
-}) => {
-  const dispatch = useDispatch();
-  const [modified, setModified] = useState(trigger !== currentTrigger);
-
-  const [submit, { data, isLoading, reset }] = useUpdateHelloMessageMutation();
+export const ReactionsChat: FC<Props> = ({ chatTitle, chatId }) => {
+  const [submit, { data, isLoading, reset }] =
+    useCreateReactionForChatMutation();
   const snackbar = useSnackbar();
+
+  const [trigger, setTrigger] = useState('');
+  const [reaction, setReaction] = useState('');
 
   useEffect(() => {
     if (data?.success) {
@@ -38,16 +25,10 @@ export const ReactionsChat: FC<Props> = ({
         message: 'Реакция создана',
         before: <Icon24ErrorCircle fill="var(--vkui--color_icon_accent)" />,
       });
-
-      setModified(false);
     }
   }, [data, snackbar]);
 
   useEffect(() => reset);
-
-  useEffect(() => {
-    setModified(trigger !== currentTrigger || reaction !== currentReaction);
-  }, [trigger, reaction, currentTrigger, currentReaction]);
 
   return (
     <div>
@@ -57,6 +38,7 @@ export const ReactionsChat: FC<Props> = ({
       >
         <Input
           value={trigger}
+          onChange={({ target: { value } }) => setTrigger(value)}
           placeholder="Слово, фраза или /регулярное выражение/"
         />
       </FormItem>
@@ -68,20 +50,18 @@ export const ReactionsChat: FC<Props> = ({
         <Textarea
           placeholder={`Сообщение-реакция для чата "${chatTitle}"`}
           value={reaction}
-          onChange={({ target: { value } }) =>
-            dispatch(updateMessage({ chatId, message: value }))
-          }
+          onChange={({ target: { value } }) => setReaction(value)}
         />
       </FormItem>
 
       <FormItem>
         <Button
           stretched
-          disabled={!trigger || !reaction || !modified}
+          disabled={!trigger || !reaction}
           loading={isLoading}
-          onClick={() => undefined}
+          onClick={() => submit({ reaction, textTrigger: trigger, chatId })}
         >
-          Создать сообщение
+          Создать реакцию
         </Button>
       </FormItem>
     </div>

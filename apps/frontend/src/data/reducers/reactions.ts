@@ -3,14 +3,14 @@ import { IReactions } from '@vera-reforged/common';
 
 type State = {
   currentChatId: number | undefined;
-  currentReactions: IReactions.ChatReaction[]
-  updatedReactions: IReactions.ChatReaction[]
+  currentReactions: IReactions.ChatReaction[];
+  updatedReactions: IReactions.ChatReaction[];
 };
 
 const initialState: State = {
   currentChatId: undefined,
   currentReactions: [],
-  updatedReactions: []
+  updatedReactions: [],
 };
 
 export const reactions = createSlice({

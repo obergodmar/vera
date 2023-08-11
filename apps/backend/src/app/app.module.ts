@@ -9,6 +9,7 @@ import { envValidation } from '../environments/env-validator';
 import { HelloMessagesModule } from '../hello-messages/hello-messages.module';
 import { LoggerModule } from '../logger/logger.module';
 import { LoginModule } from '../login/login.module';
+import { ReactionsModule } from '../reactions/reactions.module';
 import { StaticModule } from '../static/static.module';
 import { VkApiModule } from '../vk-api/vk-api.module';
 
@@ -26,6 +27,7 @@ import { VkApiModule } from '../vk-api/vk-api.module';
     LoginModule,
     DutyModule,
     HelloMessagesModule,
+    ReactionsModule,
     /**
      * Core
      */
