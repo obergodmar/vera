@@ -66,7 +66,7 @@ export class ReactionsService {
     );
 
     try {
-      this.reactionsRepository.insert({ chatId, reaction, textTrigger });
+      await this.reactionsRepository.insert({ chatId, reaction, textTrigger });
     } catch (e) {
       this.logger.log(
         `ReactionsService: Error when creating reaction ${reaction} for chat ${chatId}: ${e}`,

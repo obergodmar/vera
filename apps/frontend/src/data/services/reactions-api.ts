@@ -40,15 +40,15 @@ export const reactionsApi = createApi({
     }),
     [endpoints.updateReactionsForChat]: builder.mutation<
       IApi.IReactionsApi.UpdateReactionForChatResponse,
-      Omit<IApi.IReactionsApi.UpdateReactionForChatRequest, 'token' | 'id'>
+      Omit<IApi.IReactionsApi.UpdateReactionForChatRequest, 'token'>
     >({
       query(body) {
-        return extendFetchArgs<
-          Omit<IApi.IReactionsApi.UpdateReactionForChatRequest, 'id'>
-        >({
-          url: endpoints.updateReactionsForChat,
-          body,
-        });
+        return extendFetchArgs<IApi.IReactionsApi.UpdateReactionForChatRequest>(
+          {
+            url: endpoints.updateReactionsForChat,
+            body,
+          }
+        );
       },
       invalidatesTags: [tag],
     }),

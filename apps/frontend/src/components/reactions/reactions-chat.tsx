@@ -25,6 +25,9 @@ export const ReactionsChat: FC<Props> = ({ chatTitle, chatId }) => {
         message: 'Реакция создана',
         before: <Icon24ErrorCircle fill="var(--vkui--color_icon_accent)" />,
       });
+
+      setTrigger('');
+      setReaction('');
     }
   }, [data, snackbar]);
 
