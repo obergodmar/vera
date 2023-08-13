@@ -39,7 +39,6 @@ export class ReactionsService {
       reactions.forEach((reactionItem) => {
         const { textTrigger, reaction } = reactionItem;
         const regexp = new RegExp(textTrigger);
-        console.log(regexp, textTrigger);
 
         if (regexp.test(text)) {
           this.logger.log(
