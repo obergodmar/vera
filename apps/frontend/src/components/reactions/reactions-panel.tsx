@@ -34,6 +34,8 @@ export const ReactionsPanel: FC = () => {
     refetch: refetchReactions,
   } = useGetReactionsForChatQuery({ chatId }, { skip: !chatId });
 
+  console.log(chatId)
+
   if (isChatsLoading || isReactionsLoading) {
     return <PanelSpinner>Реакции загружаются</PanelSpinner>;
   }
@@ -43,7 +45,7 @@ export const ReactionsPanel: FC = () => {
       <Group>
         <Header>Установка реакций</Header>
         <ConvoSearch
-          value={undefined}
+          value={chatId}
           convos={chats}
           onChange={(id) => dispatch(setCurrentChatId(id))}
           refetchConvos={refetchChats}

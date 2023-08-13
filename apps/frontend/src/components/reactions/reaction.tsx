@@ -1,7 +1,7 @@
 import { IReactions } from '@vera-reforged/common';
 import { Button, Div, Input, RichCell, Textarea } from '@vkontakte/vkui';
 
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 
 import { useUpdateReactionsForChatMutation } from '../../data/services/reactions-api';
 import { useConfirmation } from '../../hooks/useConfirmation';
@@ -13,13 +13,28 @@ export const Reaction: FC<Props> = ({ id, chatId, reaction, textTrigger }) => {
   const [submit, { data, isLoading, reset }] =
     useUpdateReactionsForChatMutation();
 
+  const [currentTrigger, setCurrentTrigger] = useState(textTrigger);
+  const [currentReaction, setCurrentReaction] = useState(reaction);
+
+  useEffect(() => {
+    setCurrentTrigger(textTrigger);
+  }, [textTrigger]);
+
+  useEffect(() => {
+    setCurrentReaction(reaction);
+  }, [reaction]);
+
   return (
     <RichCell
       subhead="Триггер"
       caption="Реакция"
       bottom={
         <Div>
-          <Textarea disabled={isLoading} value={reaction} />
+          <Textarea
+            disabled={isLoading}
+            value={currentReaction}
+            onChange={({ target: { value } }) => setCurrentReaction(value)}
+          />
         </Div>
       }
       after={
@@ -41,7 +56,11 @@ export const Reaction: FC<Props> = ({ id, chatId, reaction, textTrigger }) => {
       }
     >
       <Div>
-        <Input disabled={isLoading} value={textTrigger} />
+        <Input
+          disabled={isLoading}
+          value={currentTrigger}
+          onChange={({ target: { value } }) => setCurrentTrigger(value)}
+        />
       </Div>
     </RichCell>
   );
