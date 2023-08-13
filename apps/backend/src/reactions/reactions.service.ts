@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IApi, IReactions } from '@vera-reforged/common';
+import { IApi } from '@vera-reforged/common';
 
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import { MessageContext } from 'vk-io';
 
-import { ConvoService } from '../convo/convo.service';
 import { IEnvironment } from '../environments/env-type';
 import { LoggerService } from '../logger/logger.service';
 import { VkApiService } from '../vk-api/vk-api.service';
@@ -15,16 +15,49 @@ import { Reaction } from './reactions.entity';
 @Injectable()
 export class ReactionsService {
   public constructor(
-    private readonly dataSource: DataSource,
     @InjectRepository(Reaction)
     private readonly reactionsRepository: Repository<Reaction>,
     @Inject(VkApiService) private readonly api: VkApiService,
     @Inject(LoggerService) private readonly logger: LoggerService,
-    @Inject(ConvoService) private readonly convoService: ConvoService,
     @Inject(ConfigService) private readonly config: ConfigService
   ) {
     const isListenerOff =
       this.config.get<IEnvironment['disableBotListener']>('disableBotListener');
+
+    this.api.botService.bot.hear(/.*/, async (msg: MessageContext) => {
+      if (isListenerOff) {
+        return;
+      }
+
+      const { peerId, $match } = msg;
+      const [text] = $match;
+
+      const reactions = await this.reactionsRepository.find({
+        where: { chatId: peerId, enabled: true },
+      });
+
+      reactions.forEach((reactionItem) => {
+        const { textTrigger, reaction } = reactionItem;
+        const regexp = new RegExp(textTrigger);
+        console.log(regexp, textTrigger);
+
+        if (regexp.test(text)) {
+          this.logger.log(
+            `ReactionsService: Found match "${textTrigger}" for reaction "${reaction}"" in chat ${peerId}`
+          );
+
+          this.api.botService.vk.api.messages.send({
+            peer_id: peerId,
+            message: reaction,
+            random_id: 0,
+          });
+
+          this.logger.log(
+            `ReactionsService: Sent reaction "${reaction}" for chat ${peerId}`
+          );
+        }
+      });
+    });
   }
 
   public async getReactionsForChat(

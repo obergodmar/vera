@@ -42,7 +42,7 @@ export const ReactionsChat: FC<Props> = ({ chatTitle, chatId }) => {
         <Input
           value={trigger}
           onChange={({ target: { value } }) => setTrigger(value)}
-          placeholder="Слово, фраза или /регулярное выражение/"
+          placeholder="Слово, фраза или регулярное выражение"
         />
       </FormItem>
 
