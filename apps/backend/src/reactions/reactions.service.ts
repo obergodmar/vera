@@ -59,14 +59,19 @@ export class ReactionsService {
   public async createReactionForChat(
     reactionCreationDto: CreateReactionForChat
   ): Promise<IApi.IReactionsApi.CreateReactionForChatResponse> {
-    const { chatId, reaction, textTrigger } = reactionCreationDto;
+    const { chatId, reaction, textTrigger, enabled } = reactionCreationDto;
 
     this.logger.log(
       `ReactionsService: Creating reaction "${reaction}" with trigger ${textTrigger} for chat ${chatId}`
     );
 
     try {
-      await this.reactionsRepository.insert({ chatId, reaction, textTrigger });
+      await this.reactionsRepository.insert({
+        chatId,
+        reaction,
+        textTrigger,
+        enabled,
+      });
     } catch (e) {
       this.logger.log(
         `ReactionsService: Error when creating reaction ${reaction} for chat ${chatId}: ${e}`,
@@ -87,7 +92,7 @@ export class ReactionsService {
   public async updateReactionForChat(
     reactionUpdateDto: UpdateReactionForChat
   ): Promise<IApi.IReactionsApi.UpdateReactionForChatResponse> {
-    const { id, chatId, reaction, textTrigger } = reactionUpdateDto;
+    const { id, chatId, reaction, textTrigger, enabled } = reactionUpdateDto;
 
     const isDeleting = !reaction || !textTrigger;
 
@@ -102,7 +107,7 @@ export class ReactionsService {
         await this.reactionsRepository.delete({ id });
       } else {
         await this.reactionsRepository.upsert(
-          [{ id, chatId, reaction, textTrigger }],
+          [{ id, chatId, reaction, textTrigger, enabled }],
           ['id']
         );
       }

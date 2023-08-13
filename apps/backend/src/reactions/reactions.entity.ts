@@ -4,7 +4,7 @@ import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
 @Entity()
 @Unique(['id'])
-export class Reaction {
+export class Reaction implements IReactions.ChatReaction {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -16,4 +16,7 @@ export class Reaction {
 
   @Column()
   reaction: IReactions.Reaction;
+
+  @Column()
+  enabled: boolean;
 }

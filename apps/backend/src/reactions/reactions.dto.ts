@@ -1,10 +1,13 @@
-import { IApi } from '@vera-reforged/common';
+import { IApi, IReactions } from '@vera-reforged/common';
 
-import { IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsNumber, IsString } from 'class-validator';
 
 import { TokenDto } from '../login/dto/token.dto';
 
-class BasicReactionDto extends TokenDto {
+class BasicReactionDto
+  extends TokenDto
+  implements Omit<IReactions.ChatReaction, 'id'>
+{
   @IsNumber()
   chatId: number;
 
@@ -13,6 +16,9 @@ class BasicReactionDto extends TokenDto {
 
   @IsString()
   textTrigger: string;
+
+  @IsBoolean()
+  enabled: boolean;
 }
 
 export class CreateReactionForChat

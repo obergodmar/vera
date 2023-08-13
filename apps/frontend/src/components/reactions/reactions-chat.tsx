@@ -62,7 +62,9 @@ export const ReactionsChat: FC<Props> = ({ chatTitle, chatId }) => {
           stretched
           disabled={!trigger || !reaction}
           loading={isLoading}
-          onClick={() => submit({ reaction, textTrigger: trigger, chatId })}
+          onClick={() =>
+            submit({ reaction, textTrigger: trigger, chatId, enabled: true })
+          }
         >
           Создать реакцию
         </Button>

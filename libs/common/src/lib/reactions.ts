@@ -6,5 +6,6 @@ export namespace IReactions {
     chatId: number;
     reaction: Reaction;
     textTrigger: Trigger;
+    enabled: boolean;
   };
 }
