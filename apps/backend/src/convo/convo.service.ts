@@ -23,8 +23,8 @@ export class ConvoService {
       this.updateConvoDb.call(this, peerType, peerId);
     };
 
-    this.api.botService.bot.hear(/Вера/i, handleMention);
-    this.api.botService.bot.hear(/@?club900028/, handleMention);
+    this.api.botService.bot.hear(/^Вера$/i, handleMention);
+    this.api.botService.bot.hear(/^@?club900028$/, handleMention);
   }
 
   private async updateConvoDb(peerType: string, peerId: number) {

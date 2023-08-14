@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IApi } from '@vera-reforged/common';
+import { IApi, IReactions } from '@vera-reforged/common';
 
 import { Repository } from 'typeorm';
 import { MessageContext } from 'vk-io';
@@ -29,12 +29,20 @@ export class ReactionsService {
         return;
       }
 
-      const { peerId, $match } = msg;
+      const { peerId, $match = [] } = msg;
       const [text] = $match;
 
-      const reactions = await this.reactionsRepository.find({
-        where: { chatId: peerId, enabled: true },
-      });
+      let reactions: IReactions.ChatReaction[] = [];
+      try {
+        reactions = await this.reactionsRepository.find({
+          where: { chatId: peerId, enabled: true },
+        });
+      } catch (e) {
+        this.logger.log(
+          `ReactionsService: error getting reactions for chat ${peerId}: ${e}`,
+          { type: 'error' }
+        );
+      }
 
       reactions.forEach((reactionItem) => {
         const { textTrigger, reaction } = reactionItem;
