@@ -29,7 +29,7 @@ export class ReactionsService {
         return;
       }
 
-      const { peerId, $match = [] } = msg;
+      const { peerId, conversationMessageId, $match = [] } = msg;
       const [text] = $match;
 
       let reactions: IReactions.ChatReaction[] = [];
@@ -57,6 +57,11 @@ export class ReactionsService {
             peer_id: peerId,
             message: reaction,
             random_id: 0,
+            forward: JSON.stringify({
+              peer_id: peerId,
+              is_reply: true,
+              conversation_message_ids: conversationMessageId,
+            }),
           });
 
           this.logger.log(
