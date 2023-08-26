@@ -30,6 +30,11 @@ export const panels: PanelItem[] = [
     content: <ReactionsPanel />,
   },
   {
+    value: 'crons',
+    label: 'Кроны',
+    content: <NotImplementedPanel />,
+  },
+  {
     value: 'commands',
     label: 'Команды',
     content: <NotImplementedPanel />,
@@ -37,7 +42,7 @@ export const panels: PanelItem[] = [
 ];
 
 export type PanelItem = {
-  value: 'navigation' | 'reactions' | 'commands' | 'hello-messages' | 'duty';
+  value: 'navigation' | 'reactions' | 'crons' | 'commands' | 'hello-messages' | 'duty';
   label: string;
   content: ReactNode;
   edit?: ReactNode;
