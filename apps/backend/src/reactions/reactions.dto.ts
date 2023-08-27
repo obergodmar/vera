@@ -21,11 +21,11 @@ class BasicReactionDto
   enabled: boolean;
 }
 
-export class CreateReactionForChat
+export class CreateReactionForChatDto
   extends BasicReactionDto
   implements IApi.IReactionsApi.CreateReactionForChatRequest {}
 
-export class UpdateReactionForChat
+export class UpdateReactionForChatDto
   extends BasicReactionDto
   implements IApi.IReactionsApi.UpdateReactionForChatRequest
 {

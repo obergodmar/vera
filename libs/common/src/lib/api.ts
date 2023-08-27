@@ -1,6 +1,7 @@
 import { MessagesConversation } from 'vk-io/lib/api/schemas/objects';
 import { MessagesGetConversationMembersResponse } from 'vk-io/lib/api/schemas/responses';
 
+import { ICrons } from './crons';
 import { IDuty } from './duty';
 import { IHelloMessages } from './hello-messages';
 import { IReactions } from './reactions';
@@ -25,20 +26,11 @@ export namespace IApi {
   };
 
   export namespace IConvoApi {
-    export type Requests = GetChatsRequest;
-
     export type GetChatsRequest = TokenRequest;
     export type GetChatsResponse = ConversationsList;
   }
 
   export namespace IDutyApi {
-    export type Requests =
-      | GetMembersForChatRequest
-      | GetDaysRequest
-      | GetScheduleForChatRequest
-      | GetScheduleRequest
-      | UpdateChatScheduleRequest;
-
     export type GetMembersForChatRequest = TokenRequest<WithChatId>;
     export type GetMembersForChatResponse =
       MessagesGetConversationMembersResponse;
@@ -61,11 +53,6 @@ export namespace IApi {
   }
 
   export namespace IHelloMessagesApi {
-    export type Requests =
-      | GetHelloMessagesRequest
-      | UpdateHelloMessageRequest
-      | UpdateAllHelloMessagesRequest;
-
     export type GetHelloMessagesRequest = TokenRequest;
     export type GetHelloMessagesResponse = {
       count: number;
@@ -88,8 +75,6 @@ export namespace IApi {
   }
 
   export namespace IReactionsApi {
-    export type Requests = GetReactionsForChatRequest;
-
     export type GetReactionsForChatRequest = TokenRequest<WithChatId>;
     export type GetReactionsForChatResponse = {
       count: number;
@@ -104,5 +89,23 @@ export namespace IApi {
     export type UpdateReactionForChatRequest =
       TokenRequest<IReactions.ChatReaction>;
     export type UpdateReactionForChatResponse = StatusResponse;
+  }
+
+  export namespace ICronsApi {
+    export type Requests = '';
+
+    export type GetCronsForChatRequest = TokenRequest<WithChatId>;
+    export type GetCronsForChatResponse = {
+      count: number;
+      items: ICrons.ChatCron[];
+    };
+
+    export type CreateCronForChatRequest = TokenRequest<
+      Omit<ICrons.ChatCron, 'id'>
+    >;
+    export type CreateCronForChatResponse = StatusResponse;
+
+    export type UpdateCronForChatRequest = TokenRequest<ICrons.ChatCron>;
+    export type UpdateCronForChatResponse = StatusResponse;
   }
 }

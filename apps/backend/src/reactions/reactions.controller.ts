@@ -2,7 +2,7 @@ import { Body, Controller, Inject, Post } from '@nestjs/common';
 import { IApi, ROUTES } from '@vera-reforged/common';
 
 import { WithChatIdDto } from '../convo/convo.dto';
-import { CreateReactionForChat, UpdateReactionForChat } from './reactions.dto';
+import { CreateReactionForChatDto, UpdateReactionForChatDto } from './reactions.dto';
 import { ReactionsService } from './reactions.service';
 
 const { prefix, endpoints } = ROUTES.reactions;
@@ -16,7 +16,7 @@ export class ReactionsController {
 
   @Post(endpoints.createReactionForChat)
   public createReactionForChat(
-    @Body() data: CreateReactionForChat
+    @Body() data: CreateReactionForChatDto
   ): Promise<IApi.IReactionsApi.CreateReactionForChatResponse> {
     return this.reactionsService.createReactionForChat(data);
   }
@@ -30,7 +30,7 @@ export class ReactionsController {
 
   @Post(endpoints.updateReactionsForChat)
   public updateReactionsForChat(
-    @Body() data: UpdateReactionForChat
+    @Body() data: UpdateReactionForChatDto
   ): Promise<IApi.IReactionsApi.UpdateReactionForChatResponse> {
     return this.reactionsService.updateReactionForChat(data);
   }

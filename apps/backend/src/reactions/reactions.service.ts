@@ -9,7 +9,7 @@ import { MessageContext } from 'vk-io';
 import { IEnvironment } from '../environments/env-type';
 import { LoggerService } from '../logger/logger.service';
 import { VkApiService } from '../vk-api/vk-api.service';
-import { CreateReactionForChat, UpdateReactionForChat } from './reactions.dto';
+import { CreateReactionForChatDto, UpdateReactionForChatDto } from './reactions.dto';
 import { Reaction } from './reactions.entity';
 
 @Injectable()
@@ -102,7 +102,7 @@ export class ReactionsService {
   }
 
   public async createReactionForChat(
-    reactionCreationDto: CreateReactionForChat
+    reactionCreationDto: CreateReactionForChatDto
   ): Promise<IApi.IReactionsApi.CreateReactionForChatResponse> {
     const { chatId, reaction, textTrigger, enabled } = reactionCreationDto;
 
@@ -135,7 +135,7 @@ export class ReactionsService {
   }
 
   public async updateReactionForChat(
-    reactionUpdateDto: UpdateReactionForChat
+    reactionUpdateDto: UpdateReactionForChatDto
   ): Promise<IApi.IReactionsApi.UpdateReactionForChatResponse> {
     const { id, chatId, reaction, textTrigger, enabled } = reactionUpdateDto;
 
