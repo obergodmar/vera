@@ -11,6 +11,7 @@ import { useGetChatsQuery } from '../../data/services/convo-api';
 import { useGetHelloMessagesQuery } from '../../data/services/hello-messages-api';
 import { RootState } from '../../data/store';
 import { ConvoSearch } from '../convo-search';
+import { ScrollToTop } from '../scroll-to-top';
 import { HelloMessagesChat } from './hello-messages-chat';
 import { chatMessageSelector, Message } from './message';
 
@@ -82,6 +83,8 @@ export const HelloMessagesPanel: FC = () => {
           <Message chat={chat} />
         </Group>
       ))}
+
+      <ScrollToTop />
     </>
   );
 };

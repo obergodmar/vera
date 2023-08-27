@@ -1,4 +1,4 @@
-import { Icon20RefreshOutline, Icon20Users } from '@vkontakte/icons';
+import { Icon16Users, Icon20RefreshOutline } from '@vkontakte/icons';
 import {
   Avatar,
   CustomSelectOption,
@@ -50,7 +50,7 @@ export const ConvoSearch: FC<Props> = ({
                   <Avatar
                     size={24}
                     src={avatar}
-                    fallbackIcon={<Icon20Users />}
+                    fallbackIcon={<Icon16Users />}
                   />
                 }
                 description={description}

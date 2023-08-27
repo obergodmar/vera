@@ -2,8 +2,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 type State = {
   currentChatId: number | undefined;
-  currentCrons: []
-  updatedCrons: []
+  currentCrons: [];
+  updatedCrons: [];
 };
 
 const initialState: State = {
@@ -12,8 +12,8 @@ const initialState: State = {
   updatedCrons: [],
 };
 
-export const reactions = createSlice({
-  name: 'reactions',
+export const crons = createSlice({
+  name: 'crons',
   initialState,
   reducers: {
     setCurrentChatId(state, { payload }: PayloadAction<number>) {
@@ -22,4 +22,4 @@ export const reactions = createSlice({
   },
 });
 
-export const { setCurrentChatId } = reactions.actions;
+export const { setCurrentChatId } = crons.actions;

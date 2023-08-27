@@ -18,6 +18,7 @@ import { useGetChatsQuery } from '../../data/services/convo-api';
 import { useGetReactionsForChatQuery } from '../../data/services/reactions-api';
 import { RootState } from '../../data/store';
 import { ConvoSearch } from '../convo-search';
+import { ScrollToTop } from '../scroll-to-top';
 import { Reaction } from './reaction';
 import { ReactionsChat } from './reactions-chat';
 
@@ -144,6 +145,8 @@ export const ReactionsPanel: FC = () => {
           )}
         </Fragment>
       ))}
+
+      <ScrollToTop />
     </>
   );
 };

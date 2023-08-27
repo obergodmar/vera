@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 
+import { CronsPanel } from './crons/crons-panel';
 import { DutyCancel } from './duty/duty-cancel';
 import { DutyPanel } from './duty/duty-panel';
 import { DutySubmit } from './duty/duty-submit';
@@ -32,7 +33,7 @@ export const panels: PanelItem[] = [
   {
     value: 'crons',
     label: 'Кроны',
-    content: <NotImplementedPanel />,
+    content: <CronsPanel />,
   },
   {
     value: 'commands',
@@ -42,7 +43,13 @@ export const panels: PanelItem[] = [
 ];
 
 export type PanelItem = {
-  value: 'navigation' | 'reactions' | 'crons' | 'commands' | 'hello-messages' | 'duty';
+  value:
+    | 'navigation'
+    | 'reactions'
+    | 'crons'
+    | 'commands'
+    | 'hello-messages'
+    | 'duty';
   label: string;
   content: ReactNode;
   edit?: ReactNode;
