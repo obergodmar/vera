@@ -1,6 +1,6 @@
 import { IApi, ICrons } from '@vera-reforged/common';
 
-import { IsBoolean, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsNumber, IsString } from 'class-validator';
 
 import { TokenDto } from '../login/dto/token.dto';
 
@@ -9,15 +9,12 @@ class BasicCronsDto extends TokenDto implements Omit<ICrons.ChatCron, 'id'> {
   chatId: number;
 
   @IsString()
-  @IsNotEmpty()
   message: string;
 
   @IsString()
-  @IsNotEmpty()
   daysRange: string;
 
   @IsString()
-  @IsNotEmpty()
   timeAt: string;
 
   @IsBoolean()

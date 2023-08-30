@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { setCurrentChatId } from '../../data/reducers/crons';
 import { useGetChatsQuery } from '../../data/services/convo-api';
+import { useGetCronsForChatQuery } from '../../data/services/crons-api';
 import { RootState } from '../../data/store';
 import { ConvoSearch } from '../convo-search';
 import { ScrollToTop } from '../scroll-to-top';
@@ -25,8 +26,15 @@ export const CronsPanel: FC = () => {
     [chatId, chats]
   );
 
-  if (isChatsLoading) {
-    return <PanelSpinner>Реакции загружаются</PanelSpinner>;
+  const {
+    isLoading: isCronsLoading,
+    data: crons,
+    refetch: refetchCrons,
+  } = useGetCronsForChatQuery({ chatId }, { skip: !chatId });
+
+
+  if (isChatsLoading || isCronsLoading) {
+    return <PanelSpinner>Кроны загружаются</PanelSpinner>;
   }
 
   return (
@@ -55,8 +63,8 @@ export const CronsPanel: FC = () => {
         {!!chatId && selectedChat && (
           <>
             <Group mode="plain">
-              <CellButton mode="danger">
-                Выключить все кроны для этого чата
+              <CellButton mode="danger" disabled={!crons?.count}>
+                Выключить все кроны для этого чата ({crons?.count || 0})
               </CellButton>
             </Group>
 

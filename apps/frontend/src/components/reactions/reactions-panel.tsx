@@ -89,7 +89,7 @@ export const ReactionsPanel: FC = () => {
             }
           >
             <Text style={{ fontWeight: 600 }}>
-              Созданные реакции ({reactions?.count}) для чата "
+              Созданные реакции ({reactions?.count || 0}) для чата "
               {selectedChat.label}"
             </Text>
           </SimpleCell>

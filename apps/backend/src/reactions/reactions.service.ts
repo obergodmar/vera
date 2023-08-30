@@ -9,7 +9,10 @@ import { MessageContext } from 'vk-io';
 import { IEnvironment } from '../environments/env-type';
 import { LoggerService } from '../logger/logger.service';
 import { VkApiService } from '../vk-api/vk-api.service';
-import { CreateReactionForChatDto, UpdateReactionForChatDto } from './reactions.dto';
+import {
+  CreateReactionForChatDto,
+  UpdateReactionForChatDto,
+} from './reactions.dto';
 import { Reaction } from './reactions.entity';
 
 @Injectable()
@@ -106,9 +109,8 @@ export class ReactionsService {
   ): Promise<IApi.IReactionsApi.CreateReactionForChatResponse> {
     const { chatId, reaction, textTrigger, enabled } = reactionCreationDto;
 
-    this.logger.log(
-      `ReactionsService: Creating reaction "${reaction}" with trigger ${textTrigger} for chat ${chatId}`
-    );
+    const logMeta = `"${reaction}" with trigger ${textTrigger} for chat ${chatId}`;
+    this.logger.log(`ReactionsService: Creating reaction ${logMeta}`);
 
     try {
       await this.reactionsRepository.insert({
@@ -119,7 +121,7 @@ export class ReactionsService {
       });
     } catch (e) {
       this.logger.log(
-        `ReactionsService: Error when creating reaction ${reaction} for chat ${chatId}: ${e}`,
+        `ReactionsService: Error when creating reaction ${logMeta}: ${e}`,
         { type: 'error' }
       );
 
@@ -141,10 +143,11 @@ export class ReactionsService {
 
     const isDeleting = !reaction || !textTrigger;
 
+    const logMeta = `"[${id}]: ${reaction}" with trigger ${textTrigger} for chat ${chatId}`;
     this.logger.log(
       `ReactionsService: ${isDeleting ? 'Deleting' : 'Updating'} reaction ${
-        reaction && ` ${reaction}`
-      } for chat ${chatId}`
+        !isDeleting ? `${logMeta}` : `${id} for chat ${chatId}`
+      }`
     );
 
     try {
@@ -158,7 +161,7 @@ export class ReactionsService {
       }
     } catch (e) {
       this.logger.log(
-        `ReactionsService: Error upserting new reaction into ${chatId}: ${e}`,
+        `ReactionsService: Error updating reaction ${id} in ${chatId}: ${e}`,
         { type: 'error' }
       );
       return {

@@ -5,6 +5,7 @@ import {
   filterScheduleByDayAndTime,
   getAnnounceDutyMessage,
   getDayMonthTime,
+  getDaysRange,
   getDutyMessage,
   getNextDayMonth,
   getTimeInMinutes,
@@ -14,7 +15,8 @@ import {
   getSchedule,
   getScheduleResultForAsd,
   getScheduleResultForQa,
-  getScheduleResultForWeb, getScheduleWithDifferentTime,
+  getScheduleResultForWeb,
+  getScheduleWithDifferentTime,
   getSingleScheduleWithoutTagNextDay,
   getSingleScheduleWithoutTagSameDay,
   getSingleScheduleWithTag,
@@ -101,13 +103,13 @@ describe('utils testing', () => {
     });
 
     it('should be no duty on monday after 23:45', () => {
-      expect(filterScheduleByDay(schedule, 1, 1426)).toStrictEqual([
-      ]);
+      expect(filterScheduleByDay(schedule, 1, 1426)).toStrictEqual([]);
     });
 
-
     it('should be duties on monday after 23:45', () => {
-      expect(filterScheduleByDay(scheduleNextDay, 1, 1426)).toStrictEqual(scheduleNextDay);
+      expect(filterScheduleByDay(scheduleNextDay, 1, 1426)).toStrictEqual(
+        scheduleNextDay
+      );
     });
   });
 
@@ -343,5 +345,15 @@ describe('utils testing', () => {
         '#web Нет дежурств в данное время\n\nДежурства сегодня:\n#web TestOne ExampleOne с 00:00 28.02 до 23:59 28.02\n#web ТестДва ПримерДва с 22:00 28.02 до 15:00 01.03\n#web ТестТри ПримерТри с 23:45 28.02 до 23:20 01.03'
       );
     });
+  });
+
+  describe('getDaysRange', () => {
+    expect(getDaysRange([1, 2, 3])).toBe('1-3');
+    expect(getDaysRange([1, 3])).toBe('1,3');
+    expect(getDaysRange([1, 2, 4])).toBe('1,2,4');
+    expect(getDaysRange([1, 2, 3, 4, 5])).toBe('1-5');
+    expect(getDaysRange([1, 2, 4, 5])).toBe('1,2,4,5');
+    expect(getDaysRange([1, 2, 3, 5])).toBe('1-3,5');
+    expect(getDaysRange([1, 2, 4, 5, 6])).toBe('1,2,4-6');
   });
 });

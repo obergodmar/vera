@@ -44,4 +44,13 @@ export const ROUTES = {
       updateReactionsForChat: 'updateReactionsForChat',
     },
   },
+  crons: {
+    prefix: 'crons',
+    baseUrl: '/api/crons',
+    endpoints: {
+      getCronsForChat: 'getCronsForChat',
+      createCronForChat: 'createCronForChat',
+      updateCronForChat: 'updateCronForChat',
+    },
+  },
 } as const;

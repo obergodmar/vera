@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { Convo } from '../convo/convo.entity';
+import { Cron } from '../crons/crons.entity';
 import { Duty } from '../duty/duty.entity';
 import { HelloMessage } from '../hello-messages/hello-messages.entity';
 import { Reaction } from '../reactions/reactions.entity';
@@ -23,6 +24,7 @@ import { Reaction } from '../reactions/reactions.entity';
         Duty,
         HelloMessage,
         Reaction,
+        Cron
       ],
     }),
   ],

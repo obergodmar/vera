@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 import { BotModule } from '../bot/bot.module';
+import { CronsModule } from '../crons/crons.module';
 import { DatabaseModule } from '../database/database.module';
 import { DutyModule } from '../duty/duty.module';
 import { getEnvConfig } from '../environments/env-config';
@@ -28,6 +29,7 @@ import { VkApiModule } from '../vk-api/vk-api.module';
     DutyModule,
     HelloMessagesModule,
     ReactionsModule,
+    CronsModule,
     /**
      * Core
      */

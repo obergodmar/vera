@@ -208,3 +208,30 @@ export function filterByGroupChat(
     return false;
   });
 }
+
+export function getDaysRange(days: number[]): string {
+  const sorted = [...days].sort();
+
+  return sorted.reduce((acc: string, day, idx) => {
+    const prevDay = days[idx - 1];
+    const nextDay = days[idx + 1];
+    const prevSign = acc[acc.length - 1];
+    if (!prevDay) {
+      return `${day}`;
+    }
+
+    if (day === prevDay + 1 && day === nextDay - 1 && idx !== days.length - 1) {
+      if (prevSign === '-') {
+        return acc;
+      }
+
+      return `${acc}-`;
+    }
+
+    if (prevSign === '-') {
+      return `${acc}${day}`;
+    }
+
+    return `${acc},${day}`;
+  }, '');
+}

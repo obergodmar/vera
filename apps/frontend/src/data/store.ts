@@ -15,6 +15,7 @@ import { duty } from './reducers/duty';
 import { helloMessages } from './reducers/hello-messages';
 import { reactions } from './reducers/reactions';
 import { convoApi } from './services/convo-api';
+import { cronsApi } from './services/crons-api';
 import { dutyApi } from './services/duty-api';
 import { helloMessagesApi } from './services/hello-messages-api';
 import { loginApi } from './services/login-api';
@@ -62,6 +63,7 @@ export const store = configureStore({
     [dutyApi.reducerPath]: dutyApi.reducer,
     [helloMessagesApi.reducerPath]: helloMessagesApi.reducer,
     [reactionsApi.reducerPath]: reactionsApi.reducer,
+    [cronsApi.reducerPath]: cronsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -70,6 +72,7 @@ export const store = configureStore({
       dutyApi.middleware,
       helloMessagesApi.middleware,
       reactionsApi.middleware,
+      cronsApi.middleware,
       rtkQueryErrorLogger,
       middleware,
       ...(isDev ? devMiddlewares : [])
