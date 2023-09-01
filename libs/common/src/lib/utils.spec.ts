@@ -5,6 +5,7 @@ import {
   filterScheduleByDayAndTime,
   getAnnounceDutyMessage,
   getDayMonthTime,
+  getDaysArray,
   getDaysRange,
   getDutyMessage,
   getNextDayMonth,
@@ -355,5 +356,15 @@ describe('utils testing', () => {
     expect(getDaysRange([1, 2, 4, 5])).toBe('1,2,4,5');
     expect(getDaysRange([1, 2, 3, 5])).toBe('1-3,5');
     expect(getDaysRange([1, 2, 4, 5, 6])).toBe('1,2,4-6');
+  });
+
+  describe('getDaysArray', () => {
+    expect(getDaysArray('1-3')).toStrictEqual([1, 2, 3]);
+    expect(getDaysArray('1,3')).toStrictEqual([1, 3]);
+    expect(getDaysArray('1,2,4')).toStrictEqual([1, 2, 4]);
+    expect(getDaysArray('1-5')).toStrictEqual([1, 2, 3, 4, 5]);
+    expect(getDaysArray('1,2,4,5')).toStrictEqual([1, 2, 4, 5]);
+    expect(getDaysArray('1-3,5')).toStrictEqual([1, 2, 3, 5]);
+    expect(getDaysArray('1,2,4-6')).toStrictEqual([1, 2, 4, 5, 6]);
   });
 });

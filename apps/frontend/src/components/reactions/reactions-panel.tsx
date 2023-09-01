@@ -1,14 +1,4 @@
-import { Icon20RefreshOutline } from '@vkontakte/icons';
-import {
-  Group,
-  Header,
-  IconButton,
-  PanelSpinner,
-  SimpleCell,
-  Switch,
-  Text,
-} from '@vkontakte/vkui';
-import { TextTooltip } from '@vkontakte/vkui/dist/components/TextTooltip/TextTooltip';
+import { Group, Header, PanelSpinner } from '@vkontakte/vkui';
 
 import { FC, Fragment, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,6 +8,7 @@ import { useGetChatsQuery } from '../../data/services/convo-api';
 import { useGetReactionsForChatQuery } from '../../data/services/reactions-api';
 import { RootState } from '../../data/store';
 import { ConvoSearch } from '../convo-search';
+import { FilterGroup } from '../filter-group';
 import { ScrollToTop } from '../scroll-to-top';
 import { Reaction } from './reaction';
 import { ReactionsChat } from './reactions-chat';
@@ -69,64 +60,17 @@ export const ReactionsPanel: FC = () => {
 
       {!!chatId && selectedChat && (
         <Group>
-          <SimpleCell
-            after={
-              <TextTooltip text="Обновить список реакций">
-                <IconButton
-                  aria-label="Обновить список реакций"
-                  onClick={refetchReactions}
-                  style={{
-                    minWidth: '44px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'var(--vkui--color_text_subhead)',
-                  }}
-                >
-                  <Icon20RefreshOutline />
-                </IconButton>
-              </TextTooltip>
-            }
-          >
-            <Text style={{ fontWeight: 600 }}>
-              Созданные реакции ({reactions?.count || 0}) для чата "
-              {selectedChat.label}"
-            </Text>
-          </SimpleCell>
-          <SimpleCell
-            Component="label"
-            after={
-              <Switch
-                checked={enabledFilter}
-                onChange={({ target: { checked } }) => {
-                  setEnabledFilter(checked);
-
-                  if (!checked && !disabledFilter) {
-                    setDisabledFilter(true);
-                  }
-                }}
-              />
-            }
-          >
-            Включенные
-          </SimpleCell>
-          <SimpleCell
-            Component="label"
-            after={
-              <Switch
-                checked={disabledFilter}
-                onChange={({ target: { checked } }) => {
-                  setDisabledFilter(checked);
-
-                  if (!checked && !enabledFilter) {
-                    setEnabledFilter(true);
-                  }
-                }}
-              />
-            }
-          >
-            Отключенные
-          </SimpleCell>
+          <FilterGroup
+            refetch={refetchReactions}
+            refetchText="Обновить список реакций"
+            enabledChecked={enabledFilter}
+            enabledChanged={setEnabledFilter}
+            disabledChecked={disabledFilter}
+            disabledChanged={setDisabledFilter}
+            title={`Созданные реакции (${reactions?.count || 0}) для чата "${
+              selectedChat.label
+            }"`}
+          />
         </Group>
       )}
 

@@ -235,3 +235,23 @@ export function getDaysRange(days: number[]): string {
     return `${acc},${day}`;
   }, '');
 }
+
+export function getDaysArray(daysRange: string): number[] {
+  return daysRange.split(',').reduce((acc: number[], item) => {
+    if (!item.includes('-')) {
+      acc.push(Number(item));
+
+      return acc;
+    }
+
+    const [min, max] = item.split('-').map((i) => Number(i));
+
+    if (!min || !max) {
+      return acc;
+    }
+
+    acc.push(...[...Array(max - min + 1).keys()].map((i) => i + min));
+
+    return acc;
+  }, []);
+}
