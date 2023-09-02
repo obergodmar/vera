@@ -1,5 +1,6 @@
 import { IApi, ICrons } from '@vera-reforged/common';
 
+import { Transform, TransformFnParams } from 'class-transformer';
 import { IsBoolean, IsNumber, IsString } from 'class-validator';
 
 import { TokenDto } from '../login/dto/token.dto';
@@ -9,6 +10,7 @@ class BasicCronsDto extends TokenDto implements Omit<ICrons.ChatCron, 'id'> {
   chatId: number;
 
   @IsString()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   message: string;
 
   @IsString()

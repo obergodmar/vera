@@ -64,6 +64,7 @@ export const Reaction: FC<Props> = ({
           <Input
             disabled={isLoading}
             value={currentTrigger}
+            onBlur={() => setCurrentTrigger((prev) => prev.trim())}
             onChange={({ target: { value } }) => setCurrentTrigger(value)}
           />
         </Div>
@@ -73,6 +74,7 @@ export const Reaction: FC<Props> = ({
           <Textarea
             disabled={isLoading}
             value={currentReaction}
+            onBlur={() => setCurrentReaction((prev) => prev.trim())}
             onChange={({ target: { value } }) => setCurrentReaction(value)}
           />
         </Div>

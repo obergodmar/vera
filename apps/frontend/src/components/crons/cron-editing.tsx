@@ -148,6 +148,7 @@ export const CronEditing: FC<Props> = ({
         <Textarea
           placeholder={`Сообщение для чата "${chatTitle}"`}
           value={message}
+          onBlur={() => setMessage((prev) => prev.trim())}
           onChange={({ target: { value } }) => setMessage(value)}
         />
       </FormItem>

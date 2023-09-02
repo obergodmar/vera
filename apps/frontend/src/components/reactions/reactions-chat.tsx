@@ -41,6 +41,7 @@ export const ReactionsChat: FC<Props> = ({ chatTitle, chatId }) => {
       >
         <Input
           value={trigger}
+          onBlur={() => setTrigger((prev) => prev.trim())}
           onChange={({ target: { value } }) => setTrigger(value)}
           placeholder="Слово, фраза или регулярное выражение"
         />
@@ -53,6 +54,7 @@ export const ReactionsChat: FC<Props> = ({ chatTitle, chatId }) => {
         <Textarea
           placeholder={`Сообщение-реакция для чата "${chatTitle}"`}
           value={reaction}
+          onBlur={() => setReaction((prev) => prev.trim())}
           onChange={({ target: { value } }) => setReaction(value)}
         />
       </FormItem>

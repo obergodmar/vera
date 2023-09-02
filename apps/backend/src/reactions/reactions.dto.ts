@@ -1,5 +1,6 @@
 import { IApi, IReactions } from '@vera-reforged/common';
 
+import { Transform, TransformFnParams } from 'class-transformer';
 import { IsBoolean, IsNumber, IsString } from 'class-validator';
 
 import { TokenDto } from '../login/dto/token.dto';
@@ -12,9 +13,11 @@ class BasicReactionDto
   chatId: number;
 
   @IsString()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   reaction: string;
 
   @IsString()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   textTrigger: string;
 
   @IsBoolean()
