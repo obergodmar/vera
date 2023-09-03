@@ -21,6 +21,11 @@ export class CronsController {
     return this.cronsService.getCronsForChat(data.chatId);
   }
 
+  @Post(endpoints.getCronsChats)
+  public getCronsChatsResponse(): Promise<IApi.ICronsApi.GetCronsChatsResponse> {
+    return this.cronsService.getCronsChatsResponse();
+  }
+
   @Post(endpoints.createCronForChat)
   public createCronForChat(
     @Body() data: CreateCronForChatDto

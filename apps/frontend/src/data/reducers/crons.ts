@@ -16,7 +16,7 @@ export const crons = createSlice({
   name: 'crons',
   initialState,
   reducers: {
-    setCurrentChatId(state, { payload }: PayloadAction<number>) {
+    setCurrentChatId(state, { payload }: PayloadAction<number | undefined>) {
       state.currentChatId = payload;
     },
   },

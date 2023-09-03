@@ -17,7 +17,7 @@ export const helloMessages = createSlice({
   name: 'helloMessages',
   initialState,
   reducers: {
-    setCurrentChatId(state, { payload }: PayloadAction<number>) {
+    setCurrentChatId(state, { payload }: PayloadAction<number | undefined>) {
       state.currentChatId = payload;
     },
 

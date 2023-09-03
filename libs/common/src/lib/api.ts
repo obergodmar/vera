@@ -100,6 +100,12 @@ export namespace IApi {
       items: ICrons.ChatCron[];
     };
 
+    export type GetCronsChatsRequest = TokenRequest;
+    export type GetCronsChatsResponse = {
+      count: number;
+      items: number[];
+    };
+
     export type CreateCronForChatRequest = TokenRequest<
       Omit<ICrons.ChatCron, 'id'>
     >;

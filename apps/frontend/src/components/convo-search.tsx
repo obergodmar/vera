@@ -1,23 +1,24 @@
 import { Icon16Users, Icon20RefreshOutline } from '@vkontakte/icons';
 import {
-  Avatar,
-  CustomSelectOption,
-  CustomSelectOptionInterface,
-  FormItem,
-  FormLayoutGroup,
-  IconButton,
-  Select,
-  SimpleCell,
-  Switch,
+    Avatar,
+    CustomSelectOption,
+    CustomSelectOptionInterface,
+    FormItem,
+    FormLayoutGroup,
+    IconButton,
+    Select,
+    SimpleCell,
+    Switch,
 } from '@vkontakte/vkui';
 import { TextTooltip } from '@vkontakte/vkui/dist/components/TextTooltip/TextTooltip';
 
-import { FC } from 'react';
+import { FC, useMemo, useState } from 'react';
 
 type Props = {
   value: number | undefined;
   convos: CustomSelectOptionInterface[];
-  onChange: (id: number) => void;
+  updatedConvosIds?: number[];
+  onChange: (id: number | undefined) => void;
   refetchConvos?: () => void;
   disableUpdatedConvosSwitch?: boolean;
 };
@@ -25,10 +26,25 @@ type Props = {
 export const ConvoSearch: FC<Props> = ({
   value,
   convos,
+  updatedConvosIds,
   onChange,
   refetchConvos,
   disableUpdatedConvosSwitch,
 }) => {
+  const [showUpdatedOnly, setShowUpdatedOnly] = useState(false);
+
+  const options = useMemo(() => {
+    if (!showUpdatedOnly) {
+      return convos;
+    }
+
+    return convos.filter(({ value }) => {
+      const convoId = Number(value);
+
+      return updatedConvosIds?.includes(convoId);
+    });
+  }, [convos, showUpdatedOnly, updatedConvosIds]);
+
   return (
     <FormLayoutGroup mode="vertical">
       <FormItem top="Чат">
@@ -43,7 +59,7 @@ export const ConvoSearch: FC<Props> = ({
               onChange(id);
             }}
             placeholder="Не выбран"
-            options={convos}
+            options={options}
             renderOption={({
               option: { avatar, description },
               ...restProps
@@ -91,7 +107,15 @@ export const ConvoSearch: FC<Props> = ({
 
       {!disableUpdatedConvosSwitch && (
         <FormItem bottom="Показывает только те чаты, в которые уже добавлены установки из текущего раздела">
-          <SimpleCell Component="label" after={<Switch />}>
+          <SimpleCell
+            Component="label"
+            after={
+              <Switch
+                checked={showUpdatedOnly}
+                onChange={({ target }) => setShowUpdatedOnly(target.checked)}
+              />
+            }
+          >
             Только с установками
           </SimpleCell>
         </FormItem>

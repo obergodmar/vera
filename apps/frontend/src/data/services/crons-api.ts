@@ -36,6 +36,18 @@ export const cronsApi = createApi({
       },
       providesTags: [tag],
     }),
+    [endpoints.getCronsChats]: builder.query<
+      IApi.ICronsApi.GetCronsChatsResponse,
+      Omit<IApi.ICronsApi.GetCronsChatsRequest, 'token'>
+    >({
+      query(body) {
+        return extendFetchArgs<IApi.ICronsApi.GetCronsChatsRequest>({
+          url: endpoints.getCronsChats,
+          body,
+        });
+      },
+      providesTags: [tag],
+    }),
     [endpoints.updateCronForChat]: builder.mutation<
       IApi.ICronsApi.UpdateCronForChatResponse,
       Omit<IApi.ICronsApi.UpdateCronForChatRequest, 'token'>
@@ -77,6 +89,7 @@ export const cronsApi = createApi({
 
 export const {
   useGetCronsForChatQuery,
+  useGetCronsChatsQuery,
   useCreateCronForChatMutation,
   useUpdateCronForChatMutation,
   useDisableCronsForChatMutation,

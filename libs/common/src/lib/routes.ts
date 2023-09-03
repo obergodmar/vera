@@ -49,6 +49,7 @@ export const ROUTES = {
     baseUrl: '/api/crons',
     endpoints: {
       getCronsForChat: 'getCronsForChat',
+      getCronsChats: 'getCronsChats',
       createCronForChat: 'createCronForChat',
       updateCronForChat: 'updateCronForChat',
       disableCronsForChat: 'disableCronsForChat',

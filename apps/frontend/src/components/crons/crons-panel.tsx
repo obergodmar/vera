@@ -1,9 +1,5 @@
 import { Icon24ErrorCircle } from '@vkontakte/icons';
-import {
-  Group,
-  Header,
-  PanelSpinner,
-} from '@vkontakte/vkui';
+import { Group, Header, PanelSpinner } from '@vkontakte/vkui';
 
 import { FC, Fragment, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,6 +9,7 @@ import { useGetChatsQuery } from '../../data/services/convo-api';
 import {
   useDisableAllCronsMutation,
   useDisableCronsForChatMutation,
+  useGetCronsChatsQuery,
   useGetCronsForChatQuery,
 } from '../../data/services/crons-api';
 import { RootState } from '../../data/store';
@@ -37,17 +34,19 @@ export const CronsPanel: FC = () => {
     refetch: refetchChats,
   } = useGetChatsQuery();
 
+  const { isLoading: isCronsChatsLoading, data: cronsChats } =
+    useGetCronsChatsQuery({});
+
   const chatId = useSelector((state: RootState) => state.crons.currentChatId);
   const selectedChat = useMemo(
     () => chats.find(({ value }) => value === chatId),
     [chatId, chats]
   );
 
-  const {
-    isLoading: isCronsLoading,
-    data: crons,
-    refetch: refetchCrons,
-  } = useGetCronsForChatQuery({ chatId }, { skip: !chatId });
+  const { data: crons, refetch: refetchCrons } = useGetCronsForChatQuery(
+    { chatId },
+    { skip: !chatId }
+  );
 
   const [
     disableAllCrons,
@@ -101,7 +100,7 @@ export const CronsPanel: FC = () => {
     }
   }, [disableForChatData, resetDisableForChat, snackbar]);
 
-  if (isChatsLoading || isCronsLoading) {
+  if (isChatsLoading || isCronsChatsLoading) {
     return <PanelSpinner>Кроны загружаются</PanelSpinner>;
   }
 
@@ -128,6 +127,7 @@ export const CronsPanel: FC = () => {
           <ConvoSearch
             value={chatId}
             convos={chats}
+            updatedConvosIds={cronsChats?.items}
             onChange={(id) => dispatch(setCurrentChatId(id))}
             refetchConvos={refetchChats}
           />

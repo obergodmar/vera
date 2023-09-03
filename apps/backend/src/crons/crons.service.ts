@@ -47,6 +47,30 @@ export class CronsService {
     }
   }
 
+  public async getCronsChatsResponse(): Promise<IApi.ICronsApi.GetCronsChatsResponse> {
+    this.logger.log('CronsService: crons chats were requested');
+
+    try {
+      const cronsChats = await this.cronsRepository.find();
+
+      this.logger.log('CronsService: crons chats were sucessfully sent');
+
+      return {
+        count: cronsChats.length,
+        items: cronsChats.map(({ chatId }) => chatId),
+      };
+    } catch (e) {
+      this.logger.log(`CronsService: error getting cron chats: ${e}`, {
+        type: 'error',
+      });
+
+      return {
+        count: 0,
+        items: [],
+      };
+    }
+  }
+
   public async createCronForChat(
     cronCreationDto: CreateCronForChatDto
   ): Promise<IApi.ICronsApi.CreateCronForChatResponse> {
@@ -142,7 +166,8 @@ export class CronsService {
       };
     } catch (e) {
       this.logger.log(
-        `CronsService: Error when disabling crons for chat: ${chatId}: ${e}`
+        `CronsService: Error when disabling crons for chat: ${chatId}: ${e}`,
+        { type: 'error' }
       );
 
       return {
@@ -164,7 +189,9 @@ export class CronsService {
         count: res.affected,
       };
     } catch (e) {
-      this.logger.log(`CronsService: Error when disabling all crons: ${e}`);
+      this.logger.log(`CronsService: Error when disabling all crons: ${e}`, {
+        type: 'error',
+      });
 
       return {
         error: JSON.stringify(e),

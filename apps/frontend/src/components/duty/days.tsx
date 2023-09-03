@@ -1,5 +1,4 @@
 import { IDuty } from '@vera-reforged/common';
-import { Spinner } from '@vkontakte/vkui';
 
 import { FC, memo, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,6 +10,7 @@ import {
 } from '../../data/services/duty-api';
 import { RootState } from '../../data/store';
 import { ChatMembersProvider } from '../../hooks/useChatMembers';
+import { GroupSpinner } from '../group-spinner';
 import { Day } from './day';
 
 type Props = {
@@ -66,7 +66,9 @@ export const Days: FC<Props> = memo(({ chatId }) => {
   }, [dispatch, isFetching, schedule]);
 
   if (isMembersLoading || isFetching) {
-    return <Spinner />;
+    return (
+      <GroupSpinner />
+    );
   }
 
   return (

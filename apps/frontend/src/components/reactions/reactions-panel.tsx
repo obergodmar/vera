@@ -9,6 +9,7 @@ import { useGetReactionsForChatQuery } from '../../data/services/reactions-api';
 import { RootState } from '../../data/store';
 import { ConvoSearch } from '../convo-search';
 import { FilterGroup } from '../filter-group';
+import { GroupSpinner } from '../group-spinner';
 import { ScrollToTop } from '../scroll-to-top';
 import { Reaction } from './reaction';
 import { ReactionsChat } from './reactions-chat';
@@ -38,7 +39,7 @@ export const ReactionsPanel: FC = () => {
     refetch: refetchReactions,
   } = useGetReactionsForChatQuery({ chatId }, { skip: !chatId });
 
-  if (isChatsLoading || isReactionsLoading) {
+  if (isChatsLoading) {
     return <PanelSpinner>Реакции загружаются</PanelSpinner>;
   }
 
@@ -58,6 +59,8 @@ export const ReactionsPanel: FC = () => {
           <ReactionsChat chatTitle={selectedChat.label} chatId={chatId} />
         )}
       </Group>
+
+      {isReactionsLoading && <GroupSpinner />}
 
       {!!chatId && selectedChat && (
         <Group>
