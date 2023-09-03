@@ -3,6 +3,7 @@ import { IEnvironment } from './env-type';
 export const environment: IEnvironment = {
   isProd: true,
   disableBotListener: false,
+  authorizationToken: 'REMOVED_AUTH_TOKEN',
   botToken:
     'REMOVED_BOT_TOKEN',
   botPollingGroupId: 900028,

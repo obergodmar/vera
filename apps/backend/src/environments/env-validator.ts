@@ -19,6 +19,10 @@ export class Environment implements IEnvironment {
 
   @IsString()
   @IsNotEmpty()
+  authorizationToken: string;
+
+  @IsString()
+  @IsNotEmpty()
   botToken: string;
 
   @IsNumber()

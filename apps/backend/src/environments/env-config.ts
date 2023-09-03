@@ -23,6 +23,10 @@ function parseEnvVariables(): Partial<IEnvironment> {
     envVariables.disableBotListener = !!env.DISABLE_BOT_LISTENER;
   }
 
+  if (env.AUTHORIZATION_TOKEN) {
+    envVariables.authorizationToken = env.AUTHORIZATION_TOKEN;
+  }
+
   if (env.BOT_TOKEN) {
     envVariables.botToken = env.BOT_TOKEN;
   }
