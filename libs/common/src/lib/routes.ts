@@ -51,6 +51,8 @@ export const ROUTES = {
       getCronsForChat: 'getCronsForChat',
       createCronForChat: 'createCronForChat',
       updateCronForChat: 'updateCronForChat',
+      disableCronsForChat: 'disableCronsForChat',
+      disableAllCrons: 'disableAllCrons',
     },
   },
 } as const;

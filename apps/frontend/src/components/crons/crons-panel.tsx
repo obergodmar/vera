@@ -1,12 +1,23 @@
-import { CellButton, Group, Header, PanelSpinner } from '@vkontakte/vkui';
+import { Icon24ErrorCircle } from '@vkontakte/icons';
+import {
+  Group,
+  Header,
+  PanelSpinner,
+} from '@vkontakte/vkui';
 
-import { FC, Fragment, useMemo, useState } from 'react';
+import { FC, Fragment, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { setCurrentChatId } from '../../data/reducers/crons';
 import { useGetChatsQuery } from '../../data/services/convo-api';
-import { useGetCronsForChatQuery } from '../../data/services/crons-api';
+import {
+  useDisableAllCronsMutation,
+  useDisableCronsForChatMutation,
+  useGetCronsForChatQuery,
+} from '../../data/services/crons-api';
 import { RootState } from '../../data/store';
+import { useSnackbar } from '../../hooks/useSnackbar';
+import { ConfirmationCell } from '../confirmation-cell';
 import { ConvoSearch } from '../convo-search';
 import { FilterGroup } from '../filter-group';
 import { ScrollToTop } from '../scroll-to-top';
@@ -14,6 +25,8 @@ import { Cron } from './cron';
 import { CronsChat } from './crons-chat';
 
 export const CronsPanel: FC = () => {
+  const snackbar = useSnackbar();
+
   const dispatch = useDispatch();
   const [enabledFilter, setEnabledFilter] = useState(true);
   const [disabledFilter, setDisabledFilter] = useState(true);
@@ -36,6 +49,58 @@ export const CronsPanel: FC = () => {
     refetch: refetchCrons,
   } = useGetCronsForChatQuery({ chatId }, { skip: !chatId });
 
+  const [
+    disableAllCrons,
+    {
+      isLoading: isDisableAllLoading,
+      data: disableAllStatus,
+      reset: resetDisableAll,
+    },
+  ] = useDisableAllCronsMutation();
+
+  const [
+    disableCronsForChat,
+    {
+      isLoading: isDisableForChatLoading,
+      data: disableForChatData,
+      reset: resetDisableForChat,
+    },
+  ] = useDisableCronsForChatMutation();
+
+  useEffect(
+    () => () => {
+      resetDisableAll();
+      resetDisableForChat();
+    },
+    [resetDisableAll, resetDisableForChat]
+  );
+
+  useEffect(() => {
+    if (disableAllStatus?.success) {
+      const { count } = disableAllStatus;
+
+      snackbar({
+        message: `Кронов во всех чатах выключено: ${count || 0}`,
+        before: <Icon24ErrorCircle fill="var(--vkui--color_icon_accent)" />,
+      });
+
+      resetDisableAll();
+    }
+  }, [disableAllStatus, resetDisableAll, snackbar]);
+
+  useEffect(() => {
+    if (disableForChatData?.success) {
+      const { count } = disableForChatData;
+
+      snackbar({
+        message: `Кронов для выбранного чата выключено: ${count || 0}`,
+        before: <Icon24ErrorCircle fill="var(--vkui--color_icon_accent)" />,
+      });
+
+      resetDisableForChat();
+    }
+  }, [disableForChatData, resetDisableForChat, snackbar]);
+
   if (isChatsLoading || isCronsLoading) {
     return <PanelSpinner>Кроны загружаются</PanelSpinner>;
   }
@@ -50,9 +115,12 @@ export const CronsPanel: FC = () => {
           <Header>Кроны</Header>
         </Group>
         <Group mode="plain">
-          <CellButton mode="danger">
-            Выключить все кроны (во всех чатах)
-          </CellButton>
+          <ConfirmationCell
+            onProceed={() => disableAllCrons({})}
+            title="Выключить все кроны (во всех чатах)"
+            isSucceeded={!!disableAllStatus?.success}
+            disabled={isDisableAllLoading}
+          />
         </Group>
 
         <Group mode="plain">
@@ -75,9 +143,12 @@ export const CronsPanel: FC = () => {
 
       {!!chatId && selectedChat && (
         <Group>
-          <CellButton mode="danger" disabled={!crons?.count}>
-            Выключить все кроны для этого чата ({crons?.count || 0})
-          </CellButton>
+          <ConfirmationCell
+            onProceed={() => disableCronsForChat({ chatId })}
+            title={`Выключить все кроны для этого чата (${crons?.count || 0})`}
+            isSucceeded={!!disableForChatData?.success}
+            disabled={!crons?.count || isDisableForChatLoading}
+          />
 
           <FilterGroup
             refetch={refetchCrons}

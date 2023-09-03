@@ -34,4 +34,16 @@ export class CronsController {
   ): Promise<IApi.ICronsApi.UpdateCronForChatResponse> {
     return this.cronsService.updateCronForChat(data);
   }
+
+  @Post(endpoints.disableCronsForChat)
+  public disableCronsForChat(
+    @Body() data: WithChatIdDto
+  ): Promise<IApi.ICronsApi.DisableCronsForChatResponse> {
+    return this.cronsService.disableCronsForChat(data.chatId);
+  }
+
+  @Post(endpoints.disableAllCrons)
+  public disableAllCrons(): Promise<IApi.ICronsApi.DisableAllCronsResponse> {
+    return this.cronsService.disableAllCrons();
+  }
 }

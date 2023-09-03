@@ -107,5 +107,15 @@ export namespace IApi {
 
     export type UpdateCronForChatRequest = TokenRequest<ICrons.ChatCron>;
     export type UpdateCronForChatResponse = StatusResponse;
+
+    export type DisableCronsForChatRequest = TokenRequest<WithChatId>;
+    export type DisableCronsForChatResponse = StatusResponse & {
+      count?: number;
+    };
+
+    export type DisableAllCronsRequest = TokenRequest;
+    export type DisableAllCronsResponse = StatusResponse & {
+      count?: number;
+    };
   }
 }

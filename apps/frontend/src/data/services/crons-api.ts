@@ -48,6 +48,30 @@ export const cronsApi = createApi({
       },
       invalidatesTags: [tag],
     }),
+    [endpoints.disableCronsForChat]: builder.mutation<
+      IApi.ICronsApi.DisableCronsForChatResponse,
+      Omit<IApi.ICronsApi.DisableCronsForChatRequest, 'token'>
+    >({
+      query(body) {
+        return extendFetchArgs<IApi.ICronsApi.DisableCronsForChatRequest>({
+          url: endpoints.disableCronsForChat,
+          body,
+        });
+      },
+      invalidatesTags: [tag],
+    }),
+    [endpoints.disableAllCrons]: builder.mutation<
+      IApi.ICronsApi.DisableAllCronsResponse,
+      Omit<IApi.ICronsApi.DisableAllCronsRequest, 'token'>
+    >({
+      query(body) {
+        return extendFetchArgs<IApi.ICronsApi.DisableAllCronsRequest>({
+          url: endpoints.disableAllCrons,
+          body,
+        });
+      },
+      invalidatesTags: [tag],
+    }),
   }),
 });
 
@@ -55,4 +79,6 @@ export const {
   useGetCronsForChatQuery,
   useCreateCronForChatMutation,
   useUpdateCronForChatMutation,
+  useDisableCronsForChatMutation,
+  useDisableAllCronsMutation,
 } = cronsApi;

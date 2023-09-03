@@ -7,6 +7,8 @@ import {
   FormLayoutGroup,
   IconButton,
   Select,
+  SimpleCell,
+  Switch,
 } from '@vkontakte/vkui';
 import { TextTooltip } from '@vkontakte/vkui/dist/components/TextTooltip/TextTooltip';
 
@@ -17,6 +19,7 @@ type Props = {
   convos: CustomSelectOptionInterface[];
   onChange: (id: number) => void;
   refetchConvos?: () => void;
+  disableUpdatedConvosSwitch?: boolean;
 };
 
 export const ConvoSearch: FC<Props> = ({
@@ -24,9 +27,10 @@ export const ConvoSearch: FC<Props> = ({
   convos,
   onChange,
   refetchConvos,
+  disableUpdatedConvosSwitch,
 }) => {
   return (
-    <FormLayoutGroup mode="horizontal" style={{ display: 'flex', gap: '10px' }}>
+    <FormLayoutGroup mode="vertical">
       <FormItem top="Чат">
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <Select
@@ -84,6 +88,14 @@ export const ConvoSearch: FC<Props> = ({
           )}
         </div>
       </FormItem>
+
+      {!disableUpdatedConvosSwitch && (
+        <FormItem bottom="Показывает только те чаты, в которые уже добавлены установки из текущего раздела">
+          <SimpleCell Component="label" after={<Switch />}>
+            Только с установками
+          </SimpleCell>
+        </FormItem>
+      )}
     </FormLayoutGroup>
   );
 };

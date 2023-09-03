@@ -51,6 +51,7 @@ export const ReactionsPanel: FC = () => {
           convos={chats}
           onChange={(id) => dispatch(setCurrentChatId(id))}
           refetchConvos={refetchChats}
+          disableUpdatedConvosSwitch
         />
 
         {!!chatId && selectedChat && (

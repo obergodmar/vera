@@ -118,4 +118,57 @@ export class CronsService {
       success: true,
     };
   }
+
+  public async disableCronsForChat(
+    chatId: number
+  ): Promise<IApi.ICronsApi.DisableCronsForChatResponse> {
+    this.logger.log(
+      `CronsService: Start disabling all crons for chat: ${chatId}`
+    );
+
+    try {
+      const res = await this.cronsRepository.update(
+        { chatId },
+        { enabled: false }
+      );
+
+      this.logger.log(
+        `CronsService: Successfully disabled all crons for chat: ${chatId}`
+      );
+
+      return {
+        success: true,
+        count: res.affected,
+      };
+    } catch (e) {
+      this.logger.log(
+        `CronsService: Error when disabling crons for chat: ${chatId}: ${e}`
+      );
+
+      return {
+        error: JSON.stringify(e),
+      };
+    }
+  }
+
+  public async disableAllCrons(): Promise<IApi.ICronsApi.DisableAllCronsResponse> {
+    this.logger.log('CronsService: Start disabling all crons');
+
+    try {
+      const res = await this.cronsRepository.update({}, { enabled: false });
+
+      this.logger.log('CronsService: Successfully disabled all crons ');
+
+      return {
+        success: true,
+        count: res.affected,
+      };
+    } catch (e) {
+      this.logger.log(`CronsService: Error when disabling all crons: ${e}`);
+
+      return {
+        error: JSON.stringify(e),
+      };
+    }
+  }
 }
