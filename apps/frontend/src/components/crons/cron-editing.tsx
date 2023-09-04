@@ -1,12 +1,21 @@
-import { ICrons } from '@vera-reforged/common';
+import { ICrons, IKeyboard } from '@vera-reforged/common';
 import {
   Icon20AddCircleOutline,
   Icon20RemoveCircleOutline,
+  Icon24Add,
 } from '@vkontakte/icons';
-import { Avatar, FormItem, Text, Textarea } from '@vkontakte/vkui';
+import { Avatar, Button, FormItem, Text, Textarea } from '@vkontakte/vkui';
 
-import { Dispatch, FC, Fragment, ReactNode, SetStateAction } from 'react';
+import {
+  Dispatch,
+  FC,
+  Fragment,
+  PropsWithChildren,
+  ReactNode,
+  SetStateAction,
+} from 'react';
 
+import { LinkButtonCreation } from '../link-button-creation';
 import { TimePicker } from '../time-picker';
 
 const daysNames: ICrons.Day[] = [
@@ -49,6 +58,8 @@ type Props = {
   setMessage: Dispatch<SetStateAction<string>>;
   days: number[];
   setDays: Dispatch<SetStateAction<number[]>>;
+  button?: IKeyboard.LinkButton;
+  setButton: Dispatch<SetStateAction<IKeyboard.LinkButton | undefined>>;
 
   chatTitle: ReactNode;
 };
@@ -60,6 +71,8 @@ export const CronEditing: FC<Props> = ({
   setMessage,
   days,
   setDays,
+  button,
+  setButton,
   chatTitle,
 }) => {
   return (
@@ -102,49 +115,7 @@ export const CronEditing: FC<Props> = ({
         </div>
       </FormItem>
 
-      <FormItem
-        top={`Сообщение для "${chatTitle}"`}
-        bottom={
-          !!time && !!days.length ? (
-            <>
-              Это сообщение будет отправляться каждый{' '}
-              {days.map((day) => {
-                const isBeforeLast = days.length - 1 === day;
-                const isLast = days.length === day;
-                return (
-                  <Fragment key={day}>
-                    <Text
-                      style={{
-                        display: 'inline',
-                        color: 'var(--vkui--color_accent_blue)',
-                        fontWeight: 'bold',
-                        fontSize: 'inherit',
-                      }}
-                    >
-                      {
-                        daysNames.find(({ dayNumber }) => dayNumber === day)
-                          ?.nameWhen
-                      }
-                    </Text>
-                    {isLast ? ' ' : isBeforeLast ? ' и ' : ', '}
-                  </Fragment>
-                );
-              })}{' '}
-              в{' '}
-              <Text
-                style={{
-                  display: 'inline',
-                  color: 'var(--vkui--color_accent_blue)',
-                  fontWeight: 'bold',
-                  fontSize: 'inherit',
-                }}
-              >
-                {time}
-              </Text>
-            </>
-          ) : undefined
-        }
-      >
+      <FormItem top={`Сообщение для "${chatTitle}"`}>
         <Textarea
           placeholder={`Сообщение для чата "${chatTitle}"`}
           value={message}
@@ -152,6 +123,85 @@ export const CronEditing: FC<Props> = ({
           onChange={({ target: { value } }) => setMessage(value)}
         />
       </FormItem>
+
+      {!button && (
+        <FormItem>
+          <Button
+            before={<Icon24Add />}
+            appearance="neutral"
+            mode="outline"
+            stretched
+            onClick={() => {
+              setButton({ link: '', label: '' });
+            }}
+          >
+            Добавить кнопку
+          </Button>
+        </FormItem>
+      )}
+
+      {button && (
+        <LinkButtonCreation
+          {...button}
+          header="Кнопка-ссылка"
+          onChange={(type, value) => {
+            setButton((prev = { link: '', label: '' }) => {
+              return {
+                ...prev,
+                [type as keyof IKeyboard.LinkButton]: value,
+              };
+            });
+          }}
+          onRemove={() => setButton(undefined)}
+        />
+      )}
+
+      {!!time && !!days.length && (
+        <Text
+          style={{
+            color: 'var(--vkui--color_text_secondary)',
+            margin: '8px 16px 16px',
+            wordWrap: 'break-word',
+            overflowWrap: 'break-word',
+            hyphens: 'auto',
+            whiteSpace: 'normal',
+          }}
+        >
+          Это сообщение {button ? <Highlight>с кнопкой </Highlight> : ' '}будет
+          отправляться каждый{' '}
+          {days.map((day) => {
+            const isBeforeLast = days.length - 1 === day;
+            const isLast = days.length === day;
+            return (
+              <Fragment key={day}>
+                <Highlight>
+                  {
+                    daysNames.find(({ dayNumber }) => dayNumber === day)
+                      ?.nameWhen
+                  }
+                </Highlight>
+                {isLast ? ' ' : isBeforeLast ? ' и ' : ', '}
+              </Fragment>
+            );
+          })}{' '}
+          в <Highlight>{time}</Highlight>
+        </Text>
+      )}
     </>
+  );
+};
+
+export const Highlight: FC<PropsWithChildren> = ({ children }) => {
+  return (
+    <Text
+      style={{
+        display: 'inline',
+        color: 'var(--vkui--color_accent_blue)',
+        fontWeight: 'bold',
+        fontSize: 'inherit',
+      }}
+    >
+      {children}
+    </Text>
   );
 };

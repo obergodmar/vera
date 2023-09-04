@@ -19,6 +19,9 @@ class BasicCronsDto extends TokenDto implements Omit<ICrons.ChatCron, 'id'> {
   @IsString()
   timeAt: string;
 
+  @IsString()
+  buttons: string;
+
   @IsBoolean()
   enabled: boolean;
 }

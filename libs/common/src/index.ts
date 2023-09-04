@@ -8,3 +8,4 @@ export * from './lib/utils';
 export * from './lib/misc';
 export * from './lib/env-utils';
 export * from './lib/create-log';
+export * from './lib/keyboard';

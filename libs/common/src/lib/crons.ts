@@ -12,6 +12,7 @@ export namespace ICrons {
     chatId: number;
     daysRange: string;
     timeAt: string;
+    buttons: string;
     enabled: boolean;
   };
 }

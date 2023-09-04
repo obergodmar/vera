@@ -1,7 +1,12 @@
-import { getDaysArray, getDaysRange, ICrons } from '@vera-reforged/common';
+import {
+  getDaysArray,
+  getDaysRange,
+  ICrons,
+  IKeyboard,
+} from '@vera-reforged/common';
 import { Icon24ErrorCircle } from '@vkontakte/icons';
 
-import { FC, ReactNode, useEffect, useState } from 'react';
+import { FC, ReactNode, useEffect, useMemo, useState } from 'react';
 
 import { useUpdateCronForChatMutation } from '../../data/services/crons-api';
 import { useConfirmation } from '../../hooks/useConfirmation';
@@ -20,8 +25,19 @@ export const Cron: FC<Props> = ({
   message,
   daysRange,
   enabled,
+  buttons,
   chatTitle,
 }) => {
+  const button = useMemo(() => {
+    try {
+      const item = JSON.parse(buttons)[0];
+
+      return item || undefined;
+    } catch {
+      return undefined;
+    }
+  }, [buttons]);
+
   const { confirmed, setConfirmed, confirmationTimer } = useConfirmation(5);
   const [submit, { data, isLoading, reset }] = useUpdateCronForChatMutation();
   const snackbar = useSnackbar();
@@ -30,6 +46,9 @@ export const Cron: FC<Props> = ({
   const [currentMessage, setCurrentMessage] = useState(message);
   const [currentDays, setCurrentDays] = useState(getDaysArray(daysRange));
   const [currentEnabled, setCurrentEnabled] = useState(enabled);
+  const [currentButton, setCurrentButton] = useState<
+    IKeyboard.LinkButton | undefined
+  >(button);
 
   useEffect(() => {
     setCurrentTime(timeAt);
@@ -47,11 +66,16 @@ export const Cron: FC<Props> = ({
     setCurrentEnabled(enabled);
   }, [enabled]);
 
+  useEffect(() => {
+    setCurrentButton(button);
+  }, [button]);
+
   const modified =
     currentTime !== timeAt ||
     currentMessage !== message ||
     getDaysRange(currentDays) !== daysRange ||
-    currentEnabled !== enabled;
+    currentEnabled !== enabled ||
+    buttons !== (currentButton ? JSON.stringify([currentButton]) : '');
 
   useEffect(() => {
     if (data?.success) {
@@ -78,6 +102,10 @@ export const Cron: FC<Props> = ({
           message: currentMessage,
           daysRange: getDaysRange(currentDays),
           timeAt: currentTime,
+          buttons:
+            currentButton && currentButton.label && currentButton.link
+              ? JSON.stringify([currentButton])
+              : '',
         });
       }}
       onReset={() => {
@@ -95,6 +123,7 @@ export const Cron: FC<Props> = ({
             timeAt: '',
             message: '',
             enabled,
+            buttons: '',
           });
         }
 
@@ -112,6 +141,8 @@ export const Cron: FC<Props> = ({
         days={currentDays}
         setDays={setCurrentDays}
         chatTitle={chatTitle}
+        button={currentButton}
+        setButton={setCurrentButton}
       />
     </ModifiableCell>
   );

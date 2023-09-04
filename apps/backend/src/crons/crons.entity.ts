@@ -21,5 +21,8 @@ export class Cron implements ICrons.ChatCron {
   timeAt: string;
 
   @Column()
+  buttons: string;
+
+  @Column()
   enabled: boolean;
 }

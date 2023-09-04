@@ -1,4 +1,4 @@
-import { getDaysRange } from '@vera-reforged/common';
+import { getDaysRange, IKeyboard } from '@vera-reforged/common';
 import { Icon24ErrorCircle } from '@vkontakte/icons';
 import {
   Button,
@@ -27,6 +27,7 @@ export const CronsChat: FC<Props> = ({ chatTitle, chatId }) => {
   const [days, setDays] = useState<number[]>([]);
   const [time, setTime] = useState<string>('');
   const [message, setMessage] = useState('');
+  const [button, setButton] = useState<IKeyboard.LinkButton | undefined>();
 
   useEffect(() => {
     if (data?.success) {
@@ -56,12 +57,19 @@ export const CronsChat: FC<Props> = ({ chatTitle, chatId }) => {
             days={days}
             setDays={setDays}
             chatTitle={chatTitle}
+            button={button}
+            setButton={setButton}
           />
 
           <FormItem>
             <Button
               stretched
-              disabled={!time || !days.length || !message}
+              disabled={
+                !time ||
+                !days.length ||
+                !message ||
+                (!!button && (!button.label || !button.link))
+              }
               loading={isLoading}
               onClick={() =>
                 submit({
@@ -69,6 +77,7 @@ export const CronsChat: FC<Props> = ({ chatTitle, chatId }) => {
                   timeAt: time,
                   daysRange: getDaysRange(days),
                   chatId,
+                  buttons: button ? JSON.stringify([button]) : '',
                   enabled: true,
                 })
               }
