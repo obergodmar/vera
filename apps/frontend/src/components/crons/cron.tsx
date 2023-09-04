@@ -113,6 +113,7 @@ export const Cron: FC<Props> = ({
         setCurrentMessage(message);
         setCurrentDays(getDaysArray(daysRange));
         setCurrentTime(timeAt);
+        setCurrentButton(undefined);
       }}
       onRemove={() => {
         if (confirmed) {

@@ -39,6 +39,7 @@ export const CronsChat: FC<Props> = ({ chatTitle, chatId }) => {
       setDays([]);
       setTime('');
       setMessage('');
+      setButton(undefined);
     }
   }, [data, snackbar]);
 
