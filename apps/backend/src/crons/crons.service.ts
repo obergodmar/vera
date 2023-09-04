@@ -25,7 +25,7 @@ export class CronsService {
     private readonly cronsRepository: Repository<Cron>,
     @Inject(VkApiService) private readonly api: VkApiService,
     @Inject(LoggerService) private readonly logger: LoggerService,
-    @Inject(ConfigService) private readonly config: ConfigService,
+    @Inject(ConfigService) private readonly config: ConfigService
   ) {
     const isListenerOff =
       this.config.get<IEnvironment['disableBotListener']>('disableBotListener');
@@ -49,7 +49,7 @@ export class CronsService {
         crons.forEach((cron) => {
           this.cronJobs.set(
             cron.id,
-            createCronJob(cron, this.sendMessage, this.log),
+            createCronJob(cron, this.sendMessage, this.log)
           );
         });
 
@@ -63,7 +63,7 @@ export class CronsService {
   }
 
   public async getCronsForChat(
-    chatId: number,
+    chatId: number
   ): Promise<IApi.ICronsApi.GetCronsForChatResponse> {
     this.logger.log(`CronsService: crons were requested for chat ${chatId}`);
 
@@ -79,7 +79,7 @@ export class CronsService {
     } catch (e) {
       this.logger.log(
         `CronsService: error getting crons for chat ${chatId}: ${e}`,
-        { type: 'error' },
+        { type: 'error' }
       );
 
       return {
@@ -114,7 +114,7 @@ export class CronsService {
   }
 
   public async createCronForChat(
-    cronCreationDto: CreateCronForChatDto,
+    cronCreationDto: CreateCronForChatDto
   ): Promise<IApi.ICronsApi.CreateCronForChatResponse> {
     const { chatId, message, daysRange, timeAt, buttons, enabled } =
       cronCreationDto;
@@ -147,13 +147,13 @@ export class CronsService {
             buttons,
           },
           this.sendMessage,
-          this.log,
-        ),
+          this.log
+        )
       );
     } catch (e) {
       this.logger.log(
         `CronsService: Error when creating cron ${logMeta}: ${e}`,
-        { type: 'error' },
+        { type: 'error' }
       );
 
       return {
@@ -168,7 +168,7 @@ export class CronsService {
   }
 
   public async updateCronForChat(
-    cronUpdateDto: UpdateCronForChatDto,
+    cronUpdateDto: UpdateCronForChatDto
   ): Promise<IApi.ICronsApi.UpdateCronForChatResponse> {
     const { id, chatId, message, daysRange, timeAt, buttons, enabled } =
       cronUpdateDto;
@@ -179,7 +179,7 @@ export class CronsService {
     this.logger.log(
       `CronsService: ${isDeleting ? 'Deleting' : 'Updating'} cron ${
         !isDeleting ? `${logMeta}` : `${id} for ${chatId}`
-      }`,
+      }`
     );
 
     try {
@@ -193,7 +193,7 @@ export class CronsService {
       } else {
         await this.cronsRepository.upsert(
           [{ id, chatId, daysRange, timeAt, message, enabled, buttons }],
-          ['id'],
+          ['id']
         );
 
         if (enabled) {
@@ -202,15 +202,15 @@ export class CronsService {
             createCronJob(
               { id, chatId, daysRange, timeAt, message, enabled, buttons },
               this.sendMessage,
-              this.log,
-            ),
+              this.log
+            )
           );
         }
       }
     } catch (e) {
       this.logger.log(
         `CronsService: Error updating cron ${id} in ${chatId}: ${e}`,
-        { type: 'error' },
+        { type: 'error' }
       );
       return {
         error: JSON.stringify(e),
@@ -224,10 +224,10 @@ export class CronsService {
   }
 
   public async disableCronsForChat(
-    chatId: number,
+    chatId: number
   ): Promise<IApi.ICronsApi.DisableCronsForChatResponse> {
     this.logger.log(
-      `CronsService: Start disabling all crons for chat: ${chatId}`,
+      `CronsService: Start disabling all crons for chat: ${chatId}`
     );
 
     try {
@@ -235,7 +235,7 @@ export class CronsService {
       const ids = items.map(({ id }) => id);
       const res = await this.cronsRepository.update(
         { chatId },
-        { enabled: false },
+        { enabled: false }
       );
 
       this.cronJobs.forEach((job, id) => {
@@ -246,7 +246,7 @@ export class CronsService {
       });
 
       this.logger.log(
-        `CronsService: Successfully disabled all crons for chat: ${chatId}`,
+        `CronsService: Successfully disabled all crons for chat: ${chatId}`
       );
 
       return {
@@ -256,7 +256,7 @@ export class CronsService {
     } catch (e) {
       this.logger.log(
         `CronsService: Error when disabling crons for chat: ${chatId}: ${e}`,
-        { type: 'error' },
+        { type: 'error' }
       );
 
       return {
@@ -297,7 +297,7 @@ export class CronsService {
 function createCronJob(
   cron: ICrons.ChatCron,
   sendMessage: APIMessages['send'],
-  log: LoggerService['log'],
+  log: LoggerService['log']
 ): CronJob {
   const { timeAt, chatId, daysRange, message, buttons } = cron;
   const [hours, minutes] = timeAt.split(':');
@@ -355,12 +355,12 @@ function createCronJob(
       log(`CronsService: Cron Job STOPPED for cron ${logMeta}`);
     },
     true,
-    'Europe/Moscow',
+    'Europe/Moscow'
   );
 }
 
 function getCronLogMeta(
-  cron: Omit<ICrons.ChatCron, 'id'> & { id?: number },
+  cron: Omit<ICrons.ChatCron, 'id'> & { id?: number }
 ): string {
   const { id, message, daysRange, timeAt, chatId, buttons } = cron;
   const common = `"${message}"${

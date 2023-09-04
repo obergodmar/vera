@@ -1,4 +1,4 @@
-import { IAPIOptions, IUpdatesOptions } from "vk-io";
+import { IAPIOptions, IUpdatesOptions } from 'vk-io';
 
 export interface IEnvironment {
   isProd: boolean;
@@ -6,5 +6,5 @@ export interface IEnvironment {
   authorizationToken: string;
   botToken: IAPIOptions['token'];
   botPollingGroupId: IUpdatesOptions['pollingGroupId'];
-  botApiMode: IAPIOptions['apiMode']
+  botApiMode: IAPIOptions['apiMode'];
 }

@@ -24,7 +24,7 @@ import { Reaction } from '../reactions/reactions.entity';
         Duty,
         HelloMessage,
         Reaction,
-        Cron
+        Cron,
       ],
     }),
   ],

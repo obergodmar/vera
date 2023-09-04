@@ -35,7 +35,7 @@ export const ScrollToTop: FC = memo(() => {
       }}
     >
       <IconButton
-        aria-label='Наверх'
+        aria-label="Наверх"
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       >
         <Icon24ArrowUp />

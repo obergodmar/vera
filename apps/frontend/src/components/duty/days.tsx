@@ -66,9 +66,7 @@ export const Days: FC<Props> = memo(({ chatId }) => {
   }, [dispatch, isFetching, schedule]);
 
   if (isMembersLoading || isFetching) {
-    return (
-      <GroupSpinner />
-    );
+    return <GroupSpinner />;
   }
 
   return (

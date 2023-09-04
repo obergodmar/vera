@@ -1,14 +1,14 @@
 import { Icon16Users, Icon20RefreshOutline } from '@vkontakte/icons';
 import {
-    Avatar,
-    CustomSelectOption,
-    CustomSelectOptionInterface,
-    FormItem,
-    FormLayoutGroup,
-    IconButton,
-    Select,
-    SimpleCell,
-    Switch,
+  Avatar,
+  CustomSelectOption,
+  CustomSelectOptionInterface,
+  FormItem,
+  FormLayoutGroup,
+  IconButton,
+  Select,
+  SimpleCell,
+  Switch,
 } from '@vkontakte/vkui';
 import { TextTooltip } from '@vkontakte/vkui/dist/components/TextTooltip/TextTooltip';
 
