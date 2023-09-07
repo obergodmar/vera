@@ -25,7 +25,7 @@ export class HelloMessagesService {
     @Inject(VkApiService) private readonly api: VkApiService,
     @Inject(LoggerService) private readonly logger: LoggerService,
     @Inject(ConvoService) private readonly convoService: ConvoService,
-    @Inject(ConfigService) private readonly config: ConfigService,
+    @Inject(ConfigService) private readonly config: ConfigService
   ) {
     const isListenerOff =
       this.config.get<IEnvironment['disableBotListener']>('disableBotListener');
@@ -40,7 +40,7 @@ export class HelloMessagesService {
         const { peerId } = context;
 
         this.logger.log(
-          `HelloMessagesService: chat_invite_user update in ${peerId}`,
+          `HelloMessagesService: chat_invite_user update in ${peerId}`
         );
 
         try {
@@ -62,15 +62,15 @@ export class HelloMessagesService {
           });
 
           this.logger.log(
-            `HelloMessagesService: Successfully answered to ${peerId} with ${helloMessage.message}`,
+            `HelloMessagesService: Successfully answered to ${peerId} with ${helloMessage.message}`
           );
         } catch (e) {
           this.logger.log(
             `HelloMessagesService: Error when answering on update in ${peerId}: ${e}`,
-            { type: 'error' },
+            { type: 'error' }
           );
         }
-      },
+      }
     );
   }
 
@@ -84,7 +84,7 @@ export class HelloMessagesService {
       const convosWithMessages = messages.reduce(
         (
           chats: IApi.IHelloMessagesApi.ConvoListWithMessages[],
-          { chatId, message },
+          { chatId, message }
         ) => {
           const chat = convos.items.find((chat) => chat.peer.id === chatId);
 
@@ -97,7 +97,7 @@ export class HelloMessagesService {
 
           return chats;
         },
-        [],
+        []
       );
 
       return {
@@ -107,7 +107,7 @@ export class HelloMessagesService {
     } catch (e) {
       this.logger.log(
         `HelloMessagesService: error getting helloMessages: ${e}`,
-        { type: 'error' },
+        { type: 'error' }
       );
 
       return {
@@ -119,12 +119,12 @@ export class HelloMessagesService {
 
   public async updateHelloMessage(
     chatId: number,
-    message: string,
+    message: string
   ): Promise<IApi.StatusResponse> {
     this.logger.log(
       `HelloMessagesService: ${message ? 'Setting' : 'Deleting'} message${
         message && ` ${message}`
-      } for chat ${chatId}`,
+      } for chat ${chatId}`
     );
 
     try {
@@ -136,7 +136,7 @@ export class HelloMessagesService {
     } catch (e) {
       this.logger.log(
         `HelloMessagesService: Error upserting new message into ${chatId}: ${e}`,
-        { type: 'error' },
+        { type: 'error' }
       );
       return {
         error: JSON.stringify(e),
@@ -150,10 +150,10 @@ export class HelloMessagesService {
   }
 
   public async updateAllHelloMessages(
-    data: IHelloMessages.MessagePerChat[],
+    data: IHelloMessages.MessagePerChat[]
   ): Promise<IApi.StatusResponse> {
     this.logger.log(
-      'HelloMessagesService: Starting transaction for all messages in db',
+      'HelloMessagesService: Starting transaction for all messages in db'
     );
     let error: string;
 
@@ -170,7 +170,7 @@ export class HelloMessagesService {
       await Promise.all(deletions);
 
       this.logger.log(
-        'HelloMessagesService: Transaction successfull - changes were made',
+        'HelloMessagesService: Transaction successfull - changes were made'
       );
     } catch (e) {
       await queryRunner.rollbackTransaction();
