@@ -49,6 +49,7 @@ export const Cron: FC<Props> = ({
   const [currentButton, setCurrentButton] = useState<
     IKeyboard.LinkButton | undefined
   >(button);
+  const [currentWeeks, setCurrentWeeks] = useState<number[]>([])
 
   useEffect(() => {
     setCurrentTime(timeAt);
@@ -144,6 +145,8 @@ export const Cron: FC<Props> = ({
         chatTitle={chatTitle}
         button={currentButton}
         setButton={setCurrentButton}
+        weeks={currentWeeks}
+        setWeeks={setCurrentWeeks}
       />
     </ModifiableCell>
   );

@@ -60,6 +60,8 @@ type Props = {
   setDays: Dispatch<SetStateAction<number[]>>;
   button?: IKeyboard.LinkButton;
   setButton: Dispatch<SetStateAction<IKeyboard.LinkButton | undefined>>;
+  weeks: number[];
+  setWeeks: Dispatch<SetStateAction<number[]>>;
 
   chatTitle: ReactNode;
 };
@@ -73,38 +75,72 @@ export const CronEditing: FC<Props> = ({
   setDays,
   button,
   setButton,
+  weeks,
+  setWeeks,
   chatTitle,
 }) => {
   return (
     <>
-      <FormItem top="Время">
-        <TimePicker
-          value={time}
-          onChange={(value) => {
-            setTime(value as string);
-          }}
-        />
-      </FormItem>
-      <FormItem top="Дни недели">
+      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+        <FormItem top="Время">
+          <TimePicker
+            value={time}
+            onChange={(value) => {
+              setTime(value as string);
+            }}
+          />
+        </FormItem>
+        <FormItem top="Дни недели">
+          <div style={{ display: 'flex', gap: '10px' }}>
+            {daysNames.map(({ dayNumber, shortName }) => (
+              <Avatar
+                key={dayNumber}
+                initials={shortName}
+                size={40}
+                gradientColor={days.includes(dayNumber) ? 'blue' : undefined}
+                onClick={() =>
+                  setDays((prev) => {
+                    if (prev.includes(dayNumber)) {
+                      return prev.filter((id) => id !== dayNumber);
+                    } else {
+                      return [...prev, dayNumber].sort();
+                    }
+                  })
+                }
+              >
+                <Avatar.Overlay theme="dark">
+                  {days.includes(dayNumber) ? (
+                    <Icon20RemoveCircleOutline />
+                  ) : (
+                    <Icon20AddCircleOutline />
+                  )}
+                </Avatar.Overlay>
+              </Avatar>
+            ))}
+          </div>
+        </FormItem>
+      </div>
+
+      <FormItem top="Повтор (недели)">
         <div style={{ display: 'flex', gap: '10px' }}>
-          {daysNames.map(({ dayNumber, shortName }) => (
+          {[1, 2, 3, 4].map((week) => (
             <Avatar
-              key={dayNumber}
-              initials={shortName}
+              key={week}
+              initials={`${week}`}
               size={40}
-              gradientColor={days.includes(dayNumber) ? 'blue' : undefined}
+              gradientColor={weeks.includes(week) ? 'blue' : undefined}
               onClick={() =>
-                setDays((prev) => {
-                  if (prev.includes(dayNumber)) {
-                    return prev.filter((id) => id !== dayNumber);
+                setWeeks((prev) => {
+                  if (prev.includes(week)) {
+                    return prev.filter((id) => id !== week);
                   } else {
-                    return [...prev, dayNumber].sort();
+                    return [...prev, week].sort();
                   }
                 })
               }
             >
               <Avatar.Overlay theme="dark">
-                {days.includes(dayNumber) ? (
+                {weeks.includes(week) ? (
                   <Icon20RemoveCircleOutline />
                 ) : (
                   <Icon20AddCircleOutline />
@@ -168,7 +204,11 @@ export const CronEditing: FC<Props> = ({
           }}
         >
           Это сообщение {button ? <Highlight>с кнопкой </Highlight> : ' '}будет
-          отправляться каждый{' '}
+          отправляться{' '}
+          <Highlight>
+            {weeks.length === 4 ? 'каждую' : weeks.join(', ')}
+          </Highlight>{' '}
+          неделю месяца в{' '}
           {days.map((day) => {
             const isBeforeLast = days.length - 1 === day;
             const isLast = days.length === day;

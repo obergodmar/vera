@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { IApi, ICrons } from '@vera-reforged/common';
 
 import { CronJob } from 'cron';
+import { getWeekOfMonth } from 'date-fns';
 import { Repository } from 'typeorm';
 import { APIMessages } from 'vk-io/lib/api/schemas/methods';
 import { MessagesSendParams } from 'vk-io/lib/api/schemas/params';
@@ -314,6 +315,8 @@ function createCronJob(
   return new CronJob(
     `00 ${minutes} ${hours} * * ${daysRange}`,
     () => {
+      const currentWeekNumber = getWeekOfMonth(new Date(), { weekStartsOn: 1 });
+
       try {
         sendMessage({
           peer_id: chatId,
