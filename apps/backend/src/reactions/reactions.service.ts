@@ -27,52 +27,53 @@ export class ReactionsService {
     const isListenerOff =
       this.config.get<IEnvironment['disableBotListener']>('disableBotListener');
 
-    this.api.botService.bot.hear(/.*/, async (msg: MessageContext) => {
-      if (isListenerOff) {
-        return;
-      }
+    this.api.botService.vk.updates.on(
+      'message_new',
+      async (msg: MessageContext) => {
+        if (isListenerOff) {
+          return;
+        }
 
-      const { peerId, conversationMessageId, $match = [] } = msg;
-      const [text] = $match;
-
-      let reactions: IReactions.ChatReaction[] = [];
-      try {
-        reactions = await this.reactionsRepository.find({
-          where: { chatId: peerId, enabled: true },
-        });
-      } catch (e) {
-        this.logger.log(
-          `ReactionsService: error getting reactions for chat ${peerId}: ${e}`,
-          { type: 'error' }
-        );
-      }
-
-      reactions.forEach((reactionItem) => {
-        const { textTrigger, reaction } = reactionItem;
-        const regexp = new RegExp(textTrigger);
-
-        if (regexp.test(text)) {
-          this.logger.log(
-            `ReactionsService: Found match "${textTrigger}" for reaction "${reaction}"" in chat ${peerId}`
-          );
-
-          this.api.botService.vk.api.messages.send({
-            peer_id: peerId,
-            message: reaction,
-            random_id: 0,
-            forward: JSON.stringify({
-              peer_id: peerId,
-              is_reply: true,
-              conversation_message_ids: conversationMessageId,
-            }),
+        const { peerId, conversationMessageId, text } = msg;
+        let reactions: IReactions.ChatReaction[] = [];
+        try {
+          reactions = await this.reactionsRepository.find({
+            where: { chatId: peerId, enabled: true },
           });
-
+        } catch (e) {
           this.logger.log(
-            `ReactionsService: Sent reaction "${reaction}" for chat ${peerId}`
+            `ReactionsService: error getting reactions for chat ${peerId}: ${e}`,
+            { type: 'error' }
           );
         }
-      });
-    });
+
+        reactions.forEach((reactionItem) => {
+          const { textTrigger, reaction } = reactionItem;
+          const regexp = new RegExp(textTrigger);
+
+          if (regexp.test(text)) {
+            this.logger.log(
+              `ReactionsService: Found match "${textTrigger}" for reaction "${reaction}"" in chat ${peerId}`
+            );
+
+            this.api.botService.vk.api.messages.send({
+              peer_id: peerId,
+              message: reaction + peerId,
+              random_id: 0,
+              forward: JSON.stringify({
+                peer_id: peerId,
+                is_reply: true,
+                conversation_message_ids: conversationMessageId,
+              }),
+            });
+
+            this.logger.log(
+              `ReactionsService: Sent reaction "${reaction}" for chat ${peerId}`
+            );
+          }
+        });
+      }
+    );
   }
 
   public async getReactionsForChat(
