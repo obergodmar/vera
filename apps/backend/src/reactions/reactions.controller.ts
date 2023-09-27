@@ -14,26 +14,26 @@ const { prefix, endpoints } = ROUTES.reactions;
 export class ReactionsController {
   public constructor(
     @Inject(ReactionsService)
-    private readonly reactionsService: ReactionsService
+    private readonly reactionsService: ReactionsService,
   ) {}
 
   @Post(endpoints.getReactionsForChat)
   public getReactionsForChat(
-    @Body() data: WithChatIdDto
+    @Body() data: WithChatIdDto,
   ): Promise<IApi.IReactionsApi.GetReactionsForChatResponse> {
     return this.reactionsService.getReactionsForChat(data.chatId);
   }
 
   @Post(endpoints.createReactionForChat)
   public createReactionForChat(
-    @Body() data: CreateReactionForChatDto
+    @Body() data: CreateReactionForChatDto,
   ): Promise<IApi.IReactionsApi.CreateReactionForChatResponse> {
     return this.reactionsService.createReactionForChat(data);
   }
 
   @Post(endpoints.updateReactionsForChat)
   public updateReactionsForChat(
-    @Body() data: UpdateReactionForChatDto
+    @Body() data: UpdateReactionForChatDto,
   ): Promise<IApi.IReactionsApi.UpdateReactionForChatResponse> {
     return this.reactionsService.updateReactionForChat(data);
   }

@@ -16,7 +16,7 @@ export const authorization = createSlice({
   reducers: {
     authorize: (
       state,
-      { payload: { token } }: PayloadAction<{ token: string }>
+      { payload: { token } }: PayloadAction<{ token: string }>,
     ) => {
       window.localStorage.setItem('token', token);
 

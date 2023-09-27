@@ -29,7 +29,7 @@ export const HelloMessagesChat: FC<Props> = ({
   const snackbar = useSnackbar();
 
   const [existed, setExisted] = useState(
-    currentMessage && typeof currentMessage === 'string'
+    currentMessage && typeof currentMessage === 'string',
   );
 
   useEffect(() => {

@@ -7,4 +7,7 @@ export interface IEnvironment {
   botToken: IAPIOptions['token'];
   botPollingGroupId: IUpdatesOptions['pollingGroupId'];
   botApiMode: IAPIOptions['apiMode'];
+  settingsChatId: number;
+  errorChatId: number;
+  debugChatId: number;
 }

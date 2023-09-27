@@ -25,7 +25,7 @@ export const chatSchedule = createSelector(
       chatId: currentChatId,
       schedule: chatSchedule.filter((duty) => duty.firstName && duty.lastName),
     };
-  }
+  },
 );
 
 export const DutySubmit: FC = () => {

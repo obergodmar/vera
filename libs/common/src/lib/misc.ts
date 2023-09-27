@@ -48,7 +48,7 @@ export function isDeepEqual(a: any, b: any): boolean {
         const key = i[0];
         if (!isPrimitive(key)) {
           throw new Error(
-            "isDeepEqual can't compare Maps with non primitive keys"
+            "isDeepEqual can't compare Maps with non primitive keys",
           );
         }
         if (!b.has(key)) {
@@ -71,7 +71,7 @@ export function isDeepEqual(a: any, b: any): boolean {
         const value = i[0];
         if (!isPrimitive(value)) {
           throw new Error(
-            "isDeepEqual can't compare Sets with non primitive values"
+            "isDeepEqual can't compare Sets with non primitive values",
           );
         }
         if (!b.has(value)) {

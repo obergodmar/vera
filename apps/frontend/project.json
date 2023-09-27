@@ -80,6 +80,12 @@
           "buildTarget": "frontend:build:production"
         }
       }
+    },
+    "tsc": {
+      "executor": "@webpro/nx-tsc:tsc",
+      "options": {
+        "tsConfig": ["tsconfig.app.json", "tsconfig.json"]
+      }
     }
   },
   "tags": []

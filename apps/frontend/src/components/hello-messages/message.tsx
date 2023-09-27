@@ -31,7 +31,7 @@ export const chatMessageSelector = (chatId: number | undefined) =>
       }
 
       return '';
-    }
+    },
   );
 
 export const Message: FC<Props> = ({ chat }) => {

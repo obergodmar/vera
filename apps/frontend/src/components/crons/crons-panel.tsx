@@ -40,12 +40,12 @@ export const CronsPanel: FC = () => {
   const chatId = useSelector((state: RootState) => state.crons.currentChatId);
   const selectedChat = useMemo(
     () => chats.find(({ value }) => value === chatId),
-    [chatId, chats]
+    [chatId, chats],
   );
 
   const { data: crons, refetch: refetchCrons } = useGetCronsForChatQuery(
     { chatId },
-    { skip: !chatId }
+    { skip: !chatId },
   );
 
   const [
@@ -71,7 +71,7 @@ export const CronsPanel: FC = () => {
       resetDisableAll();
       resetDisableForChat();
     },
-    [resetDisableAll, resetDisableForChat]
+    [resetDisableAll, resetDisableForChat],
   );
 
   useEffect(() => {

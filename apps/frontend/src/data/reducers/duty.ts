@@ -40,7 +40,7 @@ export const duty = createSlice({
 
     createShift(
       state,
-      { payload: { dayNumber } }: PayloadAction<{ dayNumber: number }>
+      { payload: { dayNumber } }: PayloadAction<{ dayNumber: number }>,
     ) {
       if (!state.currentChatId) {
         throw Error('currentChatId не задан');
@@ -74,14 +74,14 @@ export const duty = createSlice({
         shift: Partial<IDuty.Schedule>;
         shiftNumber: number;
         dayNumber: number;
-      }>
+      }>,
     ) {
       if (
         !state.currentChatId ||
         !state.schedule[state.currentChatId]?.length
       ) {
         throw Error(
-          'currentChatId не задан или для него отсутствует расписание'
+          'currentChatId не задан или для него отсутствует расписание',
         );
       }
 
@@ -93,12 +93,12 @@ export const duty = createSlice({
       const shiftIndex = findScheduleShiftIndex(
         currentSchedule,
         dayNumber,
-        shiftNumber
+        shiftNumber,
       );
 
       currentSchedule[shiftIndex] = Object.assign(
         currentSchedule[shiftIndex],
-        shift
+        shift,
       );
     },
 
@@ -109,7 +109,7 @@ export const duty = createSlice({
       }: PayloadAction<{
         dayNumber: number;
         shiftNumber: number;
-      }>
+      }>,
     ) {
       if (!state.currentChatId) {
         throw Error('currentChatId не задан');
@@ -119,7 +119,7 @@ export const duty = createSlice({
       const shiftIndex = findScheduleShiftIndex(
         currentSchedule,
         dayNumber,
-        shiftNumber
+        shiftNumber,
       );
 
       currentSchedule.splice(shiftIndex, 1);
@@ -139,7 +139,7 @@ export const {
 function findScheduleShiftIndex(
   schedule: IDuty.Schedule[],
   dayNumber: number,
-  shiftNumber: number
+  shiftNumber: number,
 ): number {
   const shiftsIndexes = schedule.reduce((acc: number[], duty, index) => {
     if (duty.dayNumber === dayNumber) {

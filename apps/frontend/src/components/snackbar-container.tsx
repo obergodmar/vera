@@ -34,5 +34,5 @@ const WithPortal: FC<Required<SnackbarContainerProps>> = memo(
     }
 
     return <>{children}</>;
-  }
+  },
 );

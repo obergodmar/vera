@@ -28,7 +28,7 @@ export function isTimeToNextDay(timeFrom: string, timeTo: string): boolean {
 export function filterScheduleByChatAndTag(
   schedule: IDuty.Schedule[],
   chatId: number,
-  tag: string | null
+  tag: string | null,
 ): IDuty.Schedule[] {
   return schedule.filter((duty) => {
     const chatMatch = duty.chatId === chatId;
@@ -41,7 +41,7 @@ export function filterScheduleByChatAndTag(
 export function filterScheduleByDay(
   schedule: IDuty.Schedule[],
   dayNumber: number,
-  currentTimeInMinutes: number
+  currentTimeInMinutes: number,
 ): IDuty.Schedule[] {
   return schedule.filter((duty) => {
     const nextDay = isTimeToNextDay(duty.timeFrom, duty.timeTo);
@@ -61,7 +61,7 @@ export function filterScheduleByDay(
 export function filterScheduleByDayAndTime(
   schedule: IDuty.Schedule[],
   dayNumber: number,
-  currentTimeInMinutes: number
+  currentTimeInMinutes: number,
 ): IDuty.Schedule[] {
   return schedule.filter((duty) => {
     const nextDay = isTimeToNextDay(duty.timeFrom, duty.timeTo);
@@ -126,7 +126,7 @@ export function getNextDayMonth() {
 
 export function getDutyMessage(
   schedule: IDuty.Schedule[],
-  mention = true
+  mention = true,
 ): string {
   return schedule.reduce(
     (acc, { firstName, lastName, timeFrom, timeTo, tag, userId }) => {
@@ -140,7 +140,7 @@ export function getDutyMessage(
       const { day: tomorrowDay, month: tomorrowMonth } = getNextDayMonth();
 
       const withDayMonthFrom = `${addLeadingZero(day)}.${addLeadingZero(
-        month
+        month,
       )}`;
       const withDayMonthTo = isTimeToNextDay(timeFrom, timeTo)
         ? `${addLeadingZero(tomorrowDay)}.${addLeadingZero(tomorrowMonth)}`
@@ -152,14 +152,14 @@ export function getDutyMessage(
 
       return `${withPrev}${withTag}${dutyName}${withTimeFrom} ${withDayMonthFrom}${withTimeTo} ${withDayMonthTo}`;
     },
-    ''
+    '',
   );
 }
 
 export function getAnnounceDutyMessage(
   schedule: IDuty.Schedule[],
   tag: string | null,
-  noDutyAtCurrentTime: boolean
+  noDutyAtCurrentTime: boolean,
 ) {
   const sortedSchedule = produce(schedule, (draft) => {
     draft.sort((a, b) => {
@@ -194,7 +194,7 @@ export function isGroupChat(peerType?: string): boolean {
 }
 
 export function filterByGroupChat(
-  convos?: MessagesConversation[]
+  convos?: MessagesConversation[],
 ): MessagesConversation[] {
   if (!convos?.length) {
     return [];
@@ -207,6 +207,12 @@ export function filterByGroupChat(
 
     return false;
   });
+}
+
+export function filterIds(omit: number[]) {
+  return function (id: number): boolean {
+    return omit.includes(id);
+  };
 }
 
 export function getDaysRange(days: number[]): string {

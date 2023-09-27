@@ -1,19 +1,75 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { createLog, VIM } from '@vera-reforged/common';
+import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
+import { createLog } from '@vera-reforged/common';
+
+import { Repository } from 'typeorm';
 
 import { BotService } from '../bot/bot.service';
+import { IEnvironment } from '../environments/env-type';
+import { Setting } from '../settings/settings.entity';
 
 @Injectable()
 export class LoggerService {
-  public constructor(@Inject(BotService) private readonly bot: BotService) {}
+  public constructor(
+    @InjectRepository(Setting)
+    private readonly settingsRepository: Repository<Setting>,
+    @Inject(BotService) private readonly bot: BotService,
+    @Inject(ConfigService) private readonly config: ConfigService,
+  ) {}
 
-  public log(
-    value: unknown,
-    { type }: { type: 'log' | 'error' } = { type: 'log' }
-  ) {
+  public async debug(value: unknown): Promise<void> {
+    const debugChatId =
+      this.config.get<IEnvironment['debugChatId']>('debugChatId');
+
+    let isDebugSendEnabled = false;
+    try {
+      const value = this.settingsRepository.findOneBy({
+        opt: 'debug_log_to_vk',
+      });
+
+      if (value) {
+        isDebugSendEnabled = true;
+      }
+
+      if (isDebugSendEnabled) {
+        this.sendLog(
+          'LoggerService: Fetching settings repository',
+          debugChatId,
+        );
+      }
+    } catch (e) {
+      this.error(`LoggerService: Failed to fetch settings repository: ${e}`);
+    }
+
+    const message = createLog(value, { type: 'debug' });
+    if (isDebugSendEnabled) {
+      this.sendLog(message, debugChatId);
+    }
+  }
+
+  public error(value: unknown): void {
+    const errorChatId =
+      this.config.get<IEnvironment['errorChatId']>('errorChatId');
+
+    const message = createLog(value, { type: 'error' });
+
+    this.sendLog(message, errorChatId);
+  }
+
+  public log(value: unknown): void {
+    const debugChatId =
+      this.config.get<IEnvironment['debugChatId']>('debugChatId');
+
+    const message = createLog(value, { type: 'log' });
+
+    this.sendLog(message, debugChatId);
+  }
+
+  private sendLog(message: string, peerId: number): void {
     this.bot.vk.api.messages.send({
-      peer_id: VIM,
-      message: createLog(value, { type }),
+      peer_id: peerId,
+      message,
       random_id: 0,
     });
   }

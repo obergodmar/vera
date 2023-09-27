@@ -28,18 +28,18 @@ export const HelloMessagesPanel: FC = () => {
     useGetHelloMessagesQuery();
 
   const chatId = useSelector(
-    (state: RootState) => state.helloMessages.currentChatId
+    (state: RootState) => state.helloMessages.currentChatId,
   );
   const selectedChat = useMemo(
     () => chats.find(({ value }) => value === chatId),
-    [chatId, chats]
+    [chatId, chats],
   );
   const message = useSelector(chatMessageSelector(chatId));
   const currentMessage = useMemo(
     () =>
       helloMessages?.items.find(({ peer: { id } }) => id === chatId)
         ?.helloMessage,
-    [chatId, helloMessages?.items]
+    [chatId, helloMessages?.items],
   );
 
   useEffect(() => {

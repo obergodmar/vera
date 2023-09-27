@@ -33,7 +33,7 @@ export const helloMessagesApi = createApi({
           {
             url: endpoints.updateHelloMessage,
             body,
-          }
+          },
         );
       },
       invalidatesTags: [tag],
@@ -49,7 +49,7 @@ export const helloMessagesApi = createApi({
             body: {
               updates,
             },
-          }
+          },
         );
       },
       invalidatesTags: [tag],

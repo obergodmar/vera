@@ -1,6 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 
 import {
+  BaseUserGroupFields,
+  UsersFields,
+} from 'vk-io/lib/api/schemas/objects';
+import {
   MessagesGetConversationMembersResponse,
   MessagesGetConversationsByIdResponse,
   UsersGetResponse,
@@ -8,50 +12,51 @@ import {
 
 import { BotService } from '../bot/bot.service';
 
+const defaultGroupFields: BaseUserGroupFields[] = [
+  'id',
+  'name',
+  'screen_name',
+  'type',
+  'photo_50',
+  'photo_100',
+  'photo_200',
+];
+
+const defaultUserFields: UsersFields[] = [
+  'screen_name',
+  'photo_50',
+  'photo_100',
+  'photo_200',
+];
+
 @Injectable()
 export class VkApiService {
-  private readonly groupId = 900028;
-
   public constructor(
-    @Inject(BotService) public readonly botService: BotService
+    @Inject(BotService) public readonly botService: BotService,
   ) {}
 
   public async getConversationsById(
-    peerIds: number[]
+    peerIds: number[],
   ): Promise<MessagesGetConversationsByIdResponse> {
-    return this.fetch('messages.getConversationsById', {
-      peer_ids: peerIds.join(','),
+    return this.botService.vk.api.messages.getConversationsById({
+      peer_ids: peerIds,
+      fields: defaultGroupFields,
     });
   }
 
   public async getConversationMembers(
-    chatId: number
+    chatId: number,
   ): Promise<MessagesGetConversationMembersResponse> {
-    return this.fetch('messages.getConversationMembers', {
+    return this.botService.vk.api.messages.getConversationMembers({
       peer_id: chatId,
+      fields: defaultUserFields,
     });
   }
 
   public async getUsers(peerIds: number[]): Promise<UsersGetResponse> {
-    return this.botService.vk.api.call('users.get', {
-      user_ids: peerIds.join(','),
-      fields: ['screen_name', 'photo_50'],
-    });
-  }
-
-  private fetch(method: string, params: object) {
-    return this.botService.vk.api.call(method, {
-      group_id: this.groupId,
-      fields: [
-        'id',
-        'name',
-        'screen_name',
-        'type',
-        'photo_50',
-        'photo_100',
-        'photo_200',
-      ],
-      ...params,
+    return this.botService.vk.api.users.get({
+      user_ids: peerIds,
+      fields: defaultUserFields,
     });
   }
 }

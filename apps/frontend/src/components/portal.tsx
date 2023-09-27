@@ -34,7 +34,7 @@ export type PortalProps = {
 export const Portal = forwardRef<HTMLDivElement | null, PortalProps>(
   function WithPortal(
     { children, portalClassName, portalTarget, ...props },
-    ref
+    ref,
   ) {
     const [renderNode, setRenderNode] = useState<HTMLDivElement | null>(null);
     const prevClassName = usePrevious<string | undefined>(portalClassName);
@@ -85,9 +85,9 @@ export const Portal = forwardRef<HTMLDivElement | null, PortalProps>(
       <div {...props} ref={ref}>
         {children}
       </div>,
-      renderNode
+      renderNode,
     );
-  }
+  },
 );
 
 /**

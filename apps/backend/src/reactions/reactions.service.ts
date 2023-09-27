@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { MessageContext } from 'vk-io';
 
 import { IEnvironment } from '../environments/env-type';
+import { DebugService } from '../logger/debug.service';
 import { LoggerService } from '../logger/logger.service';
 import { VkApiService } from '../vk-api/vk-api.service';
 import {
@@ -17,13 +18,17 @@ import { Reaction } from './reactions.entity';
 
 @Injectable()
 export class ReactionsService {
+  private readonly logger: DebugService;
+
   public constructor(
     @InjectRepository(Reaction)
     private readonly reactionsRepository: Repository<Reaction>,
     @Inject(VkApiService) private readonly api: VkApiService,
-    @Inject(LoggerService) private readonly logger: LoggerService,
-    @Inject(ConfigService) private readonly config: ConfigService
+    @Inject(ConfigService) private readonly config: ConfigService,
+    @Inject(LoggerService) loggerService: LoggerService,
   ) {
+    this.logger = new DebugService(loggerService, this.constructor.name);
+
     const isListenerOff =
       this.config.get<IEnvironment['disableBotListener']>('disableBotListener');
 
@@ -41,10 +46,7 @@ export class ReactionsService {
             where: { chatId: peerId, enabled: true },
           });
         } catch (e) {
-          this.logger.log(
-            `ReactionsService: error getting reactions for chat ${peerId}: ${e}`,
-            { type: 'error' }
-          );
+          this.logger.error(`Failed to get reactions for chat ${peerId}: ${e}`);
         }
 
         reactions.forEach((reactionItem) => {
@@ -52,8 +54,8 @@ export class ReactionsService {
           const regexp = new RegExp(textTrigger);
 
           if (regexp.test(text)) {
-            this.logger.log(
-              `ReactionsService: Found match "${textTrigger}" for reaction "${reaction}"" in chat ${peerId}`
+            this.logger.debug(
+              `Found match "${textTrigger}" for reaction "${reaction}"" in chat ${peerId}`,
             );
 
             this.api.botService.vk.api.messages.send({
@@ -67,21 +69,17 @@ export class ReactionsService {
               }),
             });
 
-            this.logger.log(
-              `ReactionsService: Sent reaction "${reaction}" for chat ${peerId}`
-            );
+            this.logger.debug(`Sent reaction "${reaction}" for chat ${peerId}`);
           }
         });
-      }
+      },
     );
   }
 
   public async getReactionsForChat(
-    chatId: number
+    chatId: number,
   ): Promise<IApi.IReactionsApi.GetReactionsForChatResponse> {
-    this.logger.log(
-      `ReactionsService: reactions were requested for chat ${chatId}`
-    );
+    this.logger.debug(`Reactions were requested for chat ${chatId}`);
 
     try {
       const reactions = await this.reactionsRepository.find({
@@ -93,10 +91,7 @@ export class ReactionsService {
         items: reactions,
       };
     } catch (e) {
-      this.logger.log(
-        `ReactionsService: error getting reactions for chat ${chatId}: ${e}`,
-        { type: 'error' }
-      );
+      this.logger.error(`Failed to get reactions for chat ${chatId}: ${e}`);
 
       return {
         count: 0,
@@ -106,12 +101,12 @@ export class ReactionsService {
   }
 
   public async createReactionForChat(
-    reactionCreationDto: CreateReactionForChatDto
+    reactionCreationDto: CreateReactionForChatDto,
   ): Promise<IApi.IReactionsApi.CreateReactionForChatResponse> {
     const { chatId, reaction, textTrigger, enabled } = reactionCreationDto;
 
     const logMeta = `"${reaction}" with trigger ${textTrigger} for chat ${chatId}`;
-    this.logger.log(`ReactionsService: Creating reaction ${logMeta}`);
+    this.logger.debug(`Creating reaction ${logMeta}`);
 
     try {
       await this.reactionsRepository.insert({
@@ -121,10 +116,7 @@ export class ReactionsService {
         enabled,
       });
     } catch (e) {
-      this.logger.log(
-        `ReactionsService: Error when creating reaction ${logMeta}: ${e}`,
-        { type: 'error' }
-      );
+      this.logger.error(`Can't create reaction ${logMeta}: ${e}`);
 
       return {
         success: false,
@@ -138,17 +130,17 @@ export class ReactionsService {
   }
 
   public async updateReactionForChat(
-    reactionUpdateDto: UpdateReactionForChatDto
+    reactionUpdateDto: UpdateReactionForChatDto,
   ): Promise<IApi.IReactionsApi.UpdateReactionForChatResponse> {
     const { id, chatId, reaction, textTrigger, enabled } = reactionUpdateDto;
 
     const isDeleting = !reaction || !textTrigger;
 
     const logMeta = `"[${id}]: ${reaction}" with trigger ${textTrigger} for chat ${chatId}`;
-    this.logger.log(
-      `ReactionsService: ${isDeleting ? 'Deleting' : 'Updating'} reaction ${
+    this.logger.debug(
+      `${isDeleting ? 'Deleting' : 'Updating'} reaction ${
         !isDeleting ? `${logMeta}` : `${id} for chat ${chatId}`
-      }`
+      }`,
     );
 
     try {
@@ -157,14 +149,11 @@ export class ReactionsService {
       } else {
         await this.reactionsRepository.upsert(
           [{ id, chatId, reaction, textTrigger, enabled }],
-          ['id']
+          ['id'],
         );
       }
     } catch (e) {
-      this.logger.log(
-        `ReactionsService: Error updating reaction ${id} in ${chatId}: ${e}`,
-        { type: 'error' }
-      );
+      this.logger.error(`Can't update reaction ${id} in ${chatId}: ${e}`);
       return {
         error: JSON.stringify(e),
         success: false,

@@ -26,11 +26,11 @@ export const ReactionsPanel: FC = () => {
   } = useGetChatsQuery();
 
   const chatId = useSelector(
-    (state: RootState) => state.reactions.currentChatId
+    (state: RootState) => state.reactions.currentChatId,
   );
   const selectedChat = useMemo(
     () => chats.find(({ value }) => value === chatId),
-    [chatId, chats]
+    [chatId, chats],
   );
 
   const {

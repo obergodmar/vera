@@ -75,7 +75,7 @@ export const store = configureStore({
       cronsApi.middleware,
       rtkQueryErrorLogger,
       middleware,
-      ...(isDev ? devMiddlewares : [])
+      ...(isDev ? devMiddlewares : []),
     ),
   devTools: isDev,
 });

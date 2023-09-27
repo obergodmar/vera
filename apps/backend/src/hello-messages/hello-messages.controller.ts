@@ -13,7 +13,7 @@ const { prefix, endpoints } = ROUTES.helloMessages;
 export class HelloMessagesController {
   public constructor(
     @Inject(HelloMessagesService)
-    private readonly hlService: HelloMessagesService
+    private readonly hlService: HelloMessagesService,
   ) {}
 
   @Post(endpoints.getHelloMessages)
@@ -23,14 +23,14 @@ export class HelloMessagesController {
 
   @Post(endpoints.updateHelloMessage)
   public updateHelloMessage(
-    @Body() data: UpdateHelloMessageDto
+    @Body() data: UpdateHelloMessageDto,
   ): Promise<IApi.IHelloMessagesApi.UpdateHelloMessageResponse> {
     return this.hlService.updateHelloMessage(data.chatId, data.message);
   }
 
   @Post(endpoints.updateAllHelloMessages)
   public updateAllHelloMessages(
-    @Body() data: UpdateAllHelloMessagesDto
+    @Body() data: UpdateAllHelloMessagesDto,
   ): Promise<IApi.IHelloMessagesApi.UpdateAllHelloMessagesResponse> {
     return this.hlService.updateAllHelloMessages(data.updates);
   }

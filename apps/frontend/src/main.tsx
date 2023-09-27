@@ -38,5 +38,5 @@ root.render(
         </ConfigProvider>
       </HelmetProvider>
     </Provider>
-  </StrictMode>
+  </StrictMode>,
 );

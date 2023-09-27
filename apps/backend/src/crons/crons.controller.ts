@@ -11,12 +11,12 @@ const { prefix, endpoints } = ROUTES.crons;
 export class CronsController {
   public constructor(
     @Inject(CronsService)
-    private readonly cronsService: CronsService
+    private readonly cronsService: CronsService,
   ) {}
 
   @Post(endpoints.getCronsForChat)
   public getCronsForChat(
-    @Body() data: WithChatIdDto
+    @Body() data: WithChatIdDto,
   ): Promise<IApi.ICronsApi.GetCronsForChatResponse> {
     return this.cronsService.getCronsForChat(data.chatId);
   }
@@ -28,21 +28,21 @@ export class CronsController {
 
   @Post(endpoints.createCronForChat)
   public createCronForChat(
-    @Body() data: CreateCronForChatDto
+    @Body() data: CreateCronForChatDto,
   ): Promise<IApi.ICronsApi.CreateCronForChatResponse> {
     return this.cronsService.createCronForChat(data);
   }
 
   @Post(endpoints.updateCronForChat)
   public updateCronForChat(
-    @Body() data: UpdateCronForChatDto
+    @Body() data: UpdateCronForChatDto,
   ): Promise<IApi.ICronsApi.UpdateCronForChatResponse> {
     return this.cronsService.updateCronForChat(data);
   }
 
   @Post(endpoints.disableCronsForChat)
   public disableCronsForChat(
-    @Body() data: WithChatIdDto
+    @Body() data: WithChatIdDto,
   ): Promise<IApi.ICronsApi.DisableCronsForChatResponse> {
     return this.cronsService.disableCronsForChat(data.chatId);
   }

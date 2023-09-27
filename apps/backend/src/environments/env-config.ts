@@ -39,6 +39,18 @@ function parseEnvVariables(): Partial<IEnvironment> {
     envVariables.botApiMode = parseBotApiMode(env.BOT_API_MODE);
   }
 
+  if (env.SETTINGS_CHAT_ID) {
+    envVariables.settingsChatId = parseInt(env.SETTINGS_CHAT_ID);
+  }
+
+  if (env.ERROR_CHAT_ID) {
+    envVariables.errorChatId = parseInt(env.ERROR_CHAT_ID);
+  }
+
+  if (env.DEBUG_CHAT_ID) {
+    envVariables.debugChatId = parseInt(env.DEBUG_CHAT_ID);
+  }
+
   return envVariables;
 }
 

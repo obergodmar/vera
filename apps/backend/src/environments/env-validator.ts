@@ -31,6 +31,15 @@ export class Environment implements IEnvironment {
   @IsString()
   @IsNotEmpty()
   botApiMode: 'sequential' | 'parallel' | 'parallel_selected';
+
+  @IsNumber()
+  settingsChatId: number;
+
+  @IsNumber()
+  errorChatId: number;
+
+  @IsNumber()
+  debugChatId: number;
 }
 
 export function envValidation(): IEnvironment {

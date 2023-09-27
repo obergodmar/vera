@@ -52,7 +52,7 @@ export const dutyApi = createApi({
               userId,
               firstName,
               lastName,
-            })
+            }),
           )
           .sort((a, b) => a.label.localeCompare(b.label));
       },

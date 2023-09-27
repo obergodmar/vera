@@ -125,7 +125,7 @@ export const Snackbar: FC<Props> = memo(
           'Snackbar',
           `Snackbar--layout-${layout}`,
           `Snackbar--mode-${mode}`,
-          className
+          className,
         )}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
@@ -166,7 +166,7 @@ export const Snackbar: FC<Props> = memo(
         )}
       </div>
     );
-  }
+  },
 );
 
 type DeviceData = {

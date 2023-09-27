@@ -21,7 +21,7 @@ export const chatHelloMessages = createSelector(
       modified,
       updatedMessages,
     };
-  }
+  },
 );
 
 export const HelloMessagesSubmit: FC = () => {

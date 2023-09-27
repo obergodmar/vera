@@ -33,7 +33,7 @@ export const Login: FC = () => {
       dispatch(
         authorize({
           token: loginResult.data.token,
-        })
+        }),
       );
 
       navigate('/', { replace: true });

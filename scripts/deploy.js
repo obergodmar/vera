@@ -55,12 +55,12 @@ async function deploy({ name, ...options }) {
       });
 
       console.log(
-        `[${name}] Deployment is ${status ? 'successful' : 'unsuccessful'}`
+        `[${name}] Deployment is ${status ? 'successful' : 'unsuccessful'}`,
       );
 
       if (!status) {
         console.log(
-          `[${name}] Failed transfers:\n\n${failedTransfers.join('\n')}`
+          `[${name}] Failed transfers:\n\n${failedTransfers.join('\n')}`,
         );
       }
 

@@ -138,7 +138,7 @@ function createStore(initialState: SnackbarState = []): SnackbarStore {
 
     remove: (id) => {
       setState((prevState) =>
-        prevState.filter((snackbar) => snackbar.id !== id)
+        prevState.filter((snackbar) => snackbar.id !== id),
       );
     },
 
@@ -146,7 +146,7 @@ function createStore(initialState: SnackbarState = []): SnackbarStore {
       setState(
         produce((draft) => {
           const snackbarIndex = draft.findIndex(
-            (snackbar) => snackbar.id === id
+            (snackbar) => snackbar.id === id,
           );
 
           const prevSnackbar = draft[snackbarIndex];
@@ -158,7 +158,7 @@ function createStore(initialState: SnackbarState = []): SnackbarStore {
             ...prevSnackbar,
             ...snackbar,
           };
-        })
+        }),
       );
     },
 
@@ -183,7 +183,7 @@ function createStore(initialState: SnackbarState = []): SnackbarStore {
         prevState.map((snackbar) => ({
           ...snackbar,
           requestClose: snackbar.id === id,
-        }))
+        })),
       );
     },
   };
@@ -197,7 +197,7 @@ export type CreateSnackbar<Props extends SnackbarProps = SnackbarProps> =
  * (например из стора)
  */
 export function createSnackbar<
-  Props extends SnackbarProps = SnackbarProps
+  Props extends SnackbarProps = SnackbarProps,
 >(): CreateSnackbar<Props> {
   const snackbar = (snackbar: Props & { id?: string }) => {
     return snackbarStore.create(snackbar);

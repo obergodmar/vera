@@ -23,7 +23,7 @@ export const helloMessages = createSlice({
 
     setCurrentMessages(
       state,
-      { payload }: PayloadAction<IHelloMessages.MessagePerChat[]>
+      { payload }: PayloadAction<IHelloMessages.MessagePerChat[]>,
     ) {
       state.currentMessages = payload;
       state.updatedMessages = payload;
@@ -33,10 +33,10 @@ export const helloMessages = createSlice({
       state,
       {
         payload: { chatId, message },
-      }: PayloadAction<IHelloMessages.MessagePerChat>
+      }: PayloadAction<IHelloMessages.MessagePerChat>,
     ) {
       const index = state.updatedMessages.findIndex(
-        ({ chatId: id }) => id === chatId
+        ({ chatId: id }) => id === chatId,
       );
       if (index !== -1) {
         state.updatedMessages[index] = { chatId, message };

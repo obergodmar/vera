@@ -8,7 +8,7 @@ import { LoginService } from './login.service';
 export class LoginController {
   public constructor(
     @Inject(LoginService)
-    private readonly authorizationService: LoginService
+    private readonly authorizationService: LoginService,
   ) {}
 
   @Post()

@@ -72,15 +72,15 @@ describe('utils testing', () => {
       const schedule = getSchedule();
 
       expect(
-        filterScheduleByChatAndTag(schedule, 2000010050, 'web')
+        filterScheduleByChatAndTag(schedule, 2000010050, 'web'),
       ).toStrictEqual(getScheduleResultForWeb());
 
       expect(
-        filterScheduleByChatAndTag(schedule, 2000010050, 'qa')
+        filterScheduleByChatAndTag(schedule, 2000010050, 'qa'),
       ).toStrictEqual(getScheduleResultForQa());
 
       expect(
-        filterScheduleByChatAndTag(schedule, 2000010050, null)
+        filterScheduleByChatAndTag(schedule, 2000010050, null),
       ).toStrictEqual([]);
     });
   });
@@ -109,7 +109,7 @@ describe('utils testing', () => {
 
     it('should be duties on monday after 23:45', () => {
       expect(filterScheduleByDay(scheduleNextDay, 1, 1426)).toStrictEqual(
-        scheduleNextDay
+        scheduleNextDay,
       );
     });
   });
@@ -120,7 +120,7 @@ describe('utils testing', () => {
 
     it('should be an empty array because no duty on wednesday', () => {
       expect(filterScheduleByDayAndTime(scheduleForWeb, 3, 500)).toStrictEqual(
-        []
+        [],
       );
     });
 
@@ -138,25 +138,25 @@ describe('utils testing', () => {
 
     it('Eugene should be a duty on monday at 23:46', () => {
       expect(filterScheduleByDayAndTime(scheduleForAsd, 1, 1426)).toStrictEqual(
-        scheduleForAsd
+        scheduleForAsd,
       );
     });
 
     it('Should be no duty on monday at 23:46', () => {
       expect(filterScheduleByDayAndTime(scheduleForAsd, 2, 1426)).toStrictEqual(
-        []
+        [],
       );
     });
 
     it('Eugene should be a duty on tuesday at 23:19', () => {
       expect(filterScheduleByDayAndTime(scheduleForAsd, 2, 1399)).toStrictEqual(
-        scheduleForAsd
+        scheduleForAsd,
       );
     });
 
     it('Should be no duty on tuesday at 23:20', () => {
       expect(filterScheduleByDayAndTime(scheduleForAsd, 2, 1400)).toStrictEqual(
-        []
+        [],
       );
     });
   });
@@ -201,7 +201,7 @@ describe('utils testing', () => {
       const schedule = getSingleScheduleWithoutTagSameDay();
 
       expect(getDutyMessage(schedule)).toBe(
-        '@id900033 (ТестДва) с 15:00 28.02 до 22:00 28.02'
+        '@id900033 (ТестДва) с 15:00 28.02 до 22:00 28.02',
       );
     });
 
@@ -212,7 +212,7 @@ describe('utils testing', () => {
       const schedule = getSingleScheduleWithoutTagNextDay();
 
       expect(getDutyMessage(schedule)).toBe(
-        '@id900033 (ТестДва) с 22:00 28.02 до 15:00 01.03'
+        '@id900033 (ТестДва) с 22:00 28.02 до 15:00 01.03',
       );
     });
 
@@ -223,7 +223,7 @@ describe('utils testing', () => {
       const schedule = getSingleScheduleWithTag();
 
       expect(getDutyMessage(schedule)).toBe(
-        '#web @id900033 (ТестДва) с 22:00 28.02 до 15:00 01.03'
+        '#web @id900033 (ТестДва) с 22:00 28.02 до 15:00 01.03',
       );
     });
 
@@ -233,7 +233,7 @@ describe('utils testing', () => {
 
       const schedule = getUnsortedSchedule();
       expect(getDutyMessage(schedule)).toBe(
-        '#web @id900033 (ТестДва) с 22:00 28.02 до 15:00 01.03\n#web @id900011 (ТестТри) с 23:45 28.02 до 23:20 01.03\n#web @id900026 (TestOne) с 00:00 28.02 до 23:59 28.02'
+        '#web @id900033 (ТестДва) с 22:00 28.02 до 15:00 01.03\n#web @id900011 (ТестТри) с 23:45 28.02 до 23:20 01.03\n#web @id900026 (TestOne) с 00:00 28.02 до 23:59 28.02',
       );
     });
   });
@@ -246,7 +246,7 @@ describe('utils testing', () => {
       const schedule = getSingleScheduleWithoutTagSameDay();
 
       expect(getDutyMessage(schedule, false)).toBe(
-        'ТестДва ПримерДва с 15:00 28.02 до 22:00 28.02'
+        'ТестДва ПримерДва с 15:00 28.02 до 22:00 28.02',
       );
     });
 
@@ -257,7 +257,7 @@ describe('utils testing', () => {
       const schedule = getSingleScheduleWithoutTagNextDay();
 
       expect(getDutyMessage(schedule, false)).toBe(
-        'ТестДва ПримерДва с 22:00 28.02 до 15:00 01.03'
+        'ТестДва ПримерДва с 22:00 28.02 до 15:00 01.03',
       );
     });
 
@@ -268,7 +268,7 @@ describe('utils testing', () => {
       const schedule = getSingleScheduleWithTag();
 
       expect(getDutyMessage(schedule, false)).toBe(
-        '#web ТестДва ПримерДва с 22:00 28.02 до 15:00 01.03'
+        '#web ТестДва ПримерДва с 22:00 28.02 до 15:00 01.03',
       );
     });
 
@@ -278,7 +278,7 @@ describe('utils testing', () => {
 
       const schedule = getUnsortedSchedule();
       expect(getDutyMessage(schedule, false)).toBe(
-        '#web ТестДва ПримерДва с 22:00 28.02 до 15:00 01.03\n#web ТестТри ПримерТри с 23:45 28.02 до 23:20 01.03\n#web TestOne ExampleOne с 00:00 28.02 до 23:59 28.02'
+        '#web ТестДва ПримерДва с 22:00 28.02 до 15:00 01.03\n#web ТестТри ПримерТри с 23:45 28.02 до 23:20 01.03\n#web TestOne ExampleOne с 00:00 28.02 до 23:59 28.02',
       );
     });
   });
@@ -286,21 +286,21 @@ describe('utils testing', () => {
   describe('getAnnounceDutyMessage', () => {
     describe('Should be an empty duty message without tag', () => {
       expect(getAnnounceDutyMessage([], null, false)).toBe(
-        'Нет дежурств в данное время'
+        'Нет дежурств в данное время',
       );
 
       expect(getAnnounceDutyMessage([], null, true)).toBe(
-        'Нет дежурств в данное время'
+        'Нет дежурств в данное время',
       );
     });
 
     describe('Should be an empty duty message with tag', () => {
       expect(getAnnounceDutyMessage([], 'web', false)).toBe(
-        '#web Нет дежурств в данное время'
+        '#web Нет дежурств в данное время',
       );
 
       expect(getAnnounceDutyMessage([], 'web', true)).toBe(
-        '#web Нет дежурств в данное время'
+        '#web Нет дежурств в данное время',
       );
     });
 
@@ -308,7 +308,7 @@ describe('utils testing', () => {
       const schedule = getSingleScheduleWithoutTagSameDay();
 
       expect(getAnnounceDutyMessage(schedule, null, true)).toBe(
-        'Нет дежурств в данное время\n\nДежурства сегодня:\nТестДва ПримерДва с 15:00 28.02 до 22:00 28.02'
+        'Нет дежурств в данное время\n\nДежурства сегодня:\nТестДва ПримерДва с 15:00 28.02 до 22:00 28.02',
       );
     });
 
@@ -316,7 +316,7 @@ describe('utils testing', () => {
       const schedule = getSingleScheduleWithoutTagSameDay();
 
       expect(getAnnounceDutyMessage(schedule, null, false)).toBe(
-        '@id900033 (ТестДва) с 15:00 28.02 до 22:00 28.02'
+        '@id900033 (ТестДва) с 15:00 28.02 до 22:00 28.02',
       );
     });
 
@@ -324,7 +324,7 @@ describe('utils testing', () => {
       const schedule = getSingleScheduleWithTag();
 
       expect(getAnnounceDutyMessage(schedule, 'web', true)).toBe(
-        '#web Нет дежурств в данное время\n\nДежурства сегодня:\n#web ТестДва ПримерДва с 22:00 28.02 до 15:00 01.03'
+        '#web Нет дежурств в данное время\n\nДежурства сегодня:\n#web ТестДва ПримерДва с 22:00 28.02 до 15:00 01.03',
       );
     });
 
@@ -332,7 +332,7 @@ describe('utils testing', () => {
       const schedule = getSingleScheduleWithTag();
 
       expect(getAnnounceDutyMessage(schedule, 'web', false)).toBe(
-        '#web @id900033 (ТестДва) с 22:00 28.02 до 15:00 01.03'
+        '#web @id900033 (ТестДва) с 22:00 28.02 до 15:00 01.03',
       );
     });
 
@@ -343,7 +343,7 @@ describe('utils testing', () => {
       const schedule = getUnsortedSchedule();
 
       expect(getAnnounceDutyMessage(schedule, 'web', true)).toBe(
-        '#web Нет дежурств в данное время\n\nДежурства сегодня:\n#web TestOne ExampleOne с 00:00 28.02 до 23:59 28.02\n#web ТестДва ПримерДва с 22:00 28.02 до 15:00 01.03\n#web ТестТри ПримерТри с 23:45 28.02 до 23:20 01.03'
+        '#web Нет дежурств в данное время\n\nДежурства сегодня:\n#web TestOne ExampleOne с 00:00 28.02 до 23:59 28.02\n#web ТестДва ПримерДва с 22:00 28.02 до 15:00 01.03\n#web ТестТри ПримерТри с 23:45 28.02 до 23:20 01.03',
       );
     });
   });

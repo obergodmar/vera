@@ -21,7 +21,7 @@ export const reactionsApi = createApi({
           {
             url: endpoints.createReactionForChat,
             body,
-          }
+          },
         );
       },
       invalidatesTags: [tag],
@@ -47,7 +47,7 @@ export const reactionsApi = createApi({
           {
             url: endpoints.updateReactionsForChat,
             body,
-          }
+          },
         );
       },
       invalidatesTags: [tag],

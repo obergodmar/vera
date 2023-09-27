@@ -1,11 +1,8 @@
 import { addLeadingZero } from './utils';
 
-export const VIM = 900033;
+type LogType = 'log' | 'error' | 'debug';
 
-export function createLog(
-  value: unknown,
-  { type }: { type: 'log' | 'error' } = { type: 'log' }
-): string {
+export function createLog(value: unknown, { type }: { type: LogType }): string {
   const date = new Date();
 
   const day = addLeadingZero(date.getDate());
@@ -28,8 +25,6 @@ export function createLog(
   }
 
   const message = `[${type.toUpperCase()}] ${day}.${month}.${year} ${hours}:${minutes}:${seconds}  ${stringValues}`;
-
-  console.log(message);
 
   return message;
 }

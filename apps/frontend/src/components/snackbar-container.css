@@ -37,7 +37,9 @@
 .SnackbarContainer__item--enter-active {
   transform: translate3d(0, 0, 0);
   max-height: 600px;
-  transition: transform 400ms ease-in-out, max-height 1200ms;
+  transition:
+    transform 400ms ease-in-out,
+    max-height 1200ms;
 }
 
 .SnackbarContainer__item--exit {
@@ -48,5 +50,7 @@
 .SnackbarContainer__item--exit-active {
   transform: translate3d(-140%, 0, 0);
   max-height: 0;
-  transition: transform 400ms ease-in-out, max-height 400ms ease-in-out;
+  transition:
+    transform 400ms ease-in-out,
+    max-height 400ms ease-in-out;
 }

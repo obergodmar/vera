@@ -2,7 +2,7 @@ import { IApi } from '@vera-reforged/common';
 import { CustomSelectOptionInterface } from '@vkontakte/vkui';
 
 export function transformConvosToSelectOptions(
-  data: IApi.ConversationsList
+  data: IApi.ConversationsList,
 ): CustomSelectOptionInterface[] {
   return (
     data.items.reduce((acc: CustomSelectOptionInterface[], item) => {

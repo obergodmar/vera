@@ -16,50 +16,60 @@ import { MessageContext } from 'vk-io';
 import { UsersUserFull } from 'vk-io/lib/api/schemas/objects';
 
 import { IEnvironment } from '../environments/env-type';
+import { DebugService } from '../logger/debug.service';
 import { LoggerService } from '../logger/logger.service';
 import { VkApiService } from '../vk-api/vk-api.service';
 import { Duty } from './duty.entity';
 
 @Injectable()
 export class DutyService {
+  private readonly logger: DebugService;
+
   public constructor(
     private dataSource: DataSource,
     @InjectRepository(Duty) private readonly dutyRepository: Repository<Duty>,
     @Inject(VkApiService) private readonly api: VkApiService,
-    @Inject(LoggerService) private readonly logger: LoggerService,
-    @Inject(ConfigService) private readonly config: ConfigService
+    @Inject(ConfigService) private readonly config: ConfigService,
+    @Inject(LoggerService) loggerService: LoggerService,
   ) {
+    this.logger = new DebugService(loggerService, this.constructor.name);
+
     const isListenerOff =
       this.config.get<IEnvironment['disableBotListener']>('disableBotListener');
 
-    this.api.botService.bot.hear(
-      /duty(\s#?\w+)?/,
+    this.api.botService.vk.updates.on(
+      'message_new',
       async (msg: MessageContext) => {
         if (isListenerOff) {
           return;
         }
 
-        const { peerId, $match } = msg;
-        const [, hashtag] = $match || [];
+        const { peerId, text } = msg;
 
-        const tag = hashtag?.replace(/\s?#?/, '') || null;
+        const regexp = /duty(\s#?(?<tag>\w+))?/;
+
+        if (!regexp.test(text)) {
+          return;
+        }
+
+        const { tag } = regexp.exec(text).groups || { tag: null };
 
         const chatAndTagSchedule = await this.filterScheduleForChatAndTag.call(
           this,
           peerId,
-          tag
+          tag,
         );
 
         const currentTimeDuties = this.filterScheduleForCurrentDayAndTime.call(
           this,
-          chatAndTagSchedule
+          chatAndTagSchedule,
         );
 
         const { schedule, noDutyAtCurrentTime } =
           this.filterScheduleIfNoDutyAtCurrentTime.call(
             this,
             currentTimeDuties,
-            chatAndTagSchedule
+            chatAndTagSchedule,
           );
 
         this.announceDuty.call(
@@ -67,9 +77,9 @@ export class DutyService {
           peerId,
           schedule,
           tag,
-          noDutyAtCurrentTime
+          noDutyAtCurrentTime,
         );
-      }
+      },
     );
   }
 
@@ -77,7 +87,7 @@ export class DutyService {
     peerId: number,
     schedule: IDuty.Schedule[],
     tag: string | null,
-    noDutyAtCurrentTime: boolean
+    noDutyAtCurrentTime: boolean,
   ) {
     const message = getAnnounceDutyMessage(schedule, tag, noDutyAtCurrentTime);
 
@@ -87,8 +97,8 @@ export class DutyService {
       random_id: 0,
     });
 
-    this.logger.log(
-      `DutyService: A duty was requested in ${peerId}.\nMessage was sent: ${message}`
+    this.logger.debug(
+      `Duty was requested in ${peerId}.\nMessage was sent: ${message}`,
     );
   }
 
@@ -97,23 +107,18 @@ export class DutyService {
   }
 
   public async getScheduleForChat(
-    chatId: number
+    chatId: number,
   ): Promise<IApi.IDutyApi.GetScheduleForChatResponse> {
-    this.logger.log(
-      `DutyService: Duty schedule for chat ${chatId} was requested`
-    );
+    this.logger.debug(`Duty schedule for chat ${chatId} was requested`);
 
     let dutyArray: Duty[] = [];
 
     try {
       dutyArray = await this.dutyRepository.findBy({ chatId });
-      this.logger.log(
-        `DutyService: Found ${dutyArray.length} duties for chat ${chatId}`
-      );
+      this.logger.debug(`Found ${dutyArray.length} duties for chat ${chatId}`);
     } catch (e) {
-      this.logger.log(
-        `DutyService: dutyRepository error when selecting for chat ${chatId}: ${e}`,
-        { type: 'error' }
+      this.logger.error(
+        `Duty repository error when selecting for chat ${chatId}: ${e}`,
       );
 
       return [];
@@ -123,18 +128,16 @@ export class DutyService {
       return [];
     }
 
-    this.logger.log(`DutyService: Fetching users`);
+    this.logger.debug('Fetching users');
 
     const userIds = dutyArray.map((duty) => duty.userId);
     let users: UsersUserFull[] = [];
 
     try {
       users = await this.api.getUsers(userIds);
-      this.logger.log(`DutyService: Fetch successfull`);
+      this.logger.debug('Fetch successfull');
     } catch (e) {
-      this.logger.log(`DutyService: Error when fetching users, ${e}`, {
-        type: 'error',
-      });
+      this.logger.error(`Coulnd't fetch users, ${e}`);
 
       return [];
     }
@@ -169,13 +172,13 @@ export class DutyService {
           },
         ];
       },
-      []
+      [],
     );
   }
 
   public async updateChatSchedule(
     chatId: number,
-    chatSchedule: IDuty.Schedule[]
+    chatSchedule: IDuty.Schedule[],
   ) {
     let error: string;
 
@@ -187,9 +190,9 @@ export class DutyService {
         timeFrom,
         timeTo,
         tag,
-      })
+      }),
     );
-    this.logger.log(`DutyService: Starting transaction for chat ${chatId}`);
+    this.logger.debug(`Starting transaction for chat ${chatId}`);
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.startTransaction();
@@ -199,15 +202,13 @@ export class DutyService {
 
       await this.dutyRepository.insert(dutiesToInsert);
 
-      this.logger.log(`DutyService: Changes were made in ${chatId}`);
+      this.logger.debug(`Changes were made in ${chatId}`);
     } catch (e) {
       await queryRunner.rollbackTransaction();
 
       error = JSON.stringify(e);
 
-      this.logger.log(`DutyService: Transaction failed: ${e}`, {
-        type: 'error',
-      });
+      this.logger.error(`Transaction failed: ${e}`);
     } finally {
       await queryRunner.release();
     }
@@ -225,7 +226,7 @@ export class DutyService {
   }
 
   private filterScheduleForCurrentDayAndTime(
-    schedule: IDuty.Schedule[]
+    schedule: IDuty.Schedule[],
   ): IDuty.Schedule[] {
     const { dayNumber, hours, minutes } = getDayMonthTime();
 
@@ -234,13 +235,13 @@ export class DutyService {
     return filterScheduleByDayAndTime(
       schedule,
       dayNumber,
-      currentTimeInMinutes
+      currentTimeInMinutes,
     );
   }
 
   private filterScheduleIfNoDutyAtCurrentTime(
     currentSchedule: IDuty.Schedule[],
-    schedule: IDuty.Schedule[]
+    schedule: IDuty.Schedule[],
   ): {
     schedule: IDuty.Schedule[];
     noDutyAtCurrentTime: boolean;
@@ -254,7 +255,7 @@ export class DutyService {
         schedule: filterScheduleByDay(
           schedule,
           dayNumber,
-          currentTimeInMinutes
+          currentTimeInMinutes,
         ),
         noDutyAtCurrentTime: true,
       };
@@ -268,7 +269,7 @@ export class DutyService {
 
   private async filterScheduleForChatAndTag(
     chatId: number,
-    tag: string | null
+    tag: string | null,
   ): Promise<IDuty.Schedule[]> {
     const schedule = await this.getScheduleForChat(chatId);
 

@@ -6,7 +6,7 @@ import { RootState } from '../data/store';
 
 export const Private: FC = () => {
   const authorized = useSelector<RootState>(
-    (state) => state.authorization.authorized
+    (state) => state.authorization.authorized,
   );
 
   return authorized ? <Outlet /> : <Navigate to="/login" />;
