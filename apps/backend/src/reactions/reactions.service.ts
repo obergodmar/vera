@@ -60,7 +60,7 @@ export class ReactionsService {
 
             this.api.botService.vk.api.messages.send({
               peer_id: peerId,
-              message: reaction + peerId,
+              message: reaction,
               random_id: 0,
               forward: JSON.stringify({
                 peer_id: peerId,

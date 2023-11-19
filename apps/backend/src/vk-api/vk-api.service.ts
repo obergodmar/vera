@@ -4,9 +4,11 @@ import {
   BaseUserGroupFields,
   UsersFields,
 } from 'vk-io/lib/api/schemas/objects';
+import { MessagesSendParams } from 'vk-io/lib/api/schemas/params';
 import {
   MessagesGetConversationMembersResponse,
   MessagesGetConversationsByIdResponse,
+  MessagesSendResponse,
   UsersGetResponse,
 } from 'vk-io/lib/api/schemas/responses';
 
@@ -57,6 +59,15 @@ export class VkApiService {
     return this.botService.vk.api.users.get({
       user_ids: peerIds,
       fields: defaultUserFields,
+    });
+  }
+
+  public async sendMessage(
+    params: MessagesSendParams,
+  ): Promise<MessagesSendResponse> {
+    return this.botService.vk.api.messages.send({
+      random_id: 0,
+      ...params,
     });
   }
 }
