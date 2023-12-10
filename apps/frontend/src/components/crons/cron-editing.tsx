@@ -121,34 +121,8 @@ export const CronEditing: FC<Props> = ({
         </FormItem>
       </div>
 
-      <FormItem top="Повтор (недели)">
-        <div style={{ display: 'flex', gap: '10px' }}>
-          {[1, 2, 3, 4].map((week) => (
-            <Avatar
-              key={week}
-              initials={`${week}`}
-              size={40}
-              gradientColor={weeks.includes(week) ? 'blue' : undefined}
-              onClick={() =>
-                setWeeks((prev) => {
-                  if (prev.includes(week)) {
-                    return prev.filter((id) => id !== week);
-                  } else {
-                    return [...prev, week].sort();
-                  }
-                })
-              }
-            >
-              <Avatar.Overlay theme="dark">
-                {weeks.includes(week) ? (
-                  <Icon20RemoveCircleOutline />
-                ) : (
-                  <Icon20AddCircleOutline />
-                )}
-              </Avatar.Overlay>
-            </Avatar>
-          ))}
-        </div>
+      <FormItem top="Повтор">
+        <Checkbox defaultChecked>Без повтора</Checkbox>
       </FormItem>
 
       <FormItem top={`Сообщение для "${chatTitle}"`}>
