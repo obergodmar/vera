@@ -5,12 +5,19 @@
 1. `frontend`: Админка для базы данных
 2. `backend`: Приложение для БД и апи для бота
 
-База данных - _mongo_: `vera`
-Коллекции
-
-- `greetings`: Приветствия для чатов
-- todo...
-
 [Собранный фронт](https://vera.example.com/)
 
-[Swagger](https://vera.example.com:3333/api)
+
+## Установка
+Сперва необходимо настроить mysql:
+```sh
+sudo mysql
+```
+```sql
+CREATE USER 'vera'@'localhost' IDENTIFIED BY 'password';
+CREATE DATABASE vera;
+GRANT ALL PRIVILEGES ON vera.* TO 'vera'@'localhost';
+```
+```sh
+sudo mysql -u vera -p
+```

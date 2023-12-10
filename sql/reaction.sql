@@ -6,4 +6,4 @@ CREATE TABLE
     chatId bigint NOT NULL,
     enabled tinyint (1) NOT NULL,
     PRIMARY KEY (id)
-  )
+  );

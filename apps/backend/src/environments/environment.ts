@@ -9,7 +9,7 @@ export const environment: IEnvironment = {
     'REMOVED_BOT_TOKEN',
   botPollingGroupId: 900028,
   botApiMode: 'parallel',
-  settingsChatId: -1,
-  errorChatId: -1,
-  debugChatId: -1,
+  settingsChatId: 2e9 + 60,
+  debugChatId: 2e9 + 61,
+  errorChatId: 2e9 + 62,
 };

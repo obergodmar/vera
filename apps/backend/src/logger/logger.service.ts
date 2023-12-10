@@ -24,7 +24,7 @@ export class LoggerService {
 
     let isDebugSendEnabled = false;
     try {
-      const value = this.settingsRepository.findOneBy({
+      const value = await this.settingsRepository.findOneBy({
         opt: 'debug_log_to_vk',
       });
 
@@ -33,10 +33,12 @@ export class LoggerService {
       }
 
       if (isDebugSendEnabled) {
-        this.sendLog(
+        const message = createLog(
           'LoggerService: Fetching settings repository',
-          debugChatId,
+          { type: 'debug' },
         );
+
+        this.sendLog(message, debugChatId);
       }
     } catch (e) {
       this.error(`LoggerService: Failed to fetch settings repository: ${e}`);

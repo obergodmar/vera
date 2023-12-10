@@ -8,4 +8,4 @@ CREATE TABLE
     userId bigint NOT NULL,
     chatId bigint NOT NULL,
     PRIMARY KEY (id)
-  )
+  );

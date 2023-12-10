@@ -8,4 +8,4 @@ CREATE TABLE
     screenName varchar(50) DEFAULT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY screenName (screenName)
-  )
+  );

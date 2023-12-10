@@ -8,4 +8,4 @@ CREATE TABLE
     enabled tinyint (1) DEFAULT NULL,
     buttons text,
     PRIMARY KEY (id)
-  )
+  );

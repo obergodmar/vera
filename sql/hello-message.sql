@@ -5,4 +5,4 @@ CREATE TABLE
     chatId bigint NOT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY chatId (chatId)
-  )
+  );
