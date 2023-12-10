@@ -27,6 +27,8 @@ export class BotService {
 
     const debugChatId =
       this.config.get<IEnvironment['debugChatId']>('debugChatId');
+    const errorChatId =
+      this.config.get<IEnvironment['errorChatId']>('errorChatId');
 
     const logInitStatus = createLog('BotService: Bot was launched', {
       type: 'log',
@@ -45,7 +47,7 @@ export class BotService {
       logFS(logPollingError);
 
       this.vk.api.messages.send({
-        peer_id: debugChatId,
+        peer_id: errorChatId,
         message: logPollingError,
         random_id: 0,
       });

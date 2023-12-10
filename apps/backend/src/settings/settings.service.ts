@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { Repository } from 'typeorm';
+import { MessageContext } from 'vk-io';
 
 import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
@@ -25,5 +26,14 @@ export class SettingsService {
 
     const settingsChatId =
       this.config.get<IEnvironment['settingsChatId']>('settingsChatId');
+
+    this.api.botService.vk.updates.on(
+      'message_new',
+      async (msg: MessageContext) => {
+        const { text } = msg;
+
+        // this.api.botService.vk.api.messages.send({});
+      },
+    );
   }
 }
