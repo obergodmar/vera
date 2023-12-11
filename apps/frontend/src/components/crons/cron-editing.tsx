@@ -4,7 +4,7 @@ import {
   Icon20RemoveCircleOutline,
   Icon24Add,
 } from '@vkontakte/icons';
-import { Avatar, Button, FormItem, Text, Textarea } from '@vkontakte/vkui';
+import { Avatar, Button, Checkbox, FormItem, Text, Textarea } from '@vkontakte/vkui';
 
 import {
   Dispatch,

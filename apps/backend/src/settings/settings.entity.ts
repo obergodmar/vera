@@ -6,7 +6,7 @@ import { Column, Entity, PrimaryColumn, Unique } from 'typeorm';
 @Unique(['opt'])
 export class Setting implements ISettings.Item {
   @PrimaryColumn()
-  opt: 'debug_log_to_vk';
+  opt: string;
 
   @Column()
   val: string;

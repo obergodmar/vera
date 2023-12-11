@@ -187,31 +187,9 @@ export function getAnnounceDutyMessage(
   return message;
 }
 
-export function isGroupChat(peerType?: string): boolean {
-  const GROUPS_CHATS = ['chat', 'group'];
-
-  return GROUPS_CHATS.includes(peerType || '');
-}
-
-export function filterByGroupChat(
-  convos?: MessagesConversation[],
-): MessagesConversation[] {
-  if (!convos?.length) {
-    return [];
-  }
-
-  return convos.filter((convo) => {
-    if ('peer' in convo) {
-      return isGroupChat(convo['peer']?.type);
-    }
-
-    return false;
-  });
-}
-
 export function filterIds(omit: number[]) {
   return function (id: number): boolean {
-    return omit.includes(id);
+    return !omit.includes(id);
   };
 }
 

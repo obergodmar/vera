@@ -11,6 +11,7 @@ import { HelloMessagesModule } from '../hello-messages/hello-messages.module';
 import { LoggerModule } from '../logger/logger.module';
 import { LoginModule } from '../login/login.module';
 import { ReactionsModule } from '../reactions/reactions.module';
+import { SettingsModule } from '../settings/settings.module';
 import { StaticModule } from '../static/static.module';
 import { VkApiModule } from '../vk-api/vk-api.module';
 
@@ -19,6 +20,7 @@ import { VkApiModule } from '../vk-api/vk-api.module';
     /**
      * Global Modules
      */
+    SettingsModule,
     VkApiModule,
     BotModule,
     LoggerModule,

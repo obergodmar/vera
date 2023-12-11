@@ -36,10 +36,10 @@ export class VkApiService {
   ) {}
 
   public async getConversationsById(
-    peerIds: number[],
+    peerId: number | number[],
   ): Promise<MessagesGetConversationsByIdResponse> {
     return this.botService.vk.api.messages.getConversationsById({
-      peer_ids: peerIds,
+      peer_ids: Array.isArray(peerId) ? peerId : [peerId],
       fields: defaultGroupFields,
     });
   }
