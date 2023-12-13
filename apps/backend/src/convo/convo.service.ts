@@ -26,7 +26,7 @@ export class ConvoService {
   public async getChats(): Promise<IApi.ConversationsList> {
     this.logger.debug('Vera chats requested');
     const { start, finish } = measure();
-    start();
+    const point = start();
 
     const convosAmount = await this.settings.get('convos_fetch_amount');
     this.logger.debug(`Fetching ${convosAmount} conversations`);
@@ -59,7 +59,7 @@ export class ConvoService {
       // Chat doesn't exist
     }
 
-    const callTime = finish();
+    const callTime = finish(point);
     this.logger.debug(
       `Loaded ${items.length} conversations. Took ${callTime} ms`,
     );

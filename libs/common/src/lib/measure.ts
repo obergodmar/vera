@@ -1,19 +1,15 @@
 export function measure() {
-  let t0 = 0;
-  let t1 = 0;
-
   return {
     start: () => {
-      t0 = performance.now();
+      return performance.now();
     },
-    finish: () => {
-      t1 = performance.now();
-
-      if (!!t0 || !!t1) {
+    finish: (point: number) => {
+      const t1 = performance.now();
+      if (!point || !t1) {
         return -1;
       }
 
-      return t1 - t0;
+      return Math.floor(t1 - point);
     },
   };
 }
