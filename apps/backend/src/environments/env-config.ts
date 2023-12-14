@@ -1,7 +1,6 @@
 import { DeepPartial, mergeObject } from '@vera-reforged/common';
 
 import * as dotenv from 'dotenv';
-import * as fs from 'node:fs';
 
 import { IEnvironment } from './env-type';
 
@@ -33,7 +32,9 @@ export function getEnvConfig(): IEnvironment {
 
 function parseEnvVariables(): Partial<IEnvironment> {
   const envVariables: DeepPartial<IEnvironment> = {};
-  const env = dotenv.parse(fs.readFileSync('.env'));
+
+  dotenv.config();
+  const env = process.env;
 
   if (!env) {
     return envVariables;

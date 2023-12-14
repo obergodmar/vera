@@ -12,10 +12,10 @@ export class Reaction implements IReactions.ChatReaction {
   chatId: number;
 
   @Column()
-  textTrigger: IReactions.Trigger;
+  textTrigger: string;
 
   @Column()
-  reaction: IReactions.Reaction;
+  reaction: string;
 
   @Column()
   enabled: boolean;

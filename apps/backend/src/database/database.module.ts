@@ -8,30 +8,32 @@ import { HelloMessage } from '../hello-messages/hello-messages.entity';
 import { Reaction } from '../reactions/reactions.entity';
 import { Setting } from '../settings/settings.entity';
 
+export function getOrmConfig(env: IEnvironment) {
+  return {
+    type: 'mysql' as const,
+    host: env.dbHost,
+    port: env.dbPort,
+    database: env.dbName,
+    username: env.dbUsername,
+    password: env.dbPassword,
+    entities: [
+      Setting,
+      /**
+       * Functionality
+       */
+      Duty,
+      HelloMessage,
+      Reaction,
+      Cron,
+    ],
+  };
+}
+
 export class DatabaseModule {
   public static forRoot(env: IEnvironment): DynamicModule {
     return {
       module: DatabaseModule,
-      imports: [
-        TypeOrmModule.forRoot({
-          type: 'mysql',
-          host: env.dbHost,
-          port: env.dbPort,
-          database: env.dbName,
-          username: env.dbUsername,
-          password: env.dbPassword,
-          entities: [
-            Setting,
-            /**
-             * Functionality
-             */
-            Duty,
-            HelloMessage,
-            Reaction,
-            Cron,
-          ],
-        }),
-      ],
+      imports: [TypeOrmModule.forRoot(getOrmConfig(env))],
     };
   }
 }
