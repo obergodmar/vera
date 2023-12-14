@@ -111,8 +111,16 @@ export class CronsService {
   public async createCronForChat(
     cronCreationDto: CreateCronForChatDto,
   ): Promise<IApi.ICronsApi.CreateCronForChatResponse> {
-    const { chatId, message, daysRange, timeAt, buttons, enabled } =
-      cronCreationDto;
+    const {
+      chatId,
+      message,
+      daysRange,
+      timeAt,
+      buttons,
+      startDate,
+      repeat,
+      enabled,
+    } = cronCreationDto;
 
     const logMeta = getCronLogMeta(cronCreationDto);
     this.logger.debug(`Creating cron ${logMeta}`);
@@ -125,6 +133,8 @@ export class CronsService {
         message,
         daysRange,
         buttons,
+        startDate,
+        repeat,
       });
 
       const id = res.identifiers[0].id;
@@ -140,6 +150,8 @@ export class CronsService {
             message,
             daysRange,
             buttons,
+            startDate,
+            repeat,
           },
           this.sendMessage,
           this.logger,
@@ -162,8 +174,17 @@ export class CronsService {
   public async updateCronForChat(
     cronUpdateDto: UpdateCronForChatDto,
   ): Promise<IApi.ICronsApi.UpdateCronForChatResponse> {
-    const { id, chatId, message, daysRange, timeAt, buttons, enabled } =
-      cronUpdateDto;
+    const {
+      id,
+      chatId,
+      message,
+      daysRange,
+      timeAt,
+      buttons,
+      startDate,
+      repeat,
+      enabled,
+    } = cronUpdateDto;
 
     const isDeleting = !message || !daysRange || !timeAt;
 
@@ -192,7 +213,17 @@ export class CronsService {
           this.cronJobs.set(
             id,
             createCronJob(
-              { id, chatId, daysRange, timeAt, message, enabled, buttons },
+              {
+                id,
+                chatId,
+                daysRange,
+                timeAt,
+                message,
+                enabled,
+                buttons,
+                startDate,
+                repeat,
+              },
               this.sendMessage,
               this.logger,
             ),

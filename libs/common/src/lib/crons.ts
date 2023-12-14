@@ -13,6 +13,14 @@ export namespace ICrons {
     daysRange: string;
     timeAt: string;
     buttons: string;
+    startDate: number;
+    /**
+     * 0 - Каждую неделю
+     * 1 - Раз в месяц
+     * 2 - Через неделю
+     * 3 - Через две недели
+     */
+    repeat: number;
     enabled: boolean;
   };
 }

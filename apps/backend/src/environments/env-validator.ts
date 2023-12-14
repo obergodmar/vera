@@ -11,33 +11,58 @@ import { getEnvConfig } from './env-config';
 import { IEnvironment } from './env-type';
 
 export class Environment implements IEnvironment {
+  /**
+   * ===================
+   * Настройки окружения
+   */
   @IsBoolean()
   isProd: boolean;
-
   @IsBoolean()
   disableBotListener: boolean;
-
   @IsString()
   @IsNotEmpty()
-  authorizationToken: string;
+  address: string;
+  @IsNumber()
+  port: number;
+  @IsString()
+  @IsNotEmpty()
+  dbHost: string;
+  @IsNumber()
+  dbPort: number;
+  @IsString()
+  @IsNotEmpty()
+  dbName: string;
+  @IsString()
+  @IsNotEmpty()
+  dbUsername: string;
+  @IsString()
+  @IsNotEmpty()
+  dbPassword: string;
 
+  /**
+   * ==================
+   * Настройки апи бота
+   */
   @IsString()
   @IsNotEmpty()
   botToken: string;
-
   @IsNumber()
   botPollingGroupId: number;
-
   @IsString()
   @IsNotEmpty()
   botApiMode: 'sequential' | 'parallel' | 'parallel_selected';
 
+  /**
+   * =================
+   * Настройки админки
+   */
+  @IsString()
+  @IsNotEmpty()
+  authorizationToken: string;
   @IsNumber()
   settingsChatId: number;
-
   @IsNumber()
   errorChatId: number;
-
   @IsNumber()
   debugChatId: number;
 }

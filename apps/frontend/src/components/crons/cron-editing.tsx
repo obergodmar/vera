@@ -1,10 +1,18 @@
-import { ICrons, IKeyboard } from '@vera-reforged/common';
+import { capitalize,ICrons, IKeyboard } from '@vera-reforged/common';
 import {
   Icon20AddCircleOutline,
   Icon20RemoveCircleOutline,
   Icon24Add,
 } from '@vkontakte/icons';
-import { Avatar, Button, Checkbox, FormItem, Text, Textarea } from '@vkontakte/vkui';
+import {
+  Avatar,
+  Button,
+  Checkbox,
+  DateInput,
+  FormItem,
+  Text,
+  Textarea,
+} from '@vkontakte/vkui';
 
 import {
   Dispatch,
@@ -51,6 +59,13 @@ const daysNames: ICrons.Day[] = [
   },
 ];
 
+const repeatText = [
+  'каждую неделю',
+  'раз в месяц',
+  'через неделю',
+  'через две недели',
+];
+
 type Props = {
   time: string;
   setTime: Dispatch<SetStateAction<string>>;
@@ -60,8 +75,10 @@ type Props = {
   setDays: Dispatch<SetStateAction<number[]>>;
   button?: IKeyboard.LinkButton;
   setButton: Dispatch<SetStateAction<IKeyboard.LinkButton | undefined>>;
-  weeks: number[];
-  setWeeks: Dispatch<SetStateAction<number[]>>;
+  startDate: number;
+  setStartDate: Dispatch<SetStateAction<number>>;
+  repeat: number;
+  setRepeat: Dispatch<SetStateAction<number>>;
 
   chatTitle: ReactNode;
 };
@@ -75,8 +92,10 @@ export const CronEditing: FC<Props> = ({
   setDays,
   button,
   setButton,
-  weeks,
-  setWeeks,
+  startDate,
+  setStartDate,
+  repeat,
+  setRepeat,
   chatTitle,
 }) => {
   return (
@@ -122,7 +141,37 @@ export const CronEditing: FC<Props> = ({
       </div>
 
       <FormItem top="Повтор">
-        <Checkbox defaultChecked>Без повтора</Checkbox>
+        {repeatText.map((text, idx) => (
+          <Checkbox
+            checked={repeat === idx}
+            onChange={() => {
+              setRepeat(idx);
+            }}
+          >
+            {capitalize(text)}
+          </Checkbox>
+        ))}
+      </FormItem>
+
+      <FormItem
+        top="Начиная с"
+        bottom="День и неделя, с которых начинать повтор"
+      >
+        <DateInput
+          value={new Date(startDate)}
+          onChange={(value) => {
+            if (value) {
+              setStartDate(value.getTime());
+            }
+          }}
+          enableTime={false}
+          disablePast={false}
+          disableFuture={false}
+          closeOnChange
+          disablePickers={false}
+          showNeighboringMonth
+          disableCalendar={false}
+        />
       </FormItem>
 
       <FormItem top={`Сообщение для "${chatTitle}"`}>
@@ -178,11 +227,8 @@ export const CronEditing: FC<Props> = ({
           }}
         >
           Это сообщение {button ? <Highlight>с кнопкой </Highlight> : ' '}будет
-          отправляться{' '}
-          <Highlight>
-            {weeks.length === 4 ? 'каждую' : weeks.join(', ')}
-          </Highlight>{' '}
-          неделю месяца в{' '}
+          отправляться <Highlight>{repeatText[repeat]}</Highlight> месяца
+          в{' '}
           {days.map((day) => {
             const isBeforeLast = days.length - 1 === day;
             const isLast = days.length === day;

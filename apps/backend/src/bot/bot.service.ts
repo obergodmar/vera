@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createLog } from '@vera-reforged/common';
 
@@ -30,7 +30,8 @@ export class BotService {
     const errorChatId =
       this.config.get<IEnvironment['errorChatId']>('errorChatId');
 
-    const logInitStatus = createLog('BotService: Bot was launched', {
+    const message = 'BotService: Bot was launched';
+    const logInitStatus = createLog(message, {
       type: 'log',
     });
     logFS(logInitStatus);
@@ -39,12 +40,15 @@ export class BotService {
       message: logInitStatus,
       random_id: 0,
     });
+    Logger.log(message);
 
     this.vk.updates.startPolling().catch((e) => {
-      const logPollingError = createLog(`BotService: Polling error, ${e}`, {
+      const error = `BotService: Polling error, ${e}`;
+      const logPollingError = createLog(error, {
         type: 'error',
       });
       logFS(logPollingError);
+      Logger.error(error);
 
       this.vk.api.messages.send({
         peer_id: errorChatId,

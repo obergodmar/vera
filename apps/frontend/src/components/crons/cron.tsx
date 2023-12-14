@@ -26,6 +26,8 @@ export const Cron: FC<Props> = ({
   daysRange,
   enabled,
   buttons,
+  startDate,
+  repeat,
   chatTitle,
 }) => {
   const button = useMemo(() => {
@@ -49,7 +51,8 @@ export const Cron: FC<Props> = ({
   const [currentButton, setCurrentButton] = useState<
     IKeyboard.LinkButton | undefined
   >(button);
-  const [currentWeeks, setCurrentWeeks] = useState<number[]>([])
+  const [currentStartDate, setCurrentStartDate] = useState<number>(startDate);
+  const [currentRepeat, setCurrentRepeat] = useState(repeat || 0);
 
   useEffect(() => {
     setCurrentTime(timeAt);
@@ -70,6 +73,14 @@ export const Cron: FC<Props> = ({
   useEffect(() => {
     setCurrentButton(button);
   }, [button]);
+
+  useEffect(() => {
+    setCurrentStartDate(startDate);
+  }, [startDate]);
+
+  useEffect(() => {
+    setCurrentRepeat(repeat);
+  }, [repeat]);
 
   const modified =
     currentTime !== timeAt ||
@@ -107,6 +118,8 @@ export const Cron: FC<Props> = ({
             currentButton && currentButton.label && currentButton.link
               ? JSON.stringify([currentButton])
               : '',
+          startDate: currentStartDate,
+          repeat: currentRepeat,
         });
       }}
       onReset={() => {
@@ -126,6 +139,8 @@ export const Cron: FC<Props> = ({
             message: '',
             enabled,
             buttons: '',
+            startDate: 0,
+            repeat: 0,
           });
         }
 
@@ -145,8 +160,10 @@ export const Cron: FC<Props> = ({
         chatTitle={chatTitle}
         button={currentButton}
         setButton={setCurrentButton}
-        weeks={currentWeeks}
-        setWeeks={setCurrentWeeks}
+        startDate={currentStartDate}
+        setStartDate={setCurrentStartDate}
+        repeat={currentRepeat}
+        setRepeat={setCurrentRepeat}
       />
     </ModifiableCell>
   );

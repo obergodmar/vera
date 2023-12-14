@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createLog } from '@vera-reforged/common';
 
@@ -18,8 +18,10 @@ export class LoggerService {
     const debugChatId =
       this.config.get<IEnvironment['debugChatId']>('debugChatId');
 
-    const isDebugSendEnabled = await this.settings.get('debug_log_to_vk');
     const message = createLog(value, { type: 'debug' });
+    Logger.debug(value);
+
+    const isDebugSendEnabled = await this.settings.get('debug_log_to_vk');
     if (isDebugSendEnabled) {
       this.sendLog(message, debugChatId);
     }
@@ -31,6 +33,7 @@ export class LoggerService {
 
     const message = createLog(value, { type: 'error' });
 
+    Logger.error(value);
     this.sendLog(message, errorChatId);
   }
 
@@ -40,6 +43,7 @@ export class LoggerService {
 
     const message = createLog(value, { type: 'log' });
 
+    Logger.log(value);
     this.sendLog(message, debugChatId);
   }
 

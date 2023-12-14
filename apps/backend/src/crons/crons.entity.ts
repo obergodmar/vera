@@ -24,5 +24,11 @@ export class Cron implements ICrons.ChatCron {
   buttons: string;
 
   @Column()
+  startDate: number;
+
+  @Column()
+  repeat: number;
+
+  @Column()
   enabled: boolean;
 }

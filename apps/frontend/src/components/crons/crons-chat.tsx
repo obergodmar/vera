@@ -28,7 +28,8 @@ export const CronsChat: FC<Props> = ({ chatTitle, chatId }) => {
   const [time, setTime] = useState<string>('');
   const [message, setMessage] = useState('');
   const [button, setButton] = useState<IKeyboard.LinkButton | undefined>();
-  const [weeks, setWeeks] = useState<number[]>([1, 2, 3, 4]);
+  const [startDate, setStartDate] = useState(new Date().getTime());
+  const [repeat, setRepeat] = useState(0);
 
   useEffect(() => {
     if (data?.success) {
@@ -61,8 +62,10 @@ export const CronsChat: FC<Props> = ({ chatTitle, chatId }) => {
             chatTitle={chatTitle}
             button={button}
             setButton={setButton}
-            weeks={weeks}
-            setWeeks={setWeeks}
+            startDate={startDate}
+            setStartDate={setStartDate}
+            repeat={repeat}
+            setRepeat={setRepeat}
           />
 
           <FormItem>
@@ -82,6 +85,8 @@ export const CronsChat: FC<Props> = ({ chatTitle, chatId }) => {
                   daysRange: getDaysRange(days),
                   chatId,
                   buttons: button ? JSON.stringify([button]) : '',
+                  startDate,
+                  repeat,
                   enabled: true,
                 })
               }
