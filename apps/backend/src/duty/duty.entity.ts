@@ -1,25 +1,25 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Unique } from 'typeorm';
+
+import { DefaultColumns } from '../entities/default-columns';
 
 @Entity()
-export class Duty {
-  @PrimaryGeneratedColumn('increment')
-  id: number;
-
-  @Column()
+@Unique(['id'])
+export class Duty extends DefaultColumns {
+  @Column({ type: 'bigint', unsigned: true })
   chatId: number;
 
-  @Column()
+  @Column({ type: 'bigint', unsigned: false })
   userId: number;
 
-  @Column()
+  @Column({ type: 'tinyint', unsigned: true, nullable: true, default: null })
   dayNumber?: number | null;
 
-  @Column()
+  @Column({ type: 'char', length: 5, nullable: true, default: null })
   timeFrom?: string | null;
 
-  @Column()
+  @Column({ type: 'char', length: 5, nullable: true, default: null })
   timeTo?: string | null;
 
-  @Column()
+  @Column({ type: 'varchar', length: 50, nullable: true, default: null })
   tag?: string | null;
 }

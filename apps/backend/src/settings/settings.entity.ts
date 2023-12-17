@@ -1,13 +1,15 @@
 import { ISettings } from '@vera-reforged/common';
 
-import { Column, Entity, PrimaryColumn, Unique } from 'typeorm';
+import { Column, Entity, Unique } from 'typeorm';
+
+import { DefaultColumns } from '../entities/default-columns';
 
 @Entity()
-@Unique(['opt'])
-export class Setting implements ISettings.Item {
-  @PrimaryColumn()
+@Unique(['id', 'opt'])
+export class Setting extends DefaultColumns implements ISettings.Item {
+  @Column({ type: 'varchar', length: 150, unique: true })
   opt: string;
 
-  @Column()
+  @Column({ type: 'text', nullable: true })
   val: string;
 }

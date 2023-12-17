@@ -1,34 +1,33 @@
 import { ICrons } from '@vera-reforged/common';
 
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Column, Entity, Unique } from 'typeorm';
+
+import { DefaultColumns } from '../entities/default-columns';
 
 @Entity()
 @Unique(['id'])
-export class Cron implements ICrons.ChatCron {
-  @PrimaryGeneratedColumn('increment')
-  id: number;
-
-  @Column()
+export class Cron extends DefaultColumns implements ICrons.ChatCron {
+  @Column({ type: 'bigint', unsigned: true })
   chatId: number;
 
-  @Column()
+  @Column({ type: 'text' })
   message: string;
 
-  @Column()
+  @Column({ type: 'text' })
   daysRange: string;
 
-  @Column()
+  @Column({ type: 'char', length: 5 })
   timeAt: string;
 
-  @Column()
+  @Column({ type: 'text', default: null })
   buttons: string;
 
-  @Column()
+  @Column({ type: 'bigint', unsigned: true })
   startDate: number;
 
-  @Column()
+  @Column({ type: 'tinyint', unsigned: true })
   repeat: number;
 
-  @Column()
+  @Column({ type: 'boolean', default: false })
   enabled: boolean;
 }

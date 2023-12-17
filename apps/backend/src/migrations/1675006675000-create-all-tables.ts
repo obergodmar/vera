@@ -1,5 +1,7 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
+import { withChatId, withDefaultColumns } from './common-columns';
+
 export class CreateAllTables1675006675000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     /**
@@ -9,25 +11,11 @@ export class CreateAllTables1675006675000 implements MigrationInterface {
       new Table({
         name: 'duty',
         columns: [
-          {
-            name: 'id',
-            type: 'int',
-            unsigned: true,
-            isNullable: false,
-            isGenerated: true,
-            isPrimary: true,
-            generationStrategy: 'increment',
-          },
-          {
-            name: 'chatId',
-            type: 'bigint',
-            unsigned: true,
-            isNullable: false,
-          },
+          ...withDefaultColumns(),
+          withChatId(),
           {
             name: 'userId',
             type: 'bigint',
-            unsigned: true,
             isNullable: false,
           },
           {
@@ -57,7 +45,6 @@ export class CreateAllTables1675006675000 implements MigrationInterface {
           },
         ],
       }),
-      true,
     );
     /**
      * Crons table
@@ -66,21 +53,8 @@ export class CreateAllTables1675006675000 implements MigrationInterface {
       new Table({
         name: 'cron',
         columns: [
-          {
-            name: 'id',
-            type: 'int',
-            unsigned: true,
-            isNullable: false,
-            isGenerated: true,
-            isPrimary: true,
-            generationStrategy: 'increment',
-          },
-          {
-            name: 'chatId',
-            type: 'bigint',
-            unsigned: true,
-            isNullable: false,
-          },
+          ...withDefaultColumns(),
+          withChatId(),
           {
             name: 'message',
             type: 'text',
@@ -108,7 +82,6 @@ export class CreateAllTables1675006675000 implements MigrationInterface {
           },
         ],
       }),
-      true,
     );
     /**
      * Reactions table
@@ -117,21 +90,8 @@ export class CreateAllTables1675006675000 implements MigrationInterface {
       new Table({
         name: 'reaction',
         columns: [
-          {
-            name: 'id',
-            type: 'int',
-            unsigned: true,
-            isNullable: false,
-            isGenerated: true,
-            isPrimary: true,
-            generationStrategy: "increment"
-          },
-          {
-            name: 'chatId',
-            type: 'bigint',
-            unsigned: true,
-            isNullable: false,
-          },
+          ...withDefaultColumns(),
+          withChatId(),
           {
             name: 'textTrigger',
             type: 'text',
@@ -150,7 +110,6 @@ export class CreateAllTables1675006675000 implements MigrationInterface {
           },
         ],
       }),
-      true,
     );
     /**
      * Hello messages table
@@ -159,29 +118,18 @@ export class CreateAllTables1675006675000 implements MigrationInterface {
       new Table({
         name: 'hello_message',
         columns: [
-          {
-            name: 'id',
-            type: 'int',
-            unsigned: true,
-            isNullable: false,
-            isGenerated: true,
-            isPrimary: true,
-            generationStrategy: "increment"
-          },
+          ...withDefaultColumns(),
           {
             name: 'message',
             type: 'text',
             isNullable: false,
           },
           {
-            name: 'chatId',
-            type: 'bigInt',
+            ...withChatId(),
             isUnique: true,
-            isNullable: false,
           },
         ],
       }),
-      true,
     );
     /**
      * Settings table
@@ -190,41 +138,28 @@ export class CreateAllTables1675006675000 implements MigrationInterface {
       new Table({
         name: 'setting',
         columns: [
+          ...withDefaultColumns(),
           {
             name: 'opt',
             type: 'varchar(150)',
+            isUnique: true,
             isNullable: false,
-            isPrimary: true,
           },
           {
             name: 'val',
             type: 'text',
             isNullable: true,
           },
-          {
-            name: 'created',
-            type: 'timestamp',
-            isNullable: false,
-            default: 'CURRENT_TIMESTAMP',
-          },
-          {
-            name: 'modified',
-            type: 'timestamp',
-            isNullable: false,
-            default: 'CURRENT_TIMESTAMP',
-            onUpdate: 'CURRENT_TIMESTAMP',
-          },
         ],
       }),
-      true,
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('duty', true);
-    await queryRunner.dropTable('cron', true);
-    await queryRunner.dropTable('reaction', true);
-    await queryRunner.dropTable('hello_message', true);
-    await queryRunner.dropTable('setting', true);
+    await queryRunner.dropTable('duty');
+    await queryRunner.dropTable('cron');
+    await queryRunner.dropTable('reaction');
+    await queryRunner.dropTable('hello_message');
+    await queryRunner.dropTable('setting');
   }
 }

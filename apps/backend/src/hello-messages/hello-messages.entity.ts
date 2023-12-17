@@ -1,14 +1,18 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { IHelloMessages } from '@vera-reforged/common';
+
+import { Column, Entity, Unique } from 'typeorm';
+
+import { DefaultColumns } from '../entities/default-columns';
 
 @Entity()
-@Unique(['chatId'])
-export class HelloMessage {
-  @PrimaryGeneratedColumn('increment')
-  id: number;
-
-  @Column()
+@Unique(['id', 'chatId'])
+export class HelloMessage
+  extends DefaultColumns
+  implements IHelloMessages.MessagePerChat
+{
+  @Column({ type: 'text' })
   message: string;
 
-  @Column()
+  @Column({ type: 'bigint', unsigned: true, unique: true })
   chatId: number;
 }

@@ -1,22 +1,24 @@
 import { IReactions } from '@vera-reforged/common';
 
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Column, Entity, Unique } from 'typeorm';
+
+import { DefaultColumns } from '../entities/default-columns';
 
 @Entity()
 @Unique(['id'])
-export class Reaction implements IReactions.ChatReaction {
-  @PrimaryGeneratedColumn('increment')
-  id: number;
-
-  @Column()
+export class Reaction
+  extends DefaultColumns
+  implements IReactions.ChatReaction
+{
+  @Column({ type: 'bigint', unsigned: true })
   chatId: number;
 
-  @Column()
+  @Column({ type: 'text' })
   textTrigger: string;
 
-  @Column()
+  @Column({ type: 'text' })
   reaction: string;
 
-  @Column()
+  @Column({ type: 'boolean', default: false })
   enabled: boolean;
 }
