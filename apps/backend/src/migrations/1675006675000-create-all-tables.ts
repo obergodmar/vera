@@ -15,8 +15,8 @@ export class CreateAllTables1675006675000 implements MigrationInterface {
             unsigned: true,
             isNullable: false,
             isGenerated: true,
-            isUnique: true,
             isPrimary: true,
+            generationStrategy: 'increment',
           },
           {
             name: 'chatId',
@@ -72,8 +72,8 @@ export class CreateAllTables1675006675000 implements MigrationInterface {
             unsigned: true,
             isNullable: false,
             isGenerated: true,
-            isUnique: true,
             isPrimary: true,
+            generationStrategy: 'increment',
           },
           {
             name: 'chatId',
@@ -99,14 +99,12 @@ export class CreateAllTables1675006675000 implements MigrationInterface {
           {
             name: 'enabled',
             type: 'tinyint(1)',
-            isNullable: false,
-            default: '0',
+            isNullable: true,
+            default: null,
           },
           {
             name: 'buttons',
             type: 'text',
-            isNullable: true,
-            default: '',
           },
         ],
       }),
@@ -125,8 +123,8 @@ export class CreateAllTables1675006675000 implements MigrationInterface {
             unsigned: true,
             isNullable: false,
             isGenerated: true,
-            isUnique: true,
             isPrimary: true,
+            generationStrategy: "increment"
           },
           {
             name: 'chatId',
@@ -167,8 +165,8 @@ export class CreateAllTables1675006675000 implements MigrationInterface {
             unsigned: true,
             isNullable: false,
             isGenerated: true,
-            isUnique: true,
             isPrimary: true,
+            generationStrategy: "increment"
           },
           {
             name: 'message',
@@ -178,6 +176,7 @@ export class CreateAllTables1675006675000 implements MigrationInterface {
           {
             name: 'chatId',
             type: 'bigInt',
+            isUnique: true,
             isNullable: false,
           },
         ],
@@ -195,7 +194,6 @@ export class CreateAllTables1675006675000 implements MigrationInterface {
             name: 'opt',
             type: 'varchar(150)',
             isNullable: false,
-            isUnique: true,
             isPrimary: true,
           },
           {

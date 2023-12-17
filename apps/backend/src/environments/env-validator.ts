@@ -78,7 +78,9 @@ export function envValidation(): IEnvironment {
   });
 
   if (errors.length > 0) {
-    throw new Error(errors.toString());
+    throw new Error(
+      `The Environment variables are not correct: ${errors.toString()}`,
+    );
   }
   return validatedConfig;
 }

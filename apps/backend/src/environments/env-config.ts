@@ -3,27 +3,7 @@ import { DeepPartial, mergeObject } from '@vera-reforged/common';
 import * as dotenv from 'dotenv';
 
 import { IEnvironment } from './env-type';
-
-const environment: IEnvironment = {
-  isProd: false,
-  disableBotListener: false,
-  address: '127.0.0.1',
-  port: 4256,
-  dbHost: 'localhost',
-  dbPort: 3306,
-  dbName: '',
-  dbUsername: '',
-  dbPassword: '',
-
-  botToken: '',
-  botPollingGroupId: 0,
-  botApiMode: 'parallel',
-
-  authorizationToken: '',
-  settingsChatId: 0,
-  debugChatId: 0,
-  errorChatId: 0,
-};
+import { environment } from './environment';
 
 export function getEnvConfig(): IEnvironment {
   const envVariables = parseEnvVariables();
