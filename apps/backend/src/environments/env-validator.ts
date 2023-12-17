@@ -58,6 +58,9 @@ export class Environment implements IEnvironment {
    */
   @IsString()
   @IsNotEmpty()
+  authorizationHash: string;
+  @IsString()
+  @IsNotEmpty()
   authorizationToken: string;
   @IsNumber()
   settingsChatId: number;

@@ -70,6 +70,9 @@ function parseEnvVariables(): Partial<IEnvironment> {
    * =================
    * Настройки админки
    */
+  if (env.AUTHORIZATION_HASH) {
+    envVariables.authorizationHash = env.AUTHORIZATION_HASH;
+  }
   if (env.AUTHORIZATION_TOKEN) {
     envVariables.authorizationToken = env.AUTHORIZATION_TOKEN;
   }

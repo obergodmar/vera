@@ -1,4 +1,4 @@
-import { capitalize,ICrons, IKeyboard } from '@vera-reforged/common';
+import { capitalize, ICrons, IKeyboard } from '@vera-reforged/common';
 import {
   Icon20AddCircleOutline,
   Icon20RemoveCircleOutline,
@@ -22,6 +22,8 @@ import {
   ReactNode,
   SetStateAction,
 } from 'react';
+
+import format from 'date-fns/format';
 
 import { LinkButtonCreation } from '../link-button-creation';
 import { TimePicker } from '../time-picker';
@@ -143,6 +145,7 @@ export const CronEditing: FC<Props> = ({
       <FormItem top="Повтор">
         {repeatText.map((text, idx) => (
           <Checkbox
+            key={idx}
             checked={repeat === idx}
             onChange={() => {
               setRepeat(idx);
@@ -228,7 +231,8 @@ export const CronEditing: FC<Props> = ({
         >
           Это сообщение {button ? <Highlight>с кнопкой </Highlight> : ' '}будет
           отправляться <Highlight>{repeatText[repeat]}</Highlight> месяца
-          в{' '}
+          начиная с{' '}
+          <Highlight>{format(new Date(startDate), 'dd.MM.yyyy')}</Highlight> в{' '}
           {days.map((day) => {
             const isBeforeLast = days.length - 1 === day;
             const isLast = days.length === day;

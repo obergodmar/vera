@@ -27,6 +27,7 @@ export const environment: IEnvironment = {
    * =================
    * Настройки админки
    */
+  authorizationHash: '',
   authorizationToken: '',
   settingsChatId: 0,
   debugChatId: 0,

@@ -51,6 +51,10 @@ export interface IEnvironment {
    */
 
   /**
+   * Хэш для пароля админки
+   */
+  authorizationHash: string;
+  /**
    * Токен авторизации для админки.
    * TODO: сделать его рандомным
    */
