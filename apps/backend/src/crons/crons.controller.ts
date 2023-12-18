@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, Inject, Post } from '@nestjs/common';
 import { IApi, ROUTES } from '@vera-reforged/common';
 
 import { WithChatIdDto } from '../convo/convo.dto';
@@ -15,6 +15,7 @@ export class CronsController {
   ) {}
 
   @Post(endpoints.getCronsForChat)
+  @HttpCode(200)
   public getCronsForChat(
     @Body() data: WithChatIdDto,
   ): Promise<IApi.ICronsApi.GetCronsForChatResponse> {
@@ -22,11 +23,13 @@ export class CronsController {
   }
 
   @Post(endpoints.getCronsChats)
+  @HttpCode(200)
   public getCronsChatsResponse(): Promise<IApi.ICronsApi.GetCronsChatsResponse> {
     return this.cronsService.getCronsChatsResponse();
   }
 
   @Post(endpoints.createCronForChat)
+  @HttpCode(200)
   public createCronForChat(
     @Body() data: CreateCronForChatDto,
   ): Promise<IApi.ICronsApi.CreateCronForChatResponse> {
@@ -34,6 +37,7 @@ export class CronsController {
   }
 
   @Post(endpoints.updateCronForChat)
+  @HttpCode(200)
   public updateCronForChat(
     @Body() data: UpdateCronForChatDto,
   ): Promise<IApi.ICronsApi.UpdateCronForChatResponse> {
@@ -41,6 +45,7 @@ export class CronsController {
   }
 
   @Post(endpoints.disableCronsForChat)
+  @HttpCode(200)
   public disableCronsForChat(
     @Body() data: WithChatIdDto,
   ): Promise<IApi.ICronsApi.DisableCronsForChatResponse> {
@@ -48,6 +53,7 @@ export class CronsController {
   }
 
   @Post(endpoints.disableAllCrons)
+  @HttpCode(200)
   public disableAllCrons(): Promise<IApi.ICronsApi.DisableAllCronsResponse> {
     return this.cronsService.disableAllCrons();
   }

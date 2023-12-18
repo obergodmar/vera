@@ -26,6 +26,7 @@ export function getOrmConfig(env: IEnvironment) {
       Reaction,
       Cron,
     ],
+    bigNumberStrings: false,
   };
 }
 

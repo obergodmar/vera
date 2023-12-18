@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { IApi, ICrons } from '@vera-reforged/common';
 
 import { CronJob } from 'cron';
-import { getWeekOfMonth } from 'date-fns';
 import { Repository } from 'typeorm';
 import { APIMessages } from 'vk-io/lib/api/schemas/methods';
 import { MessagesSendParams } from 'vk-io/lib/api/schemas/params';
@@ -162,7 +161,7 @@ export class CronsService {
 
       return {
         success: false,
-        error: JSON.stringify(e),
+        error: 'Ошибка записи в базу данных',
       };
     }
 
@@ -205,7 +204,7 @@ export class CronsService {
         await this.cronsRepository.delete({ id });
       } else {
         await this.cronsRepository.upsert(
-          [{ id, chatId, daysRange, timeAt, message, enabled, buttons }],
+          [{ id, chatId, daysRange, timeAt, message, enabled, buttons, startDate, repeat, }],
           ['id'],
         );
 
@@ -233,7 +232,7 @@ export class CronsService {
     } catch (e) {
       this.logger.error(`Couldn't update cron ${id} in ${chatId}: ${e}`);
       return {
-        error: JSON.stringify(e),
+        error: 'Ошибка записи в базу данных',
         success: false,
       };
     }
@@ -273,7 +272,8 @@ export class CronsService {
       this.logger.error(`Couldn't disable crons for chat: ${chatId}: ${e}`);
 
       return {
-        error: JSON.stringify(e),
+        success: false,
+        error: 'Ошибка записи в базу данных',
       };
     }
   }
@@ -299,7 +299,8 @@ export class CronsService {
       this.logger.error(`Couldn't disable all crons: ${e}`);
 
       return {
-        error: JSON.stringify(e),
+        success: false,
+        error: 'Ошибка записи в базу данных',
       };
     }
   }
@@ -310,7 +311,7 @@ function createCronJob(
   sendMessage: APIMessages['send'],
   logger: DebugService,
 ): CronJob {
-  const { timeAt, chatId, daysRange, message, buttons } = cron;
+  const { timeAt, chatId, daysRange, message, buttons, repeat, startDate } = cron;
   const [hours, minutes] = timeAt.split(':');
 
   let keyboard: string | undefined;
@@ -346,7 +347,6 @@ function createCronJob(
   return new CronJob(
     `00 ${minutes} ${hours} * * ${daysRange}`,
     () => {
-      const currentWeekNumber = getWeekOfMonth(new Date(), { weekStartsOn: 1 });
 
       try {
         sendMessage({

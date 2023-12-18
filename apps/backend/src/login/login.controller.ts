@@ -12,7 +12,7 @@ export class LoginController {
   ) {}
 
   @Post()
-  public async index(@Body() authorizeDto: LoginDto) {
+  public async authorize(@Body() authorizeDto: LoginDto) {
     return this.authorizationService.authorize(authorizeDto);
   }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, Inject, Post } from '@nestjs/common';
 import { IApi, ROUTES } from '@vera-reforged/common';
 
 import {
@@ -17,6 +17,7 @@ export class DutyController {
   ) {}
 
   @Post(endpoints.getMembersForChat)
+  @HttpCode(200)
   public async getMembersForChat(
     @Body() data: GetMembersFotChatDto,
   ): Promise<IApi.IDutyApi.GetMembersForChatResponse> {
@@ -24,6 +25,7 @@ export class DutyController {
   }
 
   @Post(endpoints.getScheduleForChat)
+  @HttpCode(200)
   public async getScheduleForChat(
     @Body() data: GetScheduleForChatDto,
   ): Promise<IApi.IDutyApi.GetScheduleForChatResponse> {
@@ -31,6 +33,7 @@ export class DutyController {
   }
 
   @Post(endpoints.updateChatSchedule)
+  @HttpCode(200)
   public updateChatSchedule(
     @Body() data: UpdateChatScheduleDto,
   ): Promise<IApi.IDutyApi.UpdateChatScheduleResponse> {

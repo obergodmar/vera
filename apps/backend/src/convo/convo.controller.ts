@@ -1,4 +1,4 @@
-import { Controller, Inject, Post } from '@nestjs/common';
+import { Controller, HttpCode, Inject, Post } from '@nestjs/common';
 import { IApi, ROUTES } from '@vera-reforged/common';
 
 import { ConvoService } from './convo.service';
@@ -12,6 +12,7 @@ export class ConvoController {
   ) {}
 
   @Post(endpoints.getChats)
+  @HttpCode(200)
   public getConvos(): Promise<IApi.IConvoApi.GetChatsResponse> {
     return this.convoService.getChats();
   }

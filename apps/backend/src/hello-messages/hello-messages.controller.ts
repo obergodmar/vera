@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, Inject, Post } from '@nestjs/common';
 import { IApi, ROUTES } from '@vera-reforged/common';
 
 import {
@@ -17,11 +17,13 @@ export class HelloMessagesController {
   ) {}
 
   @Post(endpoints.getHelloMessages)
+  @HttpCode(200)
   public getHelloMessages(): Promise<IApi.IHelloMessagesApi.GetHelloMessagesResponse> {
     return this.hlService.getHelloMessages();
   }
 
   @Post(endpoints.updateHelloMessage)
+  @HttpCode(200)
   public updateHelloMessage(
     @Body() data: UpdateHelloMessageDto,
   ): Promise<IApi.IHelloMessagesApi.UpdateHelloMessageResponse> {
@@ -29,6 +31,7 @@ export class HelloMessagesController {
   }
 
   @Post(endpoints.updateAllHelloMessages)
+  @HttpCode(200)
   public updateAllHelloMessages(
     @Body() data: UpdateAllHelloMessagesDto,
   ): Promise<IApi.IHelloMessagesApi.UpdateAllHelloMessagesResponse> {
