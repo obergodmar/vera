@@ -1,4 +1,6 @@
-import { MigrationInterface, QueryRunner, Table } from 'typeorm';
+import { defaultSettings } from '@vera-reforged/common';
+
+import { MigrationInterface, QueryRunner, Table, TableColumn } from 'typeorm';
 
 import { withChatId, withDefaultColumns } from './common-columns';
 
@@ -13,36 +15,36 @@ export class CreateAllTables1675006675000 implements MigrationInterface {
         columns: [
           ...withDefaultColumns(),
           withChatId(),
-          {
+          new TableColumn({
             name: 'userId',
             type: 'bigint',
             isNullable: false,
-          },
-          {
+          }),
+          new TableColumn({
             name: 'dayNumber',
             type: 'tinyint',
             isNullable: true,
             unsigned: true,
             default: 'null',
-          },
-          {
+          }),
+          new TableColumn({
             name: 'timeFrom',
             type: 'char(5)',
             isNullable: true,
             default: 'null',
-          },
-          {
+          }),
+          new TableColumn({
             name: 'timeTo',
             type: 'char(5)',
             isNullable: true,
             default: 'null',
-          },
-          {
+          }),
+          new TableColumn({
             name: 'tag',
             type: 'varchar(50)',
             isNullable: true,
             default: 'null',
-          },
+          }),
         ],
       }),
     );
@@ -55,31 +57,41 @@ export class CreateAllTables1675006675000 implements MigrationInterface {
         columns: [
           ...withDefaultColumns(),
           withChatId(),
-          {
+          new TableColumn({
             name: 'message',
             type: 'text',
             isNullable: false,
-          },
-          {
+          }),
+          new TableColumn({
             name: 'daysRange',
             type: 'text',
             isNullable: false,
-          },
-          {
+          }),
+          new TableColumn({
             name: 'timeAt',
             type: 'char(5)',
             isNullable: false,
-          },
-          {
+          }),
+          new TableColumn({
             name: 'enabled',
             type: 'tinyint(1)',
             isNullable: true,
             default: null,
-          },
-          {
+          }),
+          new TableColumn({
             name: 'buttons',
             type: 'text',
-          },
+          }),
+          new TableColumn({
+            name: 'startDate',
+            type: 'bigint',
+            unsigned: true,
+          }),
+          new TableColumn({
+            name: 'repeat',
+            type: 'tinyint',
+            unsigned: true,
+          }),
         ],
       }),
     );
@@ -92,22 +104,22 @@ export class CreateAllTables1675006675000 implements MigrationInterface {
         columns: [
           ...withDefaultColumns(),
           withChatId(),
-          {
+          new TableColumn({
             name: 'textTrigger',
             type: 'text',
             isNullable: false,
-          },
-          {
+          }),
+          new TableColumn({
             name: 'reaction',
             type: 'text',
             isNullable: false,
-          },
-          {
+          }),
+          new TableColumn({
             name: 'enabled',
             type: 'tinyint(1)',
             isNullable: false,
             default: '0',
-          },
+          }),
         ],
       }),
     );
@@ -119,15 +131,15 @@ export class CreateAllTables1675006675000 implements MigrationInterface {
         name: 'hello_message',
         columns: [
           ...withDefaultColumns(),
-          {
+          new TableColumn({
             name: 'message',
             type: 'text',
             isNullable: false,
-          },
-          {
+          }),
+          new TableColumn({
             ...withChatId(),
             isUnique: true,
-          },
+          }),
         ],
       }),
     );
@@ -139,20 +151,29 @@ export class CreateAllTables1675006675000 implements MigrationInterface {
         name: 'setting',
         columns: [
           ...withDefaultColumns(),
-          {
+          new TableColumn({
             name: 'opt',
             type: 'varchar(150)',
             isUnique: true,
             isNullable: false,
-          },
-          {
+          }),
+          new TableColumn({
             name: 'val',
             type: 'text',
             isNullable: true,
-          },
+          }),
         ],
       }),
     );
+
+    /**
+     * Заполняются дефолтные настройки
+     */
+    for (const [opt, val] of Object.entries(defaultSettings)) {
+      await queryRunner.query(
+        `INSERT INTO setting (opt, val) values ("${opt}", "${`${val}`}")`,
+      );
+    }
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
