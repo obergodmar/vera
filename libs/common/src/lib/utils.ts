@@ -1,6 +1,16 @@
+import {
+  differenceInCalendarWeeks,
+  differenceInWeeks,
+  endOfWeek,
+  getWeekOfMonth,
+  isSameISOWeek,
+  lastDayOfWeek,
+  startOfWeek,
+} from 'date-fns';
+import { ru } from 'date-fns/locale';
 import produce from 'immer';
-import { MessagesConversation } from 'vk-io/lib/api/schemas/objects';
 
+import { ICrons } from './crons';
 import { IDuty } from './duty';
 
 export function addLeadingZero(num: number): string {
@@ -242,3 +252,67 @@ export function getDaysArray(daysRange: string): number[] {
 
 export const capitalize = (str: string): string =>
   str.charAt(0).toUpperCase() + str.slice(1);
+
+const oddWeeks = [1, 3, 5, 6];
+const evenWeeks = [2, 4, 6];
+
+const repeatPerWeek = [
+  [],
+  oddWeeks,
+  evenWeeks,
+  oddWeeks,
+  evenWeeks,
+  oddWeeks,
+  oddWeeks,
+];
+
+const dateFNSConfig = {
+  weekStartsOn: 1,
+  locale: ru,
+} as const;
+
+export function shouldCallCron(
+  startDate: ICrons.ChatCron['startDate'],
+  currentDate: number,
+  repeat: ICrons.ChatCron['repeat'],
+): boolean {
+  const startWeekOfMonth = getWeekOfMonth(
+    lastDayOfWeek(startDate, dateFNSConfig),
+    dateFNSConfig,
+  );
+  const currWeekOfMonth = getWeekOfMonth(currentDate, dateFNSConfig);
+
+  const weeksDiff = Math.abs(
+    differenceInWeeks(
+      endOfWeek(startDate, dateFNSConfig),
+      startOfWeek(currentDate, dateFNSConfig),
+    ),
+  );
+  const isSameWeek = isSameISOWeek(startDate, currentDate);
+
+  if (isSameWeek) {
+    return true;
+  }
+
+  switch (repeat) {
+    // Каждую неделю
+    case 0:
+      return true;
+    // Раз в месяц
+    case 1:
+      return startWeekOfMonth === currWeekOfMonth;
+    // Через неделю
+    case 2:
+      return repeatPerWeek[startWeekOfMonth].includes(currWeekOfMonth);
+    // Через две недели
+    case 3: {
+      const margin = Math.floor(weeksDiff / 3) - 1;
+      const diff = weeksDiff - (weeksDiff > 3 ? (margin > 0 ? margin : 1) : 0);
+
+      return diff > 0 && diff % 2 === 0;
+    }
+
+    default:
+      return true;
+  }
+}

@@ -8,7 +8,5 @@ const env = envValidation();
 
 export default new DataSource({
   ...getOrmConfig(env),
-  migrations: [
-    CreateAllTables1675006675000,
-  ],
+  migrations: [CreateAllTables1675006675000],
 });

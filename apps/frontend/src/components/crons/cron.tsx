@@ -87,7 +87,9 @@ export const Cron: FC<Props> = ({
     currentMessage !== message ||
     getDaysRange(currentDays) !== daysRange ||
     currentEnabled !== enabled ||
-    buttons !== (currentButton ? JSON.stringify([currentButton]) : '');
+    buttons !== (currentButton ? JSON.stringify([currentButton]) : '') ||
+    startDate !== currentStartDate ||
+    repeat !== currentRepeat;
 
   useEffect(() => {
     if (data?.success) {

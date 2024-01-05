@@ -11,6 +11,7 @@ import {
   getNextDayMonth,
   getTimeInMinutes,
   isTimeToNextDay,
+  shouldCallCron,
 } from './utils';
 import {
   getSchedule,
@@ -366,5 +367,58 @@ describe('utils testing', () => {
     expect(getDaysArray('1,2,4,5')).toStrictEqual([1, 2, 4, 5]);
     expect(getDaysArray('1-3,5')).toStrictEqual([1, 2, 3, 5]);
     expect(getDaysArray('1,2,4-6')).toStrictEqual([1, 2, 4, 5, 6]);
+  });
+
+  describe('shouldCallCron', () => {
+    // Раз в месяц
+    expect(shouldCallCron(1704834000000, 1706043600000, 1)).toBe(false); // 01.10.2024 vs 01.24.2024
+    expect(shouldCallCron(1727643600000, 1727730000000, 1)).toBe(true); // 09.30.2024 vs 10.01.2024
+    expect(shouldCallCron(1727643600000, 1730149200000, 1)).toBe(false); // 09.30.2024 vs 10.29.2024 Edge Case.
+
+    expect(shouldCallCron(1704747600000, 1707080400000, 1)).toBe(true); // 01.09.2024 vs 02.05.2024
+    expect(shouldCallCron(1704747600000, 1725570000000, 1)).toBe(true); // 01.09.2024 vs 09.06.2024
+
+    // Через неделю
+    expect(shouldCallCron(1704834000000, 1705870800000, 2)).toBe(true); // 01.10.2024 vs 01.22.2024
+    expect(shouldCallCron(1704834000000, 1706043600000, 2)).toBe(true); // 01.10.2024 vs 01.24.2024
+    expect(shouldCallCron(1704834000000, 1706216400000, 2)).toBe(true); // 01.10.2024 vs 01.26.2024
+    expect(shouldCallCron(1704834000000, 1707166800000, 2)).toBe(true); // 01.10.2024 vs 02.06.2024
+    expect(shouldCallCron(1704834000000, 1708290000000, 2)).toBe(true); // 01.10.2024 vs 02.19.2024
+    expect(shouldCallCron(1704834000000, 1732136400000, 2)).toBe(true); // 01.10.2024 vs 11.21.2024
+
+    expect(shouldCallCron(1704834000000, 1706562000000, 2)).toBe(false); // 01.10.2024 vs 01.30.2024
+    expect(shouldCallCron(1704834000000, 1705266000000, 2)).toBe(false); // 01.10.2024 vs 01.15.2024
+    expect(shouldCallCron(1704834000000, 1707944400000, 2)).toBe(false); // 01.10.2024 vs 02.15.2024
+    expect(shouldCallCron(1704834000000, 1709240400000, 2)).toBe(false); // 01.10.2024 vs 03.01.2024
+    expect(shouldCallCron(1704834000000, 1732654800000, 2)).toBe(false); // 01.10.2024 vs 11.27.2024
+
+    expect(shouldCallCron(1727643600000, 1727730000000, 2)).toBe(true); // 09.30.2024 vs 10.01.2024
+    expect(shouldCallCron(1727643600000, 1728853200000, 2)).toBe(true); // 09.30.2024 vs 10.14.2024
+
+    expect(shouldCallCron(1727730000000, 1727643600000, 2)).toBe(true); // 10.01.2024 vs 09.30.2024
+    expect(shouldCallCron(1728853200000, 1727643600000, 2)).toBe(true); // 10.14.2024 vs 09.30.2024
+
+    // На следующей неделе
+    expect(shouldCallCron(1704834000000, 1705611600000, 2)).toBe(false); // 01.10.2024 vs 01.19.2024
+    // На этой же неделе
+    expect(shouldCallCron(1704834000000, 1704920400000, 2)).toBe(true); // 01.10.2024 vs 01.11.2024
+
+    // Через две недели
+    expect(shouldCallCron(1704834000000, 1706043600000, 3)).toBe(false); // 01.10.2024 vs 01.24.2024
+    expect(shouldCallCron(1704834000000, 1706562000000, 3)).toBe(true); // 01.10.2024 vs 01.30.2024
+    expect(shouldCallCron(1704834000000, 1706734800000, 3)).toBe(true); // 01.10.2024 vs 02.01.2024
+    expect(shouldCallCron(1704834000000, 1707166800000, 3)).toBe(false); // 01.10.2024 vs 02.06.2024
+    expect(shouldCallCron(1704834000000, 1707685200000, 3)).toBe(false); // 01.10.2024 vs 02.12.2024
+    expect(shouldCallCron(1704834000000, 1708290000000, 3)).toBe(true); // 01.10.2024 vs 02.19.2024
+    expect(shouldCallCron(1704834000000, 1709154000000, 3)).toBe(false); // 01.10.2024 vs 02.29.2024
+    expect(shouldCallCron(1704834000000, 1709240400000, 3)).toBe(false); // 01.10.2024 vs 03.01.2024
+    expect(shouldCallCron(1704834000000, 1709499600000, 3)).toBe(true); // 01.10.2024 vs 03.04.2024
+    expect(shouldCallCron(1704834000000, 1710277200000, 3)).toBe(false); // 01.10.2024 vs 03.13.2024
+    expect(shouldCallCron(1704834000000, 1710795600000, 3)).toBe(false); // 01.10.2024 vs 03.19.2024
+    expect(shouldCallCron(1704834000000, 1711573200000, 3)).toBe(true); // 01.10.2024 vs 03.28.2024
+    expect(shouldCallCron(1704834000000, 1711918800000, 3)).toBe(false); // 01.10.2024 vs 04.01.2024
+    expect(shouldCallCron(1704834000000, 1712782800000, 3)).toBe(false); // 01.10.2024 vs 04.11.2024
+    expect(shouldCallCron(1704834000000, 1713128400000, 3)).toBe(true); // 01.10.2024 vs 04.15.2024
+    expect(shouldCallCron(1704834000000, 1713733200000, 3)).toBe(false); // 01.10.2024 vs 04.22.2024
   });
 });

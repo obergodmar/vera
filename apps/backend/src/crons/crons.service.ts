@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IApi, ICrons } from '@vera-reforged/common';
+import { IApi, ICrons, shouldCallCron } from '@vera-reforged/common';
 
 import { CronJob } from 'cron';
 import { Repository } from 'typeorm';
@@ -204,7 +204,19 @@ export class CronsService {
         await this.cronsRepository.delete({ id });
       } else {
         await this.cronsRepository.upsert(
-          [{ id, chatId, daysRange, timeAt, message, enabled, buttons, startDate, repeat, }],
+          [
+            {
+              id,
+              chatId,
+              daysRange,
+              timeAt,
+              message,
+              enabled,
+              buttons,
+              startDate,
+              repeat,
+            },
+          ],
           ['id'],
         );
 
@@ -311,7 +323,8 @@ function createCronJob(
   sendMessage: APIMessages['send'],
   logger: DebugService,
 ): CronJob {
-  const { timeAt, chatId, daysRange, message, buttons, repeat, startDate } = cron;
+  const { timeAt, chatId, daysRange, message, buttons, repeat, startDate } =
+    cron;
   const [hours, minutes] = timeAt.split(':');
 
   let keyboard: string | undefined;
@@ -347,6 +360,15 @@ function createCronJob(
   return new CronJob(
     `00 ${minutes} ${hours} * * ${daysRange}`,
     () => {
+      try {
+        if (!shouldCallCron(startDate, Date.now(), repeat)) {
+          logger.debug(`Cron Job JUST CANNCELED for cron ${logMeta}`);
+
+          return;
+        }
+      } catch (e) {
+        logger.error(`Date-fns error, ${e}`);
+      }
 
       try {
         sendMessage({
@@ -368,13 +390,25 @@ function createCronJob(
   );
 }
 
+const repeatToString = [
+  'каждую неделю',
+  'раз в месяц',
+  'через неделю',
+  'через две недели',
+];
+
 function getCronLogMeta(
   cron: Omit<ICrons.ChatCron, 'id'> & { id?: number },
 ): string {
-  const { id, message, daysRange, timeAt, chatId, buttons } = cron;
+  const { id, message, daysRange, timeAt, chatId, buttons, repeat, startDate } =
+    cron;
   const common = `"${message}"${
     buttons ? ' with button' : ''
-  } repeating [${daysRange}] at ${timeAt} for ${chatId}`;
+  } repeating [${daysRange}] (week repeat: ${repeat} - ${
+    repeatToString[repeat]
+  }) at ${timeAt} starting date: ${new Date(startDate).toLocaleDateString(
+    'ru-RU',
+  )} for ${chatId}`;
 
   return id ? `[${id}]: ${common}` : common;
 }
