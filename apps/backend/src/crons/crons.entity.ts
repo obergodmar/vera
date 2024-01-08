@@ -22,10 +22,10 @@ export class Cron extends DefaultColumns implements ICrons.ChatCron {
   @Column({ type: 'text', default: null })
   buttons: string;
 
-  @Column({ type: 'bigint', unsigned: true })
+  @Column({ type: 'bigint', unsigned: true, default: 1704748172294 })
   startDate: number;
 
-  @Column({ type: 'tinyint', unsigned: true })
+  @Column({ type: 'tinyint', unsigned: true, default: 0 })
   repeat: number;
 
   @Column({ type: 'boolean', default: false })
