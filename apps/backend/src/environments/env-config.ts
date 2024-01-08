@@ -25,10 +25,10 @@ function parseEnvVariables(): Partial<IEnvironment> {
    * Настройки окружения
    */
   if (env.IS_PROD) {
-    envVariables.isProd = !!env.IS_PROD;
+    envVariables.isProd = env.IS_PROD === 'true';
   }
   if (env.DISABLE_BOT_LISTENER) {
-    envVariables.disableBotListener = !!env.DISABLE_BOT_LISTENER;
+    envVariables.disableBotListener = env.DISABLE_BOT_LISTENER === 'true';
   }
   if (env.ADDRESS) {
     envVariables.address = env.ADDRESS;
