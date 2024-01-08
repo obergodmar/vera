@@ -62,10 +62,25 @@ const daysNames: ICrons.Day[] = [
 ];
 
 const repeatText = [
-  'каждую неделю',
-  'раз в месяц',
-  'через неделю',
-  'через две недели',
+  {
+    name: 'каждую неделю',
+    description: 'Повторы производятся каждую неделю в выбранные дни',
+  },
+  {
+    name: 'раз в месяц',
+    description:
+      'Повторы производятся начиная с недели, включающей выбранную дату начала, и продолжаются раз в месяц в выбранную неделю месяца',
+  },
+  {
+    name: 'через неделю',
+    description:
+      'Повторы производятся с недели, включающей дату начала, и затем продолжаются через одну неделю: Если в месяце 4 недели и выбранная дата начала в первой неделе, то вызов кронов будет выглядеть следующим образом: ВЫЗОВ-пропуск-ВЫЗОВ-пропуск',
+  },
+  {
+    name: 'через две недели',
+    description:
+      'Повторы производятся с недели, включающей дату начала, и затем продолжаются через две недели: Если в месяце 4 недели и выбранная дата начала в первой неделе, то вызов кронов будет выглядеть следующим образом: ВЫЗОВ-пропуск-пропуск-ВЫЗОВ',
+  },
 ];
 
 type Props = {
@@ -83,6 +98,7 @@ type Props = {
   setRepeat: Dispatch<SetStateAction<number>>;
 
   chatTitle: ReactNode;
+  isCreation?: boolean;
 };
 
 export const CronEditing: FC<Props> = ({
@@ -99,6 +115,7 @@ export const CronEditing: FC<Props> = ({
   repeat,
   setRepeat,
   chatTitle,
+  isCreation = false,
 }) => {
   return (
     <>
@@ -143,15 +160,17 @@ export const CronEditing: FC<Props> = ({
       </div>
 
       <FormItem top="Повтор">
-        {repeatText.map((text, idx) => (
+        {repeatText.map(({ name, description }, idx) => (
           <Checkbox
             key={idx}
             checked={repeat === idx}
+            description={isCreation ? description : undefined}
+            title={description}
             onChange={() => {
               setRepeat(idx);
             }}
           >
-            {capitalize(text)}
+            {capitalize(name)}
           </Checkbox>
         ))}
       </FormItem>
@@ -230,7 +249,7 @@ export const CronEditing: FC<Props> = ({
           }}
         >
           Это сообщение {button ? <Highlight>с кнопкой </Highlight> : ' '}будет
-          отправляться <Highlight>{repeatText[repeat]}</Highlight> месяца
+          отправляться <Highlight>{repeatText[repeat].name}</Highlight> месяца
           начиная с{' '}
           <Highlight>{format(new Date(startDate), 'dd.MM.yyyy')}</Highlight> в{' '}
           {days.map((day) => {

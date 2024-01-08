@@ -66,6 +66,7 @@ export const CronsChat: FC<Props> = ({ chatTitle, chatId }) => {
             setStartDate={setStartDate}
             repeat={repeat}
             setRepeat={setRepeat}
+            isCreation
           />
 
           <FormItem>
