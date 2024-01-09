@@ -402,6 +402,8 @@ describe('utils testing', () => {
     expect(shouldCallCron(1704834000000, 1705611600000, 2)).toBe(false); // 01.10.2024 vs 01.19.2024
     // На этой же неделе
     expect(shouldCallCron(1704834000000, 1704920400000, 2)).toBe(true); // 01.10.2024 vs 01.11.2024
+    // Тот же день
+    expect(shouldCallCron(1704747600000, 1704747600000, 2)).toBe(true); // 01.09.2024 vs 01.09.2024
 
     // Через две недели
     expect(shouldCallCron(1704834000000, 1706043600000, 3)).toBe(false); // 01.10.2024 vs 01.24.2024
