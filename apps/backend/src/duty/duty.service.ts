@@ -12,7 +12,6 @@ import {
 } from '@vera-reforged/common';
 
 import { DataSource, Repository } from 'typeorm';
-import { MessageContext } from 'vk-io';
 import { UsersUserFull } from 'vk-io/lib/api/schemas/objects';
 
 import { IEnvironment } from '../environments/env-type';
@@ -37,50 +36,43 @@ export class DutyService {
     const isListenerOff =
       this.config.get<IEnvironment['disableBotListener']>('disableBotListener');
 
-    this.api.botService.vk.updates.on(
-      'message_new',
-      async (msg: MessageContext) => {
-        if (isListenerOff) {
-          return;
-        }
+    this.api.botService.vk.updates.on('message_new', async (msg, next) => {
+      if (isListenerOff) {
+        return next();
+      }
 
-        const { peerId, text } = msg;
+      const { peerId, text } = msg;
 
-        const regexp = /duty(\s#?(?<tag>\w+))?/;
+      const regexp = /duty(\s#?(?<tag>\w+))?/;
 
-        if (!regexp.test(text)) {
-          return;
-        }
+      if (!regexp.test(text)) {
+        return next();
+      }
 
-        const { tag } = regexp.exec(text).groups || { tag: null };
+      const { tag } = regexp.exec(text).groups || { tag: null };
 
-        const chatAndTagSchedule = await this.filterScheduleForChatAndTag.call(
+      const chatAndTagSchedule = await this.filterScheduleForChatAndTag.call(
+        this,
+        peerId,
+        tag,
+      );
+
+      const currentTimeDuties = this.filterScheduleForCurrentDayAndTime.call(
+        this,
+        chatAndTagSchedule,
+      );
+
+      const { schedule, noDutyAtCurrentTime } =
+        this.filterScheduleIfNoDutyAtCurrentTime.call(
           this,
-          peerId,
-          tag,
-        );
-
-        const currentTimeDuties = this.filterScheduleForCurrentDayAndTime.call(
-          this,
+          currentTimeDuties,
           chatAndTagSchedule,
         );
 
-        const { schedule, noDutyAtCurrentTime } =
-          this.filterScheduleIfNoDutyAtCurrentTime.call(
-            this,
-            currentTimeDuties,
-            chatAndTagSchedule,
-          );
+      this.announceDuty.call(this, peerId, schedule, tag, noDutyAtCurrentTime);
 
-        this.announceDuty.call(
-          this,
-          peerId,
-          schedule,
-          tag,
-          noDutyAtCurrentTime,
-        );
-      },
-    );
+      return next();
+    });
   }
 
   private announceDuty(

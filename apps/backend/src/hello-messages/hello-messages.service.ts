@@ -36,9 +36,9 @@ export class HelloMessagesService {
 
     this.api.botService.vk.updates.on(
       'chat_invite_user',
-      async (context: MessageContext) => {
+      async (context, next) => {
         if (isListenerOff) {
-          return;
+          return next();
         }
 
         const { peerId } = context;

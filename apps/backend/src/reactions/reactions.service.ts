@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { IApi, IReactions } from '@vera-reforged/common';
 
 import { Repository } from 'typeorm';
-import { MessageContext } from 'vk-io';
 
 import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
@@ -32,48 +31,47 @@ export class ReactionsService {
     const isListenerOff =
       this.config.get<IEnvironment['disableBotListener']>('disableBotListener');
 
-    this.api.botService.vk.updates.on(
-      'message_new',
-      async (msg: MessageContext) => {
-        if (isListenerOff) {
-          return;
-        }
+    this.api.botService.vk.updates.on('message_new', async (msg, next) => {
+      if (isListenerOff) {
+        return next();
+      }
 
-        const { peerId, conversationMessageId, text } = msg;
-        let reactions: IReactions.ChatReaction[] = [];
-        try {
-          reactions = await this.reactionsRepository.find({
-            where: { chatId: peerId, enabled: true },
-          });
-        } catch (e) {
-          this.logger.error(`Failed to get reactions for chat ${peerId}: ${e}`);
-        }
-
-        reactions.forEach((reactionItem) => {
-          const { textTrigger, reaction } = reactionItem;
-          const regexp = new RegExp(textTrigger);
-
-          if (regexp.test(text)) {
-            this.logger.debug(
-              `Found match "${textTrigger}" for reaction "${reaction}"" in chat ${peerId}`,
-            );
-
-            this.api.botService.vk.api.messages.send({
-              peer_id: peerId,
-              message: reaction,
-              random_id: 0,
-              forward: JSON.stringify({
-                peer_id: peerId,
-                is_reply: true,
-                conversation_message_ids: conversationMessageId,
-              }),
-            });
-
-            this.logger.debug(`Sent reaction "${reaction}" for chat ${peerId}`);
-          }
+      const { peerId, conversationMessageId, text } = msg;
+      let reactions: IReactions.ChatReaction[] = [];
+      try {
+        reactions = await this.reactionsRepository.find({
+          where: { chatId: peerId, enabled: true },
         });
-      },
-    );
+      } catch (e) {
+        this.logger.error(`Failed to get reactions for chat ${peerId}: ${e}`);
+      }
+
+      reactions.forEach((reactionItem) => {
+        const { textTrigger, reaction } = reactionItem;
+        const regexp = new RegExp(textTrigger);
+
+        if (regexp.test(text)) {
+          this.logger.debug(
+            `Found match "${textTrigger}" for reaction "${reaction}"" in chat ${peerId}`,
+          );
+
+          this.api.botService.vk.api.messages.send({
+            peer_id: peerId,
+            message: reaction,
+            random_id: 0,
+            forward: JSON.stringify({
+              peer_id: peerId,
+              is_reply: true,
+              conversation_message_ids: conversationMessageId,
+            }),
+          });
+
+          this.logger.debug(`Sent reaction "${reaction}" for chat ${peerId}`);
+        }
+      });
+
+      return next();
+    });
   }
 
   public async getReactionsForChat(
