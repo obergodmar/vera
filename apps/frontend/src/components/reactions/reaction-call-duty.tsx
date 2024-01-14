@@ -2,14 +2,14 @@ import { TAG_MAX_WIDTH } from '@vera-reforged/common';
 import { Icon16Hashtag } from '@vkontakte/icons';
 import { Checkbox, FormItem, Input, Text } from '@vkontakte/vkui';
 
-import { Dispatch, FC, SetStateAction } from 'react';
+import { FC } from 'react';
 
 type Props = {
   callDuty: boolean | null;
-  setCallDuty: Dispatch<SetStateAction<boolean | null>>;
+  setCallDuty: (value: boolean) => void;
 
   tag: string | null;
-  setTag: Dispatch<SetStateAction<string | null>>;
+  setTag: (value: string) => void;
 };
 
 export const ReactionCallDuty: FC<Props> = ({

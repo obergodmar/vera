@@ -23,8 +23,8 @@ export class Reaction
   enabled: boolean;
 
   @Column({ type: 'boolean', default: false, nullable: true })
-  callDuty?: boolean | null;
+  callDuty: boolean | null;
 
   @Column({ type: 'varchar', length: 50, nullable: true, default: null })
-  dutyTag?: string | null;
+  dutyTag: string | null;
 }

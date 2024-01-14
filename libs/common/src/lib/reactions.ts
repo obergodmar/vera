@@ -7,7 +7,7 @@ export namespace IReactions {
     reaction: Reaction;
     textTrigger: Trigger;
     enabled: boolean;
-    callDuty?: boolean | null;
-    dutyTag?: string | null;
+    callDuty: boolean | null;
+    dutyTag: string | null;
   };
 }

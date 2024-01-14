@@ -18,7 +18,7 @@ export const Reaction: FC<Props> = ({
   reaction,
   textTrigger,
   callDuty = false,
-  dutyTag = '',
+  dutyTag = null,
   enabled,
 }) => {
   const { confirmed, setConfirmed, confirmationTimer } = useConfirmation(5);
@@ -49,7 +49,7 @@ export const Reaction: FC<Props> = ({
   }, [callDuty]);
 
   useEffect(() => {
-    setCurrentDutyTag(dutyTag || '');
+    setCurrentDutyTag(dutyTag ?? null);
   }, [dutyTag]);
 
   const modified =
@@ -58,8 +58,6 @@ export const Reaction: FC<Props> = ({
     currentEnabled !== enabled ||
     currentCallDuty !== callDuty ||
     currentDutyTag !== dutyTag;
-
-  console.log(currentDutyTag, dutyTag, callDuty, currentCallDuty);
 
   useEffect(() => {
     if (data?.success) {
@@ -113,16 +111,16 @@ export const Reaction: FC<Props> = ({
           textTrigger: currentTrigger,
           reaction: currentReaction,
           enabled: currentEnabled,
-          callDuty: currentCallDuty,
-          dutyTag: currentDutyTag,
+          callDuty: currentCallDuty || false,
+          dutyTag: currentDutyTag || '',
         });
       }}
       onReset={() => {
         setCurrentTrigger(textTrigger);
         setCurrentReaction(reaction);
         setCurrentEnabled(enabled);
-        setCurrentCallDuty(!!callDuty);
-        setCurrentDutyTag(dutyTag || '');
+        setCurrentCallDuty(callDuty);
+        setCurrentDutyTag(dutyTag);
       }}
       onRemove={() => {
         if (confirmed) {
@@ -132,7 +130,7 @@ export const Reaction: FC<Props> = ({
             textTrigger: '',
             reaction: '',
             callDuty,
-            dutyTag,
+            dutyTag: '',
             enabled,
           });
         }

@@ -82,6 +82,7 @@ export const ReactionsChat: FC<Props> = ({ chatTitle, chatId }) => {
               textTrigger: trigger,
               chatId,
               callDuty,
+              dutyTag,
               enabled: true,
             })
           }

@@ -1,7 +1,7 @@
 import { IApi, IReactions } from '@vera-reforged/common';
 
 import { Transform, TransformFnParams } from 'class-transformer';
-import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsNumber, IsString } from 'class-validator';
 
 import { TokenDto } from '../login/dto/token.dto';
 
@@ -23,13 +23,11 @@ class BasicReactionDto
   @IsBoolean()
   enabled: boolean;
 
-  @IsOptional()
   @IsBoolean()
-  callDuty?: boolean;
+  callDuty: boolean;
 
-  @IsOptional()
   @IsString()
-  dutyTag?: string;
+  dutyTag: string;
 }
 
 export class CreateReactionForChatDto
