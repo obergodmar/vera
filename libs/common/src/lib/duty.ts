@@ -1,5 +1,7 @@
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 
+export const TAG_MAX_WIDTH = 50;
+
 export namespace IDuty {
   export interface IDuty {
     schedule: Schedule[];

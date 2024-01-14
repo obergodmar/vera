@@ -11,6 +11,7 @@ import { DutyService } from './duty.service';
   imports: [TypeOrmModule.forFeature([Duty]), ConvoModule],
   providers: [DutyService],
   controllers: [DutyController],
+  exports: [DutyService],
 })
 export class DutyModule {
   configure(consumer: MiddlewareConsumer) {

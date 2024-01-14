@@ -8,6 +8,7 @@ import { useUpdateReactionsForChatMutation } from '../../data/services/reactions
 import { useConfirmation } from '../../hooks/useConfirmation';
 import { useSnackbar } from '../../hooks/useSnackbar';
 import { ModifiableCell } from '../modifiable-cell';
+import { ReactionCallDuty } from './reaction-call-duty';
 
 type Props = IReactions.ChatReaction;
 
@@ -16,6 +17,8 @@ export const Reaction: FC<Props> = ({
   chatId,
   reaction,
   textTrigger,
+  callDuty = false,
+  dutyTag = '',
   enabled,
 }) => {
   const { confirmed, setConfirmed, confirmationTimer } = useConfirmation(5);
@@ -25,6 +28,8 @@ export const Reaction: FC<Props> = ({
 
   const [currentTrigger, setCurrentTrigger] = useState(textTrigger);
   const [currentReaction, setCurrentReaction] = useState(reaction);
+  const [currentCallDuty, setCurrentCallDuty] = useState(callDuty);
+  const [currentDutyTag, setCurrentDutyTag] = useState(dutyTag);
   const [currentEnabled, setCurrentEnabled] = useState(enabled);
 
   useEffect(() => {
@@ -39,10 +44,22 @@ export const Reaction: FC<Props> = ({
     setCurrentEnabled(enabled);
   }, [enabled]);
 
+  useEffect(() => {
+    setCurrentCallDuty(!!callDuty);
+  }, [callDuty]);
+
+  useEffect(() => {
+    setCurrentDutyTag(dutyTag || '');
+  }, [dutyTag]);
+
   const modified =
     currentTrigger !== textTrigger ||
     currentReaction !== reaction ||
-    currentEnabled !== enabled;
+    currentEnabled !== enabled ||
+    currentCallDuty !== callDuty ||
+    currentDutyTag !== dutyTag;
+
+  console.log(currentDutyTag, dutyTag, callDuty, currentCallDuty);
 
   useEffect(() => {
     if (data?.success) {
@@ -70,14 +87,22 @@ export const Reaction: FC<Props> = ({
         </Div>
       }
       bottom={
-        <Div>
-          <Textarea
-            disabled={isLoading}
-            value={currentReaction}
-            onBlur={() => setCurrentReaction((prev) => prev.trim())}
-            onChange={({ target: { value } }) => setCurrentReaction(value)}
+        <>
+          <Div style={{ paddingBottom: 0 }}>
+            <Textarea
+              disabled={isLoading}
+              value={currentReaction}
+              onBlur={() => setCurrentReaction((prev) => prev.trim())}
+              onChange={({ target: { value } }) => setCurrentReaction(value)}
+            />
+          </Div>
+          <ReactionCallDuty
+            callDuty={currentCallDuty}
+            setCallDuty={setCurrentCallDuty}
+            tag={currentDutyTag}
+            setTag={setCurrentDutyTag}
           />
-        </Div>
+        </>
       }
       enabled={currentEnabled}
       setEnabled={setCurrentEnabled}
@@ -88,16 +113,28 @@ export const Reaction: FC<Props> = ({
           textTrigger: currentTrigger,
           reaction: currentReaction,
           enabled: currentEnabled,
+          callDuty: currentCallDuty,
+          dutyTag: currentDutyTag,
         });
       }}
       onReset={() => {
         setCurrentTrigger(textTrigger);
         setCurrentReaction(reaction);
         setCurrentEnabled(enabled);
+        setCurrentCallDuty(!!callDuty);
+        setCurrentDutyTag(dutyTag || '');
       }}
       onRemove={() => {
         if (confirmed) {
-          submit({ chatId, id, textTrigger: '', reaction: '', enabled });
+          submit({
+            chatId,
+            id,
+            textTrigger: '',
+            reaction: '',
+            callDuty,
+            dutyTag,
+            enabled,
+          });
         }
 
         setConfirmed(true);

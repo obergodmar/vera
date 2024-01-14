@@ -21,4 +21,10 @@ export class Reaction
 
   @Column({ type: 'boolean', default: false })
   enabled: boolean;
+
+  @Column({ type: 'boolean', default: false, nullable: true })
+  callDuty?: boolean | null;
+
+  @Column({ type: 'varchar', length: 50, nullable: true, default: null })
+  dutyTag?: string | null;
 }

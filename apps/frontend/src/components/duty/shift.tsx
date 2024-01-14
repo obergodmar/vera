@@ -1,4 +1,4 @@
-import { IDuty } from '@vera-reforged/common';
+import { IDuty, TAG_MAX_WIDTH } from '@vera-reforged/common';
 import { Icon12Delete, Icon16Hashtag } from '@vkontakte/icons';
 import { FormItem, IconButton, Input, Text } from '@vkontakte/vkui';
 import { TextTooltip } from '@vkontakte/vkui/dist/components/TextTooltip/TextTooltip';
@@ -137,6 +137,7 @@ export const Shift: FC<Props> = ({ duty, shiftNumber, dayNumber }) => {
           placeholder="Без тега"
           style={{ width: '95px' }}
           value={tag}
+          maxLength={TAG_MAX_WIDTH}
           onChange={({ target: { value } }) => handleEditShift({ tag: value })}
         />
       </FormItem>

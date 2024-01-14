@@ -5,6 +5,7 @@ import { FC, ReactNode, useEffect, useState } from 'react';
 
 import { useCreateReactionForChatMutation } from '../../data/services/reactions-api';
 import { useSnackbar } from '../../hooks/useSnackbar';
+import { ReactionCallDuty } from './reaction-call-duty';
 
 type Props = {
   chatId: number;
@@ -18,6 +19,8 @@ export const ReactionsChat: FC<Props> = ({ chatTitle, chatId }) => {
 
   const [trigger, setTrigger] = useState('');
   const [reaction, setReaction] = useState('');
+  const [callDuty, setCallDuty] = useState(false);
+  const [dutyTag, setDutyTag] = useState('');
 
   useEffect(() => {
     if (data?.success) {
@@ -28,6 +31,8 @@ export const ReactionsChat: FC<Props> = ({ chatTitle, chatId }) => {
 
       setTrigger('');
       setReaction('');
+      setCallDuty(false);
+      setDutyTag('');
     }
   }, [data, snackbar]);
 
@@ -59,13 +64,26 @@ export const ReactionsChat: FC<Props> = ({ chatTitle, chatId }) => {
         />
       </FormItem>
 
+      <ReactionCallDuty
+        callDuty={callDuty}
+        setCallDuty={setCallDuty}
+        tag={dutyTag}
+        setTag={setDutyTag}
+      />
+
       <FormItem>
         <Button
           stretched
           disabled={!trigger || !reaction}
           loading={isLoading}
           onClick={() =>
-            submit({ reaction, textTrigger: trigger, chatId, enabled: true })
+            submit({
+              reaction,
+              textTrigger: trigger,
+              chatId,
+              callDuty,
+              enabled: true,
+            })
           }
         >
           Создать реакцию

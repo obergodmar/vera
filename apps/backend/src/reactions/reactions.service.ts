@@ -5,6 +5,7 @@ import { IApi, IReactions } from '@vera-reforged/common';
 
 import { Repository } from 'typeorm';
 
+import { DutyService } from '../duty/duty.service';
 import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
 import { LoggerService } from '../logger/logger.service';
@@ -22,14 +23,15 @@ export class ReactionsService {
   public constructor(
     @InjectRepository(Reaction)
     private readonly reactionsRepository: Repository<Reaction>,
+    @Inject(DutyService) private readonly dutyService: DutyService,
     @Inject(VkApiService) private readonly api: VkApiService,
     @Inject(ConfigService) private readonly config: ConfigService,
     @Inject(LoggerService) loggerService: LoggerService,
   ) {
     this.logger = new DebugService(loggerService, this.constructor.name);
 
-    const isListenerOff =
-      this.config.get<IEnvironment['disableBotListener']>('disableBotListener');
+    const isListenerOff = false;
+    // this.config.get<IEnvironment['disableBotListener']>('disableBotListener');
 
     this.api.botService.vk.updates.on('message_new', async (msg, next) => {
       if (isListenerOff) {
@@ -47,7 +49,7 @@ export class ReactionsService {
       }
 
       reactions.forEach((reactionItem) => {
-        const { textTrigger, reaction } = reactionItem;
+        const { textTrigger, reaction, callDuty, dutyTag } = reactionItem;
         const regexp = new RegExp(textTrigger);
 
         if (regexp.test(text)) {
@@ -65,6 +67,10 @@ export class ReactionsService {
               conversation_message_ids: conversationMessageId,
             }),
           });
+
+          if (callDuty) {
+            this.dutyService.lookForDutyAndAnnounce(peerId, dutyTag || null);
+          }
 
           this.logger.debug(`Sent reaction "${reaction}" for chat ${peerId}`);
         }
@@ -101,9 +107,10 @@ export class ReactionsService {
   public async createReactionForChat(
     reactionCreationDto: CreateReactionForChatDto,
   ): Promise<IApi.IReactionsApi.CreateReactionForChatResponse> {
-    const { chatId, reaction, textTrigger, enabled } = reactionCreationDto;
+    const { chatId, reaction, textTrigger, callDuty, dutyTag, enabled } =
+      reactionCreationDto;
 
-    const logMeta = `"${reaction}" with trigger ${textTrigger} for chat ${chatId}`;
+    const logMeta = getReactionLogMeta(reactionCreationDto);
     this.logger.debug(`Creating reaction ${logMeta}`);
 
     try {
@@ -111,6 +118,8 @@ export class ReactionsService {
         chatId,
         reaction,
         textTrigger,
+        callDuty,
+        dutyTag,
         enabled,
       });
     } catch (e) {
@@ -130,15 +139,14 @@ export class ReactionsService {
   public async updateReactionForChat(
     reactionUpdateDto: UpdateReactionForChatDto,
   ): Promise<IApi.IReactionsApi.UpdateReactionForChatResponse> {
-    const { id, chatId, reaction, textTrigger, enabled } = reactionUpdateDto;
+    const { id, chatId, reaction, textTrigger, callDuty, dutyTag, enabled } =
+      reactionUpdateDto;
 
     const isDeleting = !reaction || !textTrigger;
 
-    const logMeta = `"[${id}]: ${reaction}" with trigger ${textTrigger} for chat ${chatId}`;
+    const logMeta = getReactionLogMeta(reactionUpdateDto);
     this.logger.debug(
-      `${isDeleting ? 'Deleting' : 'Updating'} reaction ${
-        !isDeleting ? `${logMeta}` : `${id} for chat ${chatId}`
-      }`,
+      `${isDeleting ? 'Deleting' : 'Updating'} reaction ${logMeta}`,
     );
 
     try {
@@ -146,7 +154,7 @@ export class ReactionsService {
         await this.reactionsRepository.delete({ id });
       } else {
         await this.reactionsRepository.upsert(
-          [{ id, chatId, reaction, textTrigger, enabled }],
+          [{ id, chatId, reaction, textTrigger, callDuty, dutyTag, enabled }],
           ['id'],
         );
       }
@@ -162,4 +170,15 @@ export class ReactionsService {
       success: true,
     };
   }
+}
+
+function getReactionLogMeta(
+  reactionItem: Omit<IReactions.ChatReaction, 'id'> & { id?: number },
+): string {
+  const { id, chatId, reaction, textTrigger, callDuty, dutyTag } = reactionItem;
+  const common = `"${reaction}" with trigger ${textTrigger} for chat ${chatId} with callDuty: ${
+    callDuty ? `enabled (#${dutyTag})` : 'disabled'
+  }`;
+
+  return id ? `[${id}]: ${common}` : common;
 }

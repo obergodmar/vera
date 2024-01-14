@@ -51,28 +51,29 @@ export class DutyService {
 
       const { tag } = regexp.exec(text).groups || { tag: null };
 
-      const chatAndTagSchedule = await this.filterScheduleForChatAndTag.call(
-        this,
-        peerId,
-        tag,
-      );
-
-      const currentTimeDuties = this.filterScheduleForCurrentDayAndTime.call(
-        this,
-        chatAndTagSchedule,
-      );
-
-      const { schedule, noDutyAtCurrentTime } =
-        this.filterScheduleIfNoDutyAtCurrentTime.call(
-          this,
-          currentTimeDuties,
-          chatAndTagSchedule,
-        );
-
-      this.announceDuty.call(this, peerId, schedule, tag, noDutyAtCurrentTime);
+      this.lookForDutyAndAnnounce.call(this, peerId, tag);
 
       return next();
     });
+  }
+
+  public async lookForDutyAndAnnounce(peerId: number, tag: string | null) {
+    const chatAndTagSchedule = await this.filterScheduleForChatAndTag(
+      peerId,
+      tag,
+    );
+
+    const currentTimeDuties =
+      this.filterScheduleForCurrentDayAndTime(chatAndTagSchedule);
+
+    const { schedule, noDutyAtCurrentTime } =
+      this.filterScheduleIfNoDutyAtCurrentTime.call(
+        this,
+        currentTimeDuties,
+        chatAndTagSchedule,
+      );
+
+    this.announceDuty.call(this, peerId, schedule, tag, noDutyAtCurrentTime);
   }
 
   private announceDuty(
