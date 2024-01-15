@@ -30,8 +30,8 @@ export class ReactionsService {
   ) {
     this.logger = new DebugService(loggerService, this.constructor.name);
 
-    const isListenerOff = false;
-    // this.config.get<IEnvironment['disableBotListener']>('disableBotListener');
+    const isListenerOff =
+      this.config.get<IEnvironment['disableBotListener']>('disableBotListener');
 
     this.api.botService.vk.updates.on('message_new', async (msg, next) => {
       if (isListenerOff) {
