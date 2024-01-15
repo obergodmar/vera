@@ -188,19 +188,19 @@ export class DutyService {
     this.logger.debug(`Starting transaction for chat ${chatId}`);
 
     const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.startTransaction();
-
     try {
-      await this.dutyRepository.delete({ chatId });
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
 
+      await this.dutyRepository.delete({ chatId });
       await this.dutyRepository.insert(dutiesToInsert);
 
+      await queryRunner.commitTransaction();
       this.logger.debug(`Changes were made in ${chatId}`);
     } catch (e) {
-      await queryRunner.rollbackTransaction();
-
       error = JSON.stringify(e);
 
+      await queryRunner.rollbackTransaction();
       this.logger.error(`Transaction failed: ${e}`);
     } finally {
       await queryRunner.release();
