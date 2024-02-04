@@ -50,11 +50,21 @@ export class ReactionsService {
 
       reactions.forEach((reactionItem) => {
         const { textTrigger, reaction, callDuty, dutyTag } = reactionItem;
-        const regexp = new RegExp(textTrigger);
+
+        let regexp: RegExp;
+        try {
+          const [text, trigger, flags] = textTrigger.split('/');
+
+          regexp = text ? new RegExp(text) : new RegExp(trigger, flags);
+        } catch (e: unknown) {
+          this.logger.error(`Error parsing textTrigger ${textTrigger}: ${e}`);
+
+          return next();
+        }
 
         if (regexp.test(text)) {
           this.logger.debug(
-            `Found match "${textTrigger}" for reaction "${reaction}"" in chat ${peerId}`,
+            `Found match "${textTrigger}" for reaction "${reaction}" in chat ${peerId}`,
           );
 
           this.api.botService.vk.api.messages.send({
