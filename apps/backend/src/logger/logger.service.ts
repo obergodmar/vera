@@ -48,10 +48,14 @@ export class LoggerService {
   }
 
   private sendLog(message: string, peerId: number): void {
-    this.bot.vk.api.messages.send({
-      peer_id: peerId,
-      message,
-      random_id: 0,
-    });
+    try {
+      this.bot.vk.api.messages.send({
+        peer_id: peerId,
+        message,
+        random_id: 0,
+      });
+    } catch (e) {
+      Logger.error(e);
+    }
   }
 }
