@@ -5,7 +5,6 @@ import {
 } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
 
-import logger from 'redux-logger';
 import { ThunkMiddleware } from 'redux-thunk/es/types';
 
 import { getToken } from '../utils/getToken';
@@ -14,11 +13,11 @@ import { crons } from './reducers/crons';
 import { duty } from './reducers/duty';
 import { helloMessages } from './reducers/hello-messages';
 import { reactions } from './reducers/reactions';
+import { authApi } from './services/auth-api';
 import { convoApi } from './services/convo-api';
 import { cronsApi } from './services/crons-api';
 import { dutyApi } from './services/duty-api';
 import { helloMessagesApi } from './services/hello-messages-api';
-import { loginApi } from './services/login-api';
 import { reactionsApi } from './services/reactions-api';
 import { createSnackbar } from './snackbar-store';
 
@@ -49,8 +48,6 @@ const middleware: Middleware = (api) => (dispatch) => (action) => {
   dispatch(action);
 };
 
-const devMiddlewares = [logger];
-
 export const store = configureStore({
   reducer: {
     [authorization.name]: authorization.reducer,
@@ -58,7 +55,7 @@ export const store = configureStore({
     [helloMessages.name]: helloMessages.reducer,
     [reactions.name]: reactions.reducer,
     [crons.name]: crons.reducer,
-    [loginApi.reducerPath]: loginApi.reducer,
+    [authApi.reducerPath]: authApi.reducer,
     [convoApi.reducerPath]: convoApi.reducer,
     [dutyApi.reducerPath]: dutyApi.reducer,
     [helloMessagesApi.reducerPath]: helloMessagesApi.reducer,
@@ -67,7 +64,7 @@ export const store = configureStore({
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
-      loginApi.middleware,
+      authApi.middleware,
       convoApi.middleware,
       dutyApi.middleware,
       helloMessagesApi.middleware,
@@ -75,7 +72,6 @@ export const store = configureStore({
       cronsApi.middleware,
       rtkQueryErrorLogger,
       middleware,
-      ...(isDev ? devMiddlewares : []),
     ),
   devTools: isDev,
 });

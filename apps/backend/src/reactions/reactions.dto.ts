@@ -3,7 +3,7 @@ import { IApi, IReactions } from '@vera-reforged/common';
 import { Transform, TransformFnParams } from 'class-transformer';
 import { IsBoolean, IsNumber, IsString } from 'class-validator';
 
-import { TokenDto } from '../login/dto/token.dto';
+import { TokenDto } from '../auth/dto/token.dto';
 
 class BasicReactionDto
   extends TokenDto

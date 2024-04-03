@@ -72,4 +72,11 @@ export interface IEnvironment {
    * Айди чата, в который бот шлет сообщения об ошибках.
    */
   errorChatId: number;
+
+  /**
+   * ======================
+   * Данные для авторизации
+   */
+  appId: number
+  serviceKey: string
 }

@@ -15,11 +15,11 @@ export const ROUTES = {
       getChats: 'getChats',
     },
   },
-  login: {
-    prefix: 'login',
-    baseUrl: '/api',
+  auth: {
+    prefix: 'auth',
+    baseUrl: '/api/auth',
     endpoints: {
-      login: 'login',
+      authorize: 'authorize',
     },
   },
   config: {

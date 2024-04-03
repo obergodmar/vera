@@ -3,8 +3,8 @@ import { IApi, IHelloMessages } from '@vera-reforged/common';
 import { Type } from 'class-transformer';
 import { IsArray, IsNumber, IsString, ValidateNested } from 'class-validator';
 
+import { TokenDto } from '../auth/dto/token.dto';
 import { WithChatIdDto } from '../convo/convo.dto';
-import { TokenDto } from '../login/dto/token.dto';
 
 export class UpdateHelloMessageDto
   extends WithChatIdDto

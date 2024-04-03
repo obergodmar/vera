@@ -130,7 +130,7 @@ export class DutyService {
       users = await this.api.getUsers(userIds);
       this.logger.debug('Fetch successfull');
     } catch (e) {
-      this.logger.error(`Coulnd't fetch users, ${e}`);
+      this.logger.error(`Couldn't fetch users, ${e}`);
 
       return [];
     }

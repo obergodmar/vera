@@ -86,6 +86,17 @@ function parseEnvVariables(): Partial<IEnvironment> {
     envVariables.errorChatId = parseInt(env.ERROR_CHAT_ID);
   }
 
+  /**
+   * ======================
+   * Данные для авторизации
+   */
+  if (env.APP_ID) {
+    envVariables.appId = parseInt(env.APP_ID);
+  }
+  if (env.SERVICE_KEY) {
+    envVariables.serviceKey = env.SERVICE_KEY;
+  }
+
   return envVariables;
 }
 

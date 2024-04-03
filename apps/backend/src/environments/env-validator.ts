@@ -68,6 +68,15 @@ export class Environment implements IEnvironment {
   errorChatId: number;
   @IsNumber()
   debugChatId: number;
+
+  /**
+   * ======================
+   * Данные для авторизации
+   */
+  @IsNumber()
+  appId: number;
+  @IsString()
+  serviceKey: string;
 }
 
 export function envValidation(): IEnvironment {

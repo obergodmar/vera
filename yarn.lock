@@ -3394,10 +3394,22 @@
   dependencies:
     "@vkontakte/icons-sprite" "1.1.1"
 
+"@vkontakte/superappkit@^1.61.2":
+  version "1.61.2"
+  resolved "https://registry.yarnpkg.com/@vkontakte/superappkit/-/superappkit-1.61.2.tgz#fcdff2613db787b1e84427c9b5cb96d6f39aab19"
+  integrity sha512-PNQ17A0eqQPDzICLFwgO5/jhBIGlXR0NsgHOqZBJNz39BEw0LLmpnV8z6sDal1ekLRaK6Zz/a1VK7kG8RuZOZg==
+  dependencies:
+    "@vkontakte/vkjs" "^0.20.0"
+
 "@vkontakte/vk-bridge@^2.7.2":
   version "2.8.2"
   resolved "https://registry.yarnpkg.com/@vkontakte/vk-bridge/-/vk-bridge-2.8.2.tgz#ec57ef6830a181914678f00ab6c2a037478a9d37"
   integrity sha512-RG7G1CHmTMcNvltNEOLGMGQUjloZLWftSjnuCih8dPgOakKM77EMDHwT1zOqXJp1Z3sZiJXty5L73Y9eDMSDcA==
+
+"@vkontakte/vkjs@^0.20.0":
+  version "0.20.0"
+  resolved "https://registry.yarnpkg.com/@vkontakte/vkjs/-/vkjs-0.20.0.tgz#ddb9367649ab7e79754b9906c3f6e1960f624c37"
+  integrity sha512-bocEj9pcr6i6F0LN288xU3PX1MI4OJ3ZJXTa6kFx9IqEgk0CnoMtLAcuH2D7DzZAnc83DJCa/tuo9mT7XW035A==
 
 "@vkontakte/vkjs@^1.1.0":
   version "1.1.0"

@@ -1,3 +1,5 @@
+import { VKSilentUser } from '@vkontakte/superappkit';
+
 import { MessagesConversation } from 'vk-io/lib/api/schemas/objects';
 import { MessagesGetConversationMembersResponse } from 'vk-io/lib/api/schemas/responses';
 
@@ -24,6 +26,11 @@ export namespace IApi {
     count: number;
     items: MessagesConversation[];
   };
+
+  export namespace IAuthApi {
+    export type AuthRequest = { data: { token: string; uuid: string, user: VKSilentUser } };
+    export type AuthResponse = { token: string };
+  }
 
   export namespace IConvoApi {
     export type GetChatsRequest = TokenRequest;

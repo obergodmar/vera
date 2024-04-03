@@ -32,4 +32,11 @@ export const environment: IEnvironment = {
   settingsChatId: 0,
   debugChatId: 0,
   errorChatId: 0,
+
+  /**
+   * ======================
+   * Данные для авторизации
+   */
+  appId: 0,
+  serviceKey: '',
 };

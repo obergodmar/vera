@@ -3,8 +3,8 @@ import { IApi, ScheduleModel } from '@vera-reforged/common';
 import { Type } from 'class-transformer';
 import { ValidateNested } from 'class-validator';
 
+import { TokenDto } from '../auth/dto/token.dto';
 import { WithChatIdDto } from '../convo/convo.dto';
-import { TokenDto } from '../login/dto/token.dto';
 
 export class GetMembersFotChatDto
   extends WithChatIdDto

@@ -8,7 +8,7 @@ export default defineConfig({
   cacheDir: '../../node_modules/.vite/frontend',
 
   server: {
-    port: 4200,
+    port: 80, // Для работы авторизации
     host: 'localhost',
     proxy: {
       // '/api': 'https://vera.example.com',

@@ -1,3 +1,4 @@
+import { Config, Connect, VKSilentAuthPayload } from '@vkontakte/superappkit';
 import {
   Avatar,
   Button,
@@ -11,14 +12,16 @@ import {
   Text,
 } from '@vkontakte/vkui';
 
-import { FC, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { VERA_AVATAR_100 } from '../data/constants';
 import { authorize, logOff } from '../data/reducers/authorization';
-import { useLoginMutation } from '../data/services/login-api';
+import { useAuthorizeMutation } from '../data/services/auth-api';
 import { useSnackbar } from '../hooks/useSnackbar';
+
+Config.init({ appId: parseInt(import.meta.env.VITE_APP_ID) });
 
 export const Login: FC = () => {
   const navigate = useNavigate();
@@ -26,19 +29,43 @@ export const Login: FC = () => {
   const dispatch = useDispatch();
   const [password, setPassword] = useState('');
 
-  const [loginRequest, loginResult] = useLoginMutation();
+  const [authRequest, authResult] = useAuthorizeMutation();
 
   useEffect(() => {
-    if (loginResult.status === 'fulfilled' && loginResult.data.token) {
+    if (authResult.status === 'fulfilled' && authResult.data.token) {
       dispatch(
         authorize({
-          token: loginResult.data.token,
+          token: authResult.data.token,
         }),
       );
 
       navigate('/', { replace: true });
     }
-  }, [loginResult, dispatch, navigate, snackbar]);
+  }, [authResult, dispatch, navigate, snackbar]);
+
+  const authHandler = useCallback(async () => {
+    try {
+      const data = await Connect.userVisibleAuth();
+
+      if (data.provider === 'vk' && data.payload.auth) {
+        console.log(data);
+        return authRequest({ data: data.payload });
+
+        // return loadSuperAppToken(data.payload)
+        //   .then((result) => {
+        //     Config.setSuperAppToken(result.superapp_token);
+        //     Config.setSuperAppToken(result.superapp_token_v2, { version: 2 });
+        //
+        //     console.log('auth success! ' + result.superapp_token);
+        //   })
+        //   .catch((err) => {
+        //     console.error(err);
+        //   });
+      }
+    } catch (err: unknown) {
+      console.error(err);
+    }
+  }, []);
 
   useEffect(() => {
     dispatch(logOff());
@@ -54,28 +81,11 @@ export const Login: FC = () => {
               header="Вера"
               action={
                 <FormLayoutGroup mode="vertical">
-                  <Input
-                    style={{
-                      maxWidth: '196px',
-                    }}
-                    placeholder="Введите пароль"
-                    type="password"
-                    value={password}
-                    onChange={({ target: { value } }) => setPassword(value)}
-                    onKeyDown={({ key }) => {
-                      if (key !== 'Enter' || loginResult.isLoading) {
-                        return;
-                      }
-
-                      loginRequest(password);
-                    }}
-                  />
-
                   <Button
                     style={{ top: '10px' }}
                     size="m"
                     stretched
-                    onClick={() => loginRequest(password)}
+                    onClick={authHandler}
                   >
                     Авторизоваться
                   </Button>
