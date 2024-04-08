@@ -1,33 +1,32 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { getRandomInt, sleep } from '@vera-reforged/common';
 
 import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
 import { LoggerService } from '../logger/logger.service';
-import { IVKApi } from './IVKApi';
-
-const API_VERSION = '5.226';
-const API_ERROR_AUTH = 5;
-const API_ERROR_CAPTCHA = 14;
-const API_ERROR_SECTION_DISABLED = 43;
-const API_ERROR_TOO_MANY = 6;
-const API_ERROR_FLOOD = 9;
-const API_ERROR_METHOD_DISABLED = 23;
-const API_ERROR_RATE_LIMIT = 29;
-const API_ERROR_SERVER = 10;
-const API_ERROR_UNKNOWN = 1;
-const API_ERROR_USER_DEACTIVATED = 3610;
-const API_ERROR_UNKNOWN_USER = 39;
-
-import { getRandomInt, sleep } from '@vera-reforged/common';
-
 import {
   API_DEFAULT_TIMEOUT,
+  API_ERROR_AUTH,
+  API_ERROR_CAPTCHA,
+  API_ERROR_FLOOD,
+  API_ERROR_METHOD_DISABLED,
+  API_ERROR_RATE_LIMIT,
+  API_ERROR_SECTION_DISABLED,
+  API_ERROR_SERVER,
+  API_ERROR_TOO_MANY,
+  API_ERROR_UNKNOWN,
+  API_ERROR_UNKNOWN_USER,
+  API_ERROR_USER_DEACTIVATED,
   API_GROUP_FIELDS,
   API_MAX_RETRY_TIMEOUT,
   API_MIN_RETRY_TIMEOUT,
   API_USER_FIELDS,
+  API_VERSION,
+  RATE_LIMIT_WINDOW,
+  RATE_LINIT,
 } from './config';
+import { IVKApi } from './IVKApi';
 
 class Semaphore {
   private resources: number;
@@ -80,8 +79,8 @@ export class VkApiService implements IVKApi.IVKApi {
   ) {
     this.logger = new DebugService(loggerService, this.constructor.name);
 
-    this.semaphore = new Semaphore(5, 3000);
-    this.rateLimitWindow = 3000;
+    this.semaphore = new Semaphore(RATE_LINIT, RATE_LIMIT_WINDOW);
+    this.rateLimitWindow = RATE_LIMIT_WINDOW;
 
     this.accessToken = this.config.get<IEnvironment['botToken']>('botToken');
     this.groupId =
@@ -325,7 +324,7 @@ export class VkApiService implements IVKApi.IVKApi {
     await this.semaphore.lock();
 
     try {
-      this.logger.debug(`[API] Request: ${method} ${params}`);
+      this.logger.debug(`[API] Request: ${method}`);
 
       const enrichedParams = {
         access_token: this.accessToken,
@@ -366,7 +365,7 @@ export class VkApiService implements IVKApi.IVKApi {
           }
         });
 
-      this.logger.debug(`[API] Response:  ${method} ${result}`);
+      this.logger.debug(`[API] Response:  ${method}`);
 
       if (result.error) {
         return Promise.reject(
@@ -379,19 +378,7 @@ export class VkApiService implements IVKApi.IVKApi {
       }
 
       if (result.execute_errors) {
-        return Promise.reject(
-          new IVKApi.ExecuteErrors(
-            result.execute_errors.map(
-              (error: any) =>
-                new IVKApi.RequestError(
-                  error.error_code,
-                  `[API] RequestError: ${error.error_code} ${error.method} (${error.error_msg})`,
-                  error,
-                ),
-            ),
-            result.response,
-          ),
-        );
+        // Ignore execute_errors
       }
 
       return result.response;

@@ -1,4 +1,4 @@
-export const RATE_LINIT = 5;
+export const RATE_LINIT = 20;
 export const RATE_LIMIT_WINDOW = 3000;
 export const API_DEFAULT_TIMEOUT = 10 * 1000;
 export const API_MIN_RETRY_TIMEOUT = 500;
@@ -66,3 +66,16 @@ export const API_GROUP_FIELDS = [
   'menu',
   'role',
 ];
+
+export const API_VERSION = '5.226';
+export const API_ERROR_AUTH = 5;
+export const API_ERROR_CAPTCHA = 14;
+export const API_ERROR_SECTION_DISABLED = 43;
+export const API_ERROR_TOO_MANY = 6;
+export const API_ERROR_FLOOD = 9;
+export const API_ERROR_METHOD_DISABLED = 23;
+export const API_ERROR_RATE_LIMIT = 29;
+export const API_ERROR_SERVER = 10;
+export const API_ERROR_UNKNOWN = 1;
+export const API_ERROR_USER_DEACTIVATED = 3610;
+export const API_ERROR_UNKNOWN_USER = 39;

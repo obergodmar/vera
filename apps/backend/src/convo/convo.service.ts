@@ -1,10 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { filterIds, IApi, measure } from '@vera-reforged/common';
+import { MessagesGetConversationByIdExtended } from '@example/api-schema-typescript';
 
-import { MessagesConversation } from 'vk-io/lib/api/schemas/objects';
-
-import { BotService } from '../bot/bot.service';
 import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
 import { LoggerService } from '../logger/logger.service';
@@ -41,33 +39,55 @@ export class ConvoService {
 
     const omitChats = [settingsChatId, errorChatId, debugChatId];
 
-    const items = []
+    const items = [];
     try {
       const ids = [...Array(convosAmount).keys()].map((i) => i + 1 + 2e9);
 
       const convosToFetch = ids.filter(filterIds(omitChats));
+      const chunkedConvos: number[][] = [];
 
-      const responses = this.api.fetchMany(
-        convosToFetch.map((peerId) => ({
-          method: 'messages.getConversationsById',
-          params: {
-            group_id: 1,
-            extended: 1,
-            peer_ids: `${peerId}`,
-          },
-        })),
+      const chunkSize = 25;
+      for (let i = 0; i < convosToFetch.length; i += chunkSize) {
+        const chunk = convosToFetch.slice(i, i + chunkSize);
+        chunkedConvos.push(chunk);
+      }
+
+      const requests = chunkedConvos.reduce(
+        (acc: Promise<MessagesGetConversationByIdExtended[]>[], chunk) => {
+          return [
+            ...acc,
+            this.api.fetchMany(
+              chunk.map((peerId) => ({
+                method: 'messages.getConversationsById',
+                params: {
+                  group_id: 1,
+                  extended: 0,
+                  peer_ids: `${peerId}`,
+                },
+              })),
+            ),
+          ];
+        },
+        [],
       );
 
-      console.log(responses)
-      // await Promise.allSettled(convosPromises).then((results) => {
-      //   results.forEach((result) => {
-      //     if (result.status === 'fulfilled') {
-      //       result.value.items.forEach((item) => {
-      //         items.set(item.peer.id, item);
-      //       });
-      //     }
-      //   });
-      // });
+      const responses = await Promise.allSettled(requests);
+      const convos: MessagesGetConversationByIdExtended[] = responses.reduce(
+        (acc, promise) => {
+          if (promise.status === 'fulfilled') {
+            return [...acc, ...promise.value];
+          }
+
+          return acc;
+        },
+        [],
+      );
+
+      convos.forEach(({ items: arrayItems }) => {
+        if (arrayItems[0]) {
+          items.push(arrayItems[0]);
+        }
+      });
     } catch {
       // Chat doesn't exist
     }
