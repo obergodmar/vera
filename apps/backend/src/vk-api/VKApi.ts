@@ -1,26 +1,20 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-
-import { IEnvironment } from '../environments/env-type';
-import { DebugService } from '../logger/debug.service';
-import { LoggerService } from '../logger/logger.service';
-import { IVKApi } from './IVKApi';
-
-const API_VERSION = '5.226';
-const API_ERROR_AUTH = 5;
-const API_ERROR_CAPTCHA = 14;
-const API_ERROR_SECTION_DISABLED = 43;
-const API_ERROR_TOO_MANY = 6;
-const API_ERROR_FLOOD = 9;
-const API_ERROR_METHOD_DISABLED = 23;
-const API_ERROR_RATE_LIMIT = 29;
-const API_ERROR_SERVER = 10;
-const API_ERROR_UNKNOWN = 1;
-const API_ERROR_USER_DEACTIVATED = 3610;
-const API_ERROR_UNKNOWN_USER = 39;
-
 import { getRandomInt, sleep } from '@vera-reforged/common';
+import {
+  API_ERROR_AUTH,
+  API_ERROR_CAPTCHA,
+  API_ERROR_FLOOD,
+  API_ERROR_METHOD_DISABLED,
+  API_ERROR_RATE_LIMIT,
+  API_ERROR_SECTION_DISABLED,
+  API_ERROR_SERVER,
+  API_ERROR_TOO_MANY,
+  API_ERROR_UNKNOWN,
+  API_ERROR_UNKNOWN_USER,
+  API_ERROR_USER_DEACTIVATED,
+  API_VERSION,
+} from '@example/api-schema-typescript';
 
+import { DebugService } from '../logger/debug.service';
 import {
   API_DEFAULT_TIMEOUT,
   API_GROUP_FIELDS,
@@ -28,6 +22,7 @@ import {
   API_MIN_RETRY_TIMEOUT,
   API_USER_FIELDS,
 } from './config';
+import { IVKApi } from './IVKApi';
 
 class Semaphore {
   private resources: number;
@@ -62,30 +57,30 @@ class Semaphore {
   }
 }
 
-@Injectable()
-export class VkApiService implements IVKApi.IVKApi {
-  private readonly logger: DebugService;
-  private readonly accessToken: string;
-  private readonly groupId: number;
+type RateLimitConfig = {
+  rateLimit: number;
+  rateLimitWindow: number;
+};
 
+export class VKApi implements IVKApi.IVKApi {
   private readonly semaphore: Semaphore;
   private readonly rateLimitWindow: number;
 
   private readonly abortTrackers: Map<IVKApi.TrackId<any>, () => void> =
     new Map();
 
-  public constructor(
-    @Inject(LoggerService) loggerService: LoggerService,
-    @Inject(ConfigService) private readonly config: ConfigService,
+  constructor(
+    private readonly logger: DebugService,
+    private readonly request: (
+      url: string,
+      params: Record<string, any>,
+      abortSignal?: AbortSignal,
+    ) => Promise<any>,
+    private readonly accessToken: string,
+    { rateLimit, rateLimitWindow }: RateLimitConfig,
   ) {
-    this.logger = new DebugService(loggerService, this.constructor.name);
-
-    this.semaphore = new Semaphore(5, 3000);
-    this.rateLimitWindow = 3000;
-
-    this.accessToken = this.config.get<IEnvironment['botToken']>('botToken');
-    this.groupId =
-      this.config.get<IEnvironment['botPollingGroupId']>('botPollingGroupId');
+    this.semaphore = new Semaphore(rateLimit, rateLimitWindow);
+    this.rateLimitWindow = rateLimitWindow;
   }
 
   public async fetch<
@@ -276,44 +271,32 @@ export class VkApiService implements IVKApi.IVKApi {
   ): Params => {
     const scope = method.slice(0, method.indexOf('.'));
 
-    let enrichedParams = params;
-
     switch (scope) {
       case 'users':
       case 'friends': {
-        enrichedParams = {
+        return {
           ...params,
           fields: API_USER_FIELDS.join(','),
         };
-        break;
       }
+
       case 'groups':
-        enrichedParams = {
+      case 'channels':
+        return {
           ...params,
           fields: API_GROUP_FIELDS.join(','),
         };
-        break;
 
       default:
-        break;
+        return 'extended' in params && params.extended
+          ? {
+              ...params,
+              fields: Array.from(
+                new Set([...API_USER_FIELDS, ...API_GROUP_FIELDS]),
+              ).join(','),
+            }
+          : params;
     }
-
-    if ('extended' in params && params.extended)
-      enrichedParams = {
-        ...enrichedParams,
-        fields: Array.from(
-          new Set([...API_USER_FIELDS, ...API_GROUP_FIELDS]),
-        ).join(','),
-      };
-
-    if ('group_id' in params && params.group_id) {
-      enrichedParams = {
-        ...enrichedParams,
-        group_id: this.groupId,
-      };
-    }
-
-    return enrichedParams;
   };
 
   private doFetch = async <Method extends keyof IVKApi.Request>(
@@ -346,7 +329,7 @@ export class VkApiService implements IVKApi.IVKApi {
         ctrl.abort();
       }, timeout);
 
-      const result = await request(url, enrichedParams, ctrl.signal)
+      const result = await this.request(url, enrichedParams, ctrl.signal)
         .catch((err: unknown) => {
           if (ctrl.signal.aborted) {
             if (isTimeout) {
@@ -403,33 +386,4 @@ export class VkApiService implements IVKApi.IVKApi {
       this.semaphore.release();
     }
   };
-}
-
-async function request(
-  url: string,
-  params: Record<string, any>,
-  abortSignal?: AbortSignal,
-): Promise<any> {
-  const headers = new Headers();
-  headers.append('Content-Type', 'application/x-www-form-urlencoded');
-
-  const formData = Object.keys(params).reduce((acc, param) => {
-    if (typeof params[param] !== 'undefined') {
-      acc.append(param, params[param]);
-    }
-    return acc;
-  }, new URLSearchParams());
-
-  const res = await fetch(url, {
-    method: 'POST',
-    headers,
-    signal: abortSignal,
-    body: formData,
-  });
-
-  if (!res.ok) {
-    throw new Error(`ServerError ${res.status}`);
-  }
-
-  return await res.json();
 }

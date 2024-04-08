@@ -10,10 +10,12 @@ import {
   IApi,
   IDuty,
 } from '@vera-reforged/common';
+import { MessagesGetConversationMembersResponse } from '@example/api-schema-typescript';
 
 import { DataSource, Repository } from 'typeorm';
 import { UsersUserFull } from 'vk-io/lib/api/schemas/objects';
 
+import { BotService } from '../bot/bot.service';
 import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
 import { LoggerService } from '../logger/logger.service';
@@ -27,6 +29,7 @@ export class DutyService {
   public constructor(
     private dataSource: DataSource,
     @InjectRepository(Duty) private readonly dutyRepository: Repository<Duty>,
+    @Inject(BotService) private readonly botService: BotService,
     @Inject(VkApiService) private readonly api: VkApiService,
     @Inject(ConfigService) private readonly config: ConfigService,
     @Inject(LoggerService) loggerService: LoggerService,
@@ -36,7 +39,7 @@ export class DutyService {
     const isListenerOff =
       this.config.get<IEnvironment['disableBotListener']>('disableBotListener');
 
-    this.api.botService.vk.updates.on('message_new', async (msg, next) => {
+    this.botService.vk.updates.on('message_new', async (msg, next) => {
       if (isListenerOff) {
         return next();
       }
@@ -84,7 +87,7 @@ export class DutyService {
   ) {
     const message = getAnnounceDutyMessage(schedule, tag, noDutyAtCurrentTime);
 
-    this.api.botService.vk.api.messages.send({
+    this.botService.vk.api.messages.send({
       peer_id: peerId,
       message,
       random_id: 0,
@@ -95,8 +98,14 @@ export class DutyService {
     );
   }
 
-  public async getMembersForChat(chatId: number) {
-    return this.api.getConversationMembers(chatId);
+  public async getMembersForChat(
+    chatId: number,
+  ): Promise<MessagesGetConversationMembersResponse> {
+    return this.api.fetch('messages.getConversationMembers', {
+      extended: 1,
+      peer_id: chatId,
+      group_id: 1,
+    });
   }
 
   public async getScheduleForChat(
@@ -127,7 +136,9 @@ export class DutyService {
     let users: UsersUserFull[] = [];
 
     try {
-      users = await this.api.getUsers(userIds);
+      users = await this.api.fetch('users.get', {
+        user_ids: userIds.join(','),
+      });
       this.logger.debug('Fetch successfull');
     } catch (e) {
       this.logger.error(`Couldn't fetch users, ${e}`);

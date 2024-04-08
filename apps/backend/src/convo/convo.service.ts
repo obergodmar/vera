@@ -16,7 +16,6 @@ export class ConvoService {
   private readonly logger: DebugService;
 
   public constructor(
-    @Inject(BotService) private readonly botServce: BotService,
     @Inject(VkApiService) private readonly api: VkApiService,
     @Inject(ConfigService) private readonly config: ConfigService,
     @Inject(SettingsService) private readonly settings: SettingsService,
@@ -42,57 +41,67 @@ export class ConvoService {
 
     const omitChats = [settingsChatId, errorChatId, debugChatId];
 
-    const items: Map<number, MessagesConversation> = new Map()
+    const items = []
     try {
       const ids = [...Array(convosAmount).keys()].map((i) => i + 1 + 2e9);
 
-      const convosPromises = ids
-        .filter(filterIds(omitChats))
-        .map(this.api.getConversationsById.bind(this.api));
+      const convosToFetch = ids.filter(filterIds(omitChats));
 
-      await Promise.allSettled(convosPromises).then((results) => {
-        results.forEach((result) => {
-          if (result.status === 'fulfilled') {
-            result.value.items.forEach((item) => {
-              items.set(item.peer.id, item)
-            })
-          }
-        });
-      });
+      const responses = this.api.fetchMany(
+        convosToFetch.map((peerId) => ({
+          method: 'messages.getConversationsById',
+          params: {
+            group_id: 1,
+            extended: 1,
+            peer_ids: `${peerId}`,
+          },
+        })),
+      );
+
+      console.log(responses)
+      // await Promise.allSettled(convosPromises).then((results) => {
+      //   results.forEach((result) => {
+      //     if (result.status === 'fulfilled') {
+      //       result.value.items.forEach((item) => {
+      //         items.set(item.peer.id, item);
+      //       });
+      //     }
+      //   });
+      // });
     } catch {
       // Chat doesn't exist
     }
 
-    const membersPromises = Array.from(items.values()).map(({ peer: { id } }) =>
-      this.api.getConversationMembers(id).then((result) => ({
-        result,
-        chatId: id,
-      })),
-    );
-
-    let realItems: MessagesConversation[] = []
-    await Promise.allSettled(membersPromises).then((results) => {
-      results.forEach((result) => {
-        if (result.status === 'fulfilled') {
-          if (
-            result.value.result.items.find(
-              ({ member_id }) => member_id === 900033,
-            )
-          ) {
-            realItems = [...realItems, items.get(result.value.chatId)]
-          }
-        }
-      });
-    });
+    // const membersPromises = Array.from(items.values()).map(({ peer: { id } }) =>
+    //   this.api.getConversationMembers(id).then((result) => ({
+    //     result,
+    //     chatId: id,
+    //   })),
+    // );
+    //
+    // let realItems: MessagesConversation[] = [];
+    // await Promise.allSettled(membersPromises).then((results) => {
+    //   results.forEach((result) => {
+    //     if (result.status === 'fulfilled') {
+    //       if (
+    //         result.value.result.items.find(
+    //           ({ member_id }) => member_id === 900033,
+    //         )
+    //       ) {
+    //         realItems = [...realItems, items.get(result.value.chatId)];
+    //       }
+    //     }
+    //   });
+    // });
 
     const callTime = finish(point);
     this.logger.debug(
-      `Loaded ${realItems.length} conversations. Took ${callTime} ms`,
+      `Loaded ${items.length} conversations. Took ${callTime} ms`,
     );
 
     return {
-      count: realItems.length,
-      items: realItems,
+      count: items.length,
+      items: items,
     };
   }
 }

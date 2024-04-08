@@ -5,11 +5,11 @@ import { IApi, IReactions } from '@vera-reforged/common';
 
 import { Repository } from 'typeorm';
 
+import { BotService } from '../bot/bot.service';
 import { DutyService } from '../duty/duty.service';
 import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
 import { LoggerService } from '../logger/logger.service';
-import { VkApiService } from '../vk-api/vk-api.service';
 import {
   CreateReactionForChatDto,
   UpdateReactionForChatDto,
@@ -24,7 +24,7 @@ export class ReactionsService {
     @InjectRepository(Reaction)
     private readonly reactionsRepository: Repository<Reaction>,
     @Inject(DutyService) private readonly dutyService: DutyService,
-    @Inject(VkApiService) private readonly api: VkApiService,
+    @Inject(BotService) private readonly botService: BotService,
     @Inject(ConfigService) private readonly config: ConfigService,
     @Inject(LoggerService) loggerService: LoggerService,
   ) {
@@ -33,7 +33,7 @@ export class ReactionsService {
     const isListenerOff =
       this.config.get<IEnvironment['disableBotListener']>('disableBotListener');
 
-    this.api.botService.vk.updates.on('message_new', async (msg, next) => {
+    this.botService.vk.updates.on('message_new', async (msg, next) => {
       if (isListenerOff) {
         return next();
       }
@@ -67,7 +67,7 @@ export class ReactionsService {
             `Found match "${textTrigger}" for reaction "${reaction}" in chat ${peerId}`,
           );
 
-          this.api.botService.vk.api.messages.send({
+          this.botService.vk.api.messages.send({
             peer_id: peerId,
             message: reaction,
             random_id: 0,

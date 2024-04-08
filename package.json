@@ -43,6 +43,7 @@
     "@nestjs/swagger": "7.1.1",
     "@nestjs/typeorm": "^10.0.0",
     "@reduxjs/toolkit": "1.9.3",
+    "@example/api-schema-typescript": "1.5226.9",
     "@vkontakte/api-schema-typescript": "^1.5131.2",
     "@vkontakte/icons": "^2.48.1",
     "@vkontakte/superappkit": "^1.61.2",

@@ -8,10 +8,10 @@ import { Repository } from 'typeorm';
 import { APIMessages } from 'vk-io/lib/api/schemas/methods';
 import { MessagesSendParams } from 'vk-io/lib/api/schemas/params';
 
+import { BotService } from '../bot/bot.service';
 import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
 import { LoggerService } from '../logger/logger.service';
-import { VkApiService } from '../vk-api/vk-api.service';
 import { CreateCronForChatDto, UpdateCronForChatDto } from './crons.dto';
 import { Cron } from './crons.entity';
 
@@ -24,7 +24,7 @@ export class CronsService {
   public constructor(
     @InjectRepository(Cron)
     private readonly cronsRepository: Repository<Cron>,
-    @Inject(VkApiService) private readonly api: VkApiService,
+    @Inject(BotService) private readonly botService: BotService,
     @Inject(ConfigService) private readonly config: ConfigService,
     @Inject(LoggerService) loggerService: LoggerService,
   ) {
@@ -38,7 +38,7 @@ export class CronsService {
         return;
       }
 
-      return this.api.botService.vk.api.messages.send(params);
+      return this.botService.vk.api.messages.send(params);
     };
 
     this.logger.debug('Crons initial load started');

@@ -1,9 +1,18 @@
 /* eslint-disable prefer-const */
+export type NonEmptyArray<T = any> = [T, ...T[]];
+
+export type Opaque<Type, Token = unknown> = Type & {
+  readonly __opaque__: Token;
+};
 
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
+}
+
+export function getRandomInt(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

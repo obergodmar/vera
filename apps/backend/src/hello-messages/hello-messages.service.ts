@@ -4,13 +4,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { IApi, IHelloMessages } from '@vera-reforged/common';
 
 import { DataSource, Repository } from 'typeorm';
-import { MessageContext } from 'vk-io';
 
+import { BotService } from '../bot/bot.service';
 import { ConvoService } from '../convo/convo.service';
 import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
 import { LoggerService } from '../logger/logger.service';
-import { VkApiService } from '../vk-api/vk-api.service';
 import { HelloMessage } from './hello-messages.entity';
 
 const SPAM_TIMEOUT = 1000;
@@ -24,7 +23,7 @@ export class HelloMessagesService {
     private readonly dataSource: DataSource,
     @InjectRepository(HelloMessage)
     private readonly hlRepository: Repository<HelloMessage>,
-    @Inject(VkApiService) private readonly api: VkApiService,
+    @Inject(BotService) private readonly botService: BotService,
     @Inject(LoggerService) loggerService: LoggerService,
     @Inject(ConvoService) private readonly convoService: ConvoService,
     @Inject(ConfigService) private readonly config: ConfigService,
@@ -34,7 +33,7 @@ export class HelloMessagesService {
     const isListenerOff =
       this.config.get<IEnvironment['disableBotListener']>('disableBotListener');
 
-    this.api.botService.vk.updates.on(
+    this.botService.vk.updates.on(
       'chat_invite_user',
       async (context, next) => {
         if (isListenerOff) {
@@ -57,7 +56,7 @@ export class HelloMessagesService {
             this.lock = null;
           }, SPAM_TIMEOUT);
 
-          this.api.botService.vk.api.messages.send({
+          this.botService.vk.api.messages.send({
             peer_id: peerId,
             message: helloMessage.message,
             random_id: 0,

@@ -42,8 +42,8 @@ export const dutyApi = createApi({
               id: userId,
               photo_100: avatar = '',
               screen_name: screenName = '',
-              first_name: firstName,
-              last_name: lastName,
+              first_name: firstName = '',
+              last_name: lastName = '',
             }) => ({
               label: `${firstName} ${lastName}`,
               value: userId,
