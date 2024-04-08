@@ -24,7 +24,7 @@ export const authorization = createSlice({
         authorized: true,
       };
     },
-    logOff: (state) => {
+    logOff: () => {
       window.localStorage.removeItem('token');
 
       return {

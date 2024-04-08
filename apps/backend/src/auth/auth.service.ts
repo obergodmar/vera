@@ -1,106 +1,91 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { IApi } from '@vera-reforged/common';
+import { UsersUser } from '@example/api-schema-typescript';
 
-import { BotService } from '../bot/bot.service';
+import { Request } from 'express';
+
 import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
 import { LoggerService } from '../logger/logger.service';
+import { request } from '../vk-api/request';
+import { VkApiService } from '../vk-api/vk-api.service';
 import { AuthDto } from './dto/auth.dto';
+
+declare module 'express-session' {
+  interface SessionData {
+    user: UsersUser;
+    token: string;
+  }
+}
 
 @Injectable()
 export class AuthService {
   private readonly appId: number;
-  private readonly token: string
   private readonly serviceKey: string;
   private readonly logger: DebugService;
 
   public constructor(
-    @Inject(BotService) private readonly botService: BotService,
     @Inject(LoggerService) loggerService: LoggerService,
+    @Inject(VkApiService) private readonly vkApi: VkApiService,
     @Inject(ConfigService) config: ConfigService,
   ) {
     this.logger = new DebugService(loggerService, this.constructor.name);
 
     this.appId = config.get<IEnvironment['appId']>('appId');
     this.serviceKey = config.get<IEnvironment['serviceKey']>('serviceKey');
-    this.token = config.get<IEnvironment['authorizationToken']>('authorizationToken');
   }
 
-  public async authorize(authorizeDto: AuthDto) {
+  public async authorize(
+    authorizeDto: AuthDto,
+    req: Request,
+  ): Promise<IApi.IAuthApi.AuthResponse> {
+    const { sessionStore, session } = req;
     const { token, uuid, user } = authorizeDto.data;
 
     this.logger.log(
       `Auth request from id ${user.id} ${user.first_name} ${user.last_name}`,
     );
 
-    const params = `app_id=${this.appId}&access_token=${encodeURIComponent(
-      this.serviceKey,
-    )}&v=5.191&token=${encodeURIComponent(token)}&uuid=${encodeURIComponent(
-      uuid,
-    )}`;
-
-    console.log(params);
-
+    let result: { response: { access_token: string } };
     try {
-      const result = await fetch(
-        'https://api.vk.com/method/auth.exchangeSilentAuthToken?' + params,
+      result = await request(
+        'https://api.vk.com/method/auth.exchangeSilentAuthToken?v=5.191',
         {
-          method: 'POST',
+          app_id: this.appId,
+          access_token: this.serviceKey,
+          token,
+          uuid,
         },
-      ).then((res) => res.json());
+      );
 
-      console.log(result);
+      const userToken = result.response.access_token;
+
+      const userResponse = await this.vkApi.fetchWithUserToken('users.get', {
+        access_token: userToken,
+      });
+      const user = userResponse[0];
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      const createdSession = sessionStore.createSession(req, {
+        cookie: session.cookie,
+        user,
+        token: result.response.access_token,
+      });
+
+      this.logger.debug(`Session created with id = ${createdSession.id}`);
     } catch (err: unknown) {
-      console.error(err);
-    }
+      this.logger.error(`Authorization error: ${err}`);
 
+      return { token: '', error: 'Ошибка авторизации' };
+    }
     this.logger.debug('Authenticated successfully');
 
     return {
-      token: this.token,
+      success: true,
+      token: result.response.access_token,
     };
   }
 }
-
-// function doAuthorize(req, res) {
-//   console.log(req);
-//
-//   const { token, uuid, user } = req.body;
-//
-//   const params = `app_id=${APP_ID}&access_token=${encodeURIComponent(
-//     SERVICE_KEY,
-//   )}&v=5.191&token=${encodeURIComponent(token)}&uuid=${encodeURIComponent(
-//     uuid,
-//   )}`;
-//
-//   fetch('https://api.vk.com/method/auth.exchangeSilentAuthToken?' + params, {
-//     method: 'POST',
-//   })
-//     .then((res) => res.json())
-//     .then(async (result) => {
-//       const accessToken = result.response && result.response.access_token;
-//       const isPartialToken = result.response && result.response.is_partial;
-//       if (!accessToken) {
-//         console.log('Silent token exchanging error.', result.error);
-//       }
-//       res.setHeader('Content-Type', 'application/json');
-//       let userProfile;
-//       if (user) {
-//         userProfile = await getUsersGetUser(accessToken);
-//         console.log('User is: ', JSON.stringify(userProfile));
-//       }
-//       res.send(
-//         JSON.stringify({
-//           superapp_token: makeSuperAppToken(accessToken),
-//           superapp_token_v2: makeSuperAppToken2(
-//             accessToken,
-//             'superappkit-web',
-//             { scope: ['messenger'] },
-//           ),
-//           is_partial: isPartialToken,
-//           user: userProfile,
-//         }),
-//       );
-//     })
-//     .catch(console.error);
-// }

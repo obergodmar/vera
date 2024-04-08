@@ -27,6 +27,7 @@ import {
   RATE_LINIT,
 } from './config';
 import { IVKApi } from './IVKApi';
+import { request } from './request';
 
 class Semaphore {
   private resources: number;
@@ -85,6 +86,17 @@ export class VkApiService implements IVKApi.IVKApi {
     this.accessToken = this.config.get<IEnvironment['botToken']>('botToken');
     this.groupId =
       this.config.get<IEnvironment['botPollingGroupId']>('botPollingGroupId');
+  }
+
+  public async fetchWithUserToken<
+    Method extends keyof IVKApi.Request,
+    TrackIdMethod extends Method = Method,
+  >(
+    method: Method,
+    params: IVKApi.Request[Method]['params'] & { access_token: string },
+    opts: IVKApi.Options<TrackIdMethod> = {},
+  ): Promise<IVKApi.Request[Method]['response']> {
+    return this.fetch(method, params, opts);
   }
 
   public async fetch<
@@ -326,8 +338,10 @@ export class VkApiService implements IVKApi.IVKApi {
     try {
       this.logger.debug(`[API] Request: ${method}`);
 
+      const userToken = 'access_token' in params && params.access_token;
+
       const enrichedParams = {
-        access_token: this.accessToken,
+        access_token: userToken || this.accessToken,
         ...this.enrichParams(method, params),
       };
       const version = API_VERSION;
@@ -390,33 +404,4 @@ export class VkApiService implements IVKApi.IVKApi {
       this.semaphore.release();
     }
   };
-}
-
-async function request(
-  url: string,
-  params: Record<string, any>,
-  abortSignal?: AbortSignal,
-): Promise<any> {
-  const headers = new Headers();
-  headers.append('Content-Type', 'application/x-www-form-urlencoded');
-
-  const formData = Object.keys(params).reduce((acc, param) => {
-    if (typeof params[param] !== 'undefined') {
-      acc.append(param, params[param]);
-    }
-    return acc;
-  }, new URLSearchParams());
-
-  const res = await fetch(url, {
-    method: 'POST',
-    headers,
-    signal: abortSignal,
-    body: formData,
-  });
-
-  if (!res.ok) {
-    throw new Error(`ServerError ${res.status}`);
-  }
-
-  return await res.json();
 }

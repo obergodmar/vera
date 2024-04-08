@@ -24,6 +24,10 @@ export interface IEnvironment {
    */
   port: number;
   /**
+   * Уникальная строка для сессий
+   */
+  secret: string;
+  /**
    * Настройки подключения к базе данных
    * mysql
    */
@@ -49,17 +53,6 @@ export interface IEnvironment {
    * =================
    * Настройки админки
    */
-
-  /**
-   * Хэш для пароля админки
-   */
-  authorizationHash: string;
-  /**
-   * Токен авторизации для админки.
-   * TODO: сделать его рандомным
-   */
-  authorizationToken: string;
-
   /**
    * Айди чата, в котором меняются настройки для бота.
    */
@@ -77,6 +70,6 @@ export interface IEnvironment {
    * ======================
    * Данные для авторизации
    */
-  appId: number
-  serviceKey: string
+  appId: number;
+  serviceKey: string;
 }

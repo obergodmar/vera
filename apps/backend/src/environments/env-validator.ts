@@ -26,6 +26,9 @@ export class Environment implements IEnvironment {
   port: number;
   @IsString()
   @IsNotEmpty()
+  secret: string;
+  @IsString()
+  @IsNotEmpty()
   dbHost: string;
   @IsNumber()
   dbPort: number;
@@ -56,12 +59,6 @@ export class Environment implements IEnvironment {
    * =================
    * Настройки админки
    */
-  @IsString()
-  @IsNotEmpty()
-  authorizationHash: string;
-  @IsString()
-  @IsNotEmpty()
-  authorizationToken: string;
   @IsNumber()
   settingsChatId: number;
   @IsNumber()

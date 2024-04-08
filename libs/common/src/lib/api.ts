@@ -31,7 +31,7 @@ export namespace IApi {
     export type AuthRequest = {
       data: { token: string; uuid: string; user: VKSilentUser };
     };
-    export type AuthResponse = { token: string };
+    export type AuthResponse = StatusResponse & { token: string };
   }
 
   export namespace IConvoApi {

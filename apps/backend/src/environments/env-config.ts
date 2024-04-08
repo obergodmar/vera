@@ -36,6 +36,9 @@ function parseEnvVariables(): Partial<IEnvironment> {
   if (env.PORT) {
     envVariables.port = parseInt(env.PORT);
   }
+  if (env.SECRET) {
+    envVariables.secret = env.SECRET;
+  }
   if (env.DB_HOST) {
     envVariables.dbHost = env.DB_HOST;
   }
@@ -70,12 +73,6 @@ function parseEnvVariables(): Partial<IEnvironment> {
    * =================
    * Настройки админки
    */
-  if (env.AUTHORIZATION_HASH) {
-    envVariables.authorizationHash = env.AUTHORIZATION_HASH;
-  }
-  if (env.AUTHORIZATION_TOKEN) {
-    envVariables.authorizationToken = env.AUTHORIZATION_TOKEN;
-  }
   if (env.SETTINGS_CHAT_ID) {
     envVariables.settingsChatId = parseInt(env.SETTINGS_CHAT_ID);
   }

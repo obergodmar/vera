@@ -28,7 +28,7 @@ const snackbar = createSnackbar();
 
 const rtkQueryErrorLogger: ThunkMiddleware = () => (dispatch) => (action) => {
   if (isRejectedWithValue(action) || action?.payload?.error) {
-    if (action?.payload?.originalStatus === 401) {
+    if (action?.payload?.status === 401) {
       dispatch(logOff());
     }
 

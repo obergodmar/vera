@@ -21,7 +21,7 @@ export function encrypt(text: string, key: string): string {
 
   return Buffer.concat([signature, encrypted]).toString('base64');
 }
-export function decrypt(text:string, key: string): string {
+export function decrypt(text: string, key: string): string {
   const keyBuffer = prepareKey(key);
   const textBuffer = Buffer.from(text, 'base64');
 
@@ -54,7 +54,10 @@ function hmac(data: Buffer, key: Buffer): Buffer {
   return createHmac('sha256', key).update(data).digest();
 }
 
-export function makeSuperAppToken(serviceKey: string, accessToken: string): string {
+export function makeSuperAppToken(
+  serviceKey: string,
+  accessToken: string,
+): string {
   const now = Math.floor(Date.now() / 1000);
   const then = now + 3600;
 

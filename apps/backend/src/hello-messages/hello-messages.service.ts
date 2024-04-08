@@ -33,43 +33,40 @@ export class HelloMessagesService {
     const isListenerOff =
       this.config.get<IEnvironment['disableBotListener']>('disableBotListener');
 
-    this.botService.vk.updates.on(
-      'chat_invite_user',
-      async (context, next) => {
-        if (isListenerOff) {
-          return next();
+    this.botService.vk.updates.on('chat_invite_user', async (context, next) => {
+      if (isListenerOff) {
+        return next();
+      }
+
+      const { peerId } = context;
+
+      this.logger.debug(`chat_invite_user update in ${peerId}`);
+
+      try {
+        const helloMessage = await this.hlRepository.findOneBy({
+          chatId: peerId,
+        });
+        if (!helloMessage || this.lock) {
+          return;
         }
 
-        const { peerId } = context;
+        this.lock = setTimeout(() => {
+          this.lock = null;
+        }, SPAM_TIMEOUT);
 
-        this.logger.debug(`chat_invite_user update in ${peerId}`);
+        this.botService.vk.api.messages.send({
+          peer_id: peerId,
+          message: helloMessage.message,
+          random_id: 0,
+        });
 
-        try {
-          const helloMessage = await this.hlRepository.findOneBy({
-            chatId: peerId,
-          });
-          if (!helloMessage || this.lock) {
-            return;
-          }
-
-          this.lock = setTimeout(() => {
-            this.lock = null;
-          }, SPAM_TIMEOUT);
-
-          this.botService.vk.api.messages.send({
-            peer_id: peerId,
-            message: helloMessage.message,
-            random_id: 0,
-          });
-
-          this.logger.debug(
-            `Successfully answered to ${peerId} with ${helloMessage.message}`,
-          );
-        } catch (e) {
-          this.logger.error(`Couldn't answer for update in ${peerId}: ${e}`);
-        }
-      },
-    );
+        this.logger.debug(
+          `Successfully answered to ${peerId} with ${helloMessage.message}`,
+        );
+      } catch (e) {
+        this.logger.error(`Couldn't answer for update in ${peerId}: ${e}`);
+      }
+    });
   }
 
   public async getHelloMessages(): Promise<IApi.IHelloMessagesApi.GetHelloMessagesResponse> {

@@ -9,6 +9,7 @@ export const environment: IEnvironment = {
   disableBotListener: false,
   address: '127.0.0.1',
   port: 4256,
+  secret: '',
   dbHost: 'localhost',
   dbPort: 3306,
   dbName: '',
@@ -27,8 +28,6 @@ export const environment: IEnvironment = {
    * =================
    * Настройки админки
    */
-  authorizationHash: '',
-  authorizationToken: '',
   settingsChatId: 0,
   debugChatId: 0,
   errorChatId: 0,
@@ -38,5 +37,5 @@ export const environment: IEnvironment = {
    * Данные для авторизации
    */
   appId: 0,
-  serviceKey: ''
+  serviceKey: '',
 };

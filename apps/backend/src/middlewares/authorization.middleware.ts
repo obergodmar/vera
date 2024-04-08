@@ -1,36 +1,58 @@
 import { Inject, Injectable, NestMiddleware } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 
 import { NextFunction, Request, Response } from 'express';
+import { SessionData } from 'express-session';
 
-import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
 import { LoggerService } from '../logger/logger.service';
+import { VkApiService } from '../vk-api/vk-api.service';
 
 @Injectable()
 export class AuthorizationMiddleware implements NestMiddleware {
   private readonly logger: DebugService;
 
   public constructor(
-    @Inject(ConfigService) private readonly config: ConfigService,
+    @Inject(VkApiService) private readonly vkApi: VkApiService,
     @Inject(LoggerService) loggerService: LoggerService,
   ) {
     this.logger = new DebugService(loggerService, this.constructor.name);
   }
 
-  use(req: Request, res: Response, next: NextFunction) {
-    const authorizationToken =
-      this.config.get<IEnvironment['authorizationToken']>('authorizationToken');
-    if (!authorizationToken) {
-      throw Error('AUTHORIZATION_TOKEN is empty');
-    }
+  async use(req: Request, res: Response, next: NextFunction) {
+    const { body, session, sessionStore } = req;
 
-    const { body } = req;
+    try {
+      const userResponse = await this.vkApi.fetchWithUserToken('users.get', {
+        access_token: body.token,
+      });
+      const user = userResponse[0];
+      if (!user) {
+        throw new Error('User not found');
+      }
 
-    if (body?.token !== authorizationToken) {
-      this.logger.debug('Token is missing or invalid');
+      const { user: savedUser, token } = await new Promise<SessionData>(
+        (resolve, reject) => {
+          sessionStore.get(session.id, (err, existingSession) => {
+            if (err) {
+              return reject(err);
+            }
 
-      res.status(401).send('Токен авторизации пуст или невалиден');
+            if (!existingSession) {
+              return reject('Session was not found');
+            }
+
+            return resolve(existingSession);
+          });
+        },
+      );
+
+      if (savedUser.id !== user.id || body.token !== token) {
+        throw new Error('Data missmatched');
+      }
+    } catch (error: unknown) {
+      res.status(401).send({ error: 'Сессия устарела' });
+
+      this.logger.debug(`Error: ${error}`);
 
       return;
     }
