@@ -81,6 +81,9 @@ export class AuthMiddleware implements NestMiddleware {
       ) {
         throw new Error('User is not in access chat');
       }
+
+      // Update user profile
+      // sessionStore.set(session.id, { token, user, cookie: session.cookie });
     } catch (error: unknown) {
       res.status(401).send({ error: 'Сессия устарела' });
 
