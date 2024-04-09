@@ -82,6 +82,15 @@ function parseEnvVariables(): Partial<IEnvironment> {
   if (env.ERROR_CHAT_ID) {
     envVariables.errorChatId = parseInt(env.ERROR_CHAT_ID);
   }
+  if (env.AUTH_CHAT_ID) {
+    envVariables.authChatId = parseInt(env.AUTH_CHAT_ID);
+  }
+  if (env.ACCESS_CHAT_ID) {
+    envVariables.accessChatId = parseInt(env.ACCESS_CHAT_ID);
+  }
+  if (env.ADMIN_CHAT_ID) {
+    envVariables.adminChatId = parseInt(env.ADMIN_CHAT_ID);
+  }
 
   /**
    * ======================

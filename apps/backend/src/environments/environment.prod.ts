@@ -31,6 +31,9 @@ export const environment: IEnvironment = {
   settingsChatId: 0,
   debugChatId: 0,
   errorChatId: 0,
+  authChatId: 0,
+  accessChatId: 0,
+  adminChatId: 0,
 
   /**
    * ======================

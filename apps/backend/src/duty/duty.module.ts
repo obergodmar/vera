@@ -2,7 +2,7 @@ import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ConvoModule } from '../convo/convo.module';
-import { AuthorizationMiddleware } from '../middlewares/authorization.middleware';
+import { AuthMiddleware } from '../middlewares/auth.middleware';
 import { DutyController } from './duty.controller';
 import { Duty } from './duty.entity';
 import { DutyService } from './duty.service';
@@ -15,6 +15,6 @@ import { DutyService } from './duty.service';
 })
 export class DutyModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthorizationMiddleware).forRoutes(DutyController);
+    consumer.apply(AuthMiddleware).forRoutes(DutyController);
   }
 }

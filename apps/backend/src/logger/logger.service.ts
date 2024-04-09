@@ -1,15 +1,15 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { createLog } from '@vera-reforged/common';
+import { createLog, getRandomId } from '@vera-reforged/common';
 
-import { BotService } from '../bot/bot.service';
 import { IEnvironment } from '../environments/env-type';
 import { SettingsService } from '../settings/settings.service';
+import { VkApiService } from '../vk-api/vk-api.service';
 
 @Injectable()
 export class LoggerService {
   public constructor(
-    @Inject(BotService) private readonly bot: BotService,
+    @Inject(VkApiService) private readonly vkApi: VkApiService,
     @Inject(ConfigService) private readonly config: ConfigService,
     @Inject(SettingsService) private readonly settings: SettingsService,
   ) {}
@@ -47,13 +47,33 @@ export class LoggerService {
     this.sendLog(message, debugChatId);
   }
 
+  public custom(where: 'auth', value: unknown): void {
+    let chatId: number;
+    switch (where) {
+      case 'auth':
+        chatId = this.config.get<IEnvironment['authChatId']>('authChatId');
+        break;
+      default:
+        break;
+    }
+
+    const message = createLog(value, { type: 'log' });
+    Logger.log(value);
+    this.sendLog(message, chatId);
+  }
+
   private sendLog(message: string, peerId: number): void {
     try {
-      this.bot.vk.api.messages.send({
-        peer_id: peerId,
-        message,
-        random_id: 0,
-      });
+      this.vkApi.fetch(
+        'messages.send',
+        {
+          peer_id: peerId,
+          message,
+          group_id: 1,
+          random_id: getRandomId(),
+        },
+        { retries: 3 },
+      );
     } catch (e) {
       Logger.error(e);
     }

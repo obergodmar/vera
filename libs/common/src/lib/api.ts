@@ -1,7 +1,7 @@
 import { VKSilentUser } from '@vkontakte/superappkit';
 import { MessagesGetConversationMembersResponse } from '@example/api-schema-typescript';
 
-import { MessagesConversation } from 'vk-io/lib/api/schemas/objects';
+import { MessagesConversation, UsersUser } from 'vk-io/lib/api/schemas/objects';
 
 import { ICrons } from './crons';
 import { IDuty } from './duty';
@@ -31,7 +31,10 @@ export namespace IApi {
     export type AuthRequest = {
       data: { token: string; uuid: string; user: VKSilentUser };
     };
-    export type AuthResponse = StatusResponse & { token: string };
+    export type AuthResponse = StatusResponse & {
+      token: string;
+      user: UsersUser | null;
+    };
   }
 
   export namespace IConvoApi {
@@ -41,7 +44,7 @@ export namespace IApi {
 
   export namespace IDutyApi {
     export type GetMembersForChatRequest = TokenRequest<WithChatId>;
-    export type GetMembersForChatResponse =
+    export type GetMembersForChatResponse = StatusResponse &
       MessagesGetConversationMembersResponse;
 
     export type GetDaysRequest = TokenRequest;

@@ -1,6 +1,6 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 
-import { AuthorizationMiddleware } from '../middlewares/authorization.middleware';
+import { AuthMiddleware } from '../middlewares/auth.middleware';
 import { ConvoController } from './convo.controller';
 import { ConvoService } from './convo.service';
 
@@ -11,6 +11,6 @@ import { ConvoService } from './convo.service';
 })
 export class ConvoModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthorizationMiddleware).forRoutes(ConvoController);
+    consumer.apply(AuthMiddleware).forRoutes(ConvoController);
   }
 }

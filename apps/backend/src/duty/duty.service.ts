@@ -7,6 +7,7 @@ import {
   filterScheduleByDayAndTime,
   getAnnounceDutyMessage,
   getDayMonthTime,
+  getRandomId,
   IApi,
   IDuty,
 } from '@vera-reforged/common';
@@ -30,7 +31,7 @@ export class DutyService {
     private dataSource: DataSource,
     @InjectRepository(Duty) private readonly dutyRepository: Repository<Duty>,
     @Inject(BotService) private readonly botService: BotService,
-    @Inject(VkApiService) private readonly api: VkApiService,
+    @Inject(VkApiService) private readonly vkApi: VkApiService,
     @Inject(ConfigService) private readonly config: ConfigService,
     @Inject(LoggerService) loggerService: LoggerService,
   ) {
@@ -79,19 +80,29 @@ export class DutyService {
     this.announceDuty.call(this, peerId, schedule, tag, noDutyAtCurrentTime);
   }
 
-  private announceDuty(
+  private async announceDuty(
     peerId: number,
     schedule: IDuty.Schedule[],
     tag: string | null,
     noDutyAtCurrentTime: boolean,
-  ) {
-    const message = getAnnounceDutyMessage(schedule, tag, noDutyAtCurrentTime);
+  ): Promise<void> {
+    let message: string;
+    try {
+      message = getAnnounceDutyMessage(schedule, tag, noDutyAtCurrentTime);
 
-    this.botService.vk.api.messages.send({
-      peer_id: peerId,
-      message,
-      random_id: 0,
-    });
+      await this.vkApi.fetch(
+        'messages.send',
+        {
+          peer_id: peerId,
+          message,
+          random_id: getRandomId(),
+          group_id: 1,
+        },
+        { retries: 3 },
+      );
+    } catch (error: unknown) {
+      this.logger.error(`announceDuty: ${error}`);
+    }
 
     this.logger.debug(
       `Duty was requested in ${peerId}.\nMessage was sent: ${message}`,
@@ -100,12 +111,31 @@ export class DutyService {
 
   public async getMembersForChat(
     chatId: number,
-  ): Promise<MessagesGetConversationMembersResponse> {
-    return this.api.fetch('messages.getConversationMembers', {
-      extended: 1,
-      peer_id: chatId,
-      group_id: 1,
-    });
+  ): Promise<IApi.IDutyApi.GetMembersForChatResponse> {
+    let response: MessagesGetConversationMembersResponse;
+    try {
+      response = await this.vkApi.fetch(
+        'messages.getConversationMembers',
+        {
+          extended: 1,
+          peer_id: chatId,
+          group_id: 1,
+        },
+        {
+          retries: 3,
+        },
+      );
+    } catch (error: unknown) {
+      this.logger.error(`getMembersForChat: ${error}`);
+
+      return {
+        items: [],
+        count: 0,
+        error: 'Что-то пошло не так',
+      };
+    }
+
+    return response;
   }
 
   public async getScheduleForChat(
@@ -136,9 +166,14 @@ export class DutyService {
     let users: UsersUserFull[] = [];
 
     try {
-      users = await this.api.fetch('users.get', {
-        user_ids: userIds.join(','),
-      });
+      users = await this.vkApi.fetch(
+        'users.get',
+        {
+          user_ids: userIds.join(','),
+        },
+        { retries: 3 },
+      );
+
       this.logger.debug('Fetch successfull');
     } catch (e) {
       this.logger.error(`Couldn't fetch users, ${e}`);

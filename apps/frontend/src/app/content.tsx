@@ -4,6 +4,7 @@ import {
   Panel,
   PanelHeader,
   PanelHeaderBack,
+  PanelHeaderContent,
   SplitCol,
   SplitLayout,
   useAdaptivityConditionalRender,
@@ -13,7 +14,7 @@ import {
 } from '@vkontakte/vkui';
 
 import { FC, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import { ModalCancel } from '../components/modal-cancel';
@@ -22,12 +23,15 @@ import { PanelItem, panels } from '../components/panels';
 import { VERA_AVATAR_50 } from '../data/constants';
 import { resetSchedule } from '../data/reducers/duty';
 import { resetHelloMessages } from '../data/reducers/hello-messages';
+import { RootState } from '../data/store';
 import { ModalProvider, modalsIds } from '../hooks/useModal';
 
 export const Content: FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+
+  const user = useSelector((state: RootState) => state.authorization.user);
 
   const { viewWidth } = useAdaptivityConditionalRender();
   const { viewWidth: width } = useAdaptivityWithJSMediaQueries();
@@ -137,7 +141,12 @@ export const Content: FC = () => {
                   )
                 }
               >
-                {label}
+                <PanelHeaderContent
+                  before={<Avatar size={36} src={user?.photo_100} />}
+                  status={`Пользователь: ${user?.first_name} ${user?.last_name}`}
+                >
+                  {label}
+                </PanelHeaderContent>
               </PanelHeader>
 
               <Outlet />

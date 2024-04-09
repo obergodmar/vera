@@ -1,8 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IApi, IHelloMessages } from '@vera-reforged/common';
+import { getRandomId, IApi, IHelloMessages } from '@vera-reforged/common';
 
+import { Request } from 'express';
 import { DataSource, Repository } from 'typeorm';
 
 import { BotService } from '../bot/bot.service';
@@ -10,6 +11,7 @@ import { ConvoService } from '../convo/convo.service';
 import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
 import { LoggerService } from '../logger/logger.service';
+import { VkApiService } from '../vk-api/vk-api.service';
 import { HelloMessage } from './hello-messages.entity';
 
 const SPAM_TIMEOUT = 1000;
@@ -24,6 +26,7 @@ export class HelloMessagesService {
     @InjectRepository(HelloMessage)
     private readonly hlRepository: Repository<HelloMessage>,
     @Inject(BotService) private readonly botService: BotService,
+    @Inject(VkApiService) private readonly vkApi: VkApiService,
     @Inject(LoggerService) loggerService: LoggerService,
     @Inject(ConvoService) private readonly convoService: ConvoService,
     @Inject(ConfigService) private readonly config: ConfigService,
@@ -54,11 +57,20 @@ export class HelloMessagesService {
           this.lock = null;
         }, SPAM_TIMEOUT);
 
-        this.botService.vk.api.messages.send({
-          peer_id: peerId,
-          message: helloMessage.message,
-          random_id: 0,
-        });
+        try {
+          await this.vkApi.fetch(
+            'messages.send',
+            {
+              peer_id: peerId,
+              message: helloMessage.message,
+              random_id: getRandomId(),
+              group_id: 1,
+            },
+            { retries: 3 },
+          );
+        } catch (error: unknown) {
+          this.logger.error(`Could not send message: ${error}`);
+        }
 
         this.logger.debug(
           `Successfully answered to ${peerId} with ${helloMessage.message}`,
@@ -69,12 +81,14 @@ export class HelloMessagesService {
     });
   }
 
-  public async getHelloMessages(): Promise<IApi.IHelloMessagesApi.GetHelloMessagesResponse> {
+  public async getHelloMessages(
+    req: Request,
+  ): Promise<IApi.IHelloMessagesApi.GetHelloMessagesResponse> {
     this.logger.debug('Hello messages were requested');
 
     try {
       const messages = await this.hlRepository.find();
-      const convos = await this.convoService.getChats();
+      const convos = await this.convoService.getChats(req);
 
       const convosWithMessages = messages.reduce(
         (

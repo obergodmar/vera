@@ -6,9 +6,12 @@ import {
   MessagesGetConversationMembersResponse,
   MessagesGetConversationsByIdExtendedResponse,
   MessagesGetConversationsByIdParams,
+  MessagesSendParams,
   UsersGetParams,
   UsersGetResponse,
 } from '@example/api-schema-typescript';
+
+import { MessagesSendResponse } from 'vk-io/lib/api/schemas/responses';
 
 export namespace IVKApi {
   export interface IVKApi {
@@ -60,6 +63,11 @@ export namespace IVKApi {
     execute: {
       params: { code: string };
       response: any;
+    };
+
+    'messages.send': {
+      params: MessagesSendParams;
+      response: MessagesSendResponse;
     };
 
     'messages.getConversationsById': {

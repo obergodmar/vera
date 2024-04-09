@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IApi, IReactions } from '@vera-reforged/common';
+import { getRandomId, IApi, IReactions } from '@vera-reforged/common';
 
 import { Repository } from 'typeorm';
 
@@ -10,6 +10,7 @@ import { DutyService } from '../duty/duty.service';
 import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
 import { LoggerService } from '../logger/logger.service';
+import { VkApiService } from '../vk-api/vk-api.service';
 import {
   CreateReactionForChatDto,
   UpdateReactionForChatDto,
@@ -23,6 +24,7 @@ export class ReactionsService {
   public constructor(
     @InjectRepository(Reaction)
     private readonly reactionsRepository: Repository<Reaction>,
+    @Inject(VkApiService) private readonly vkApi: VkApiService,
     @Inject(DutyService) private readonly dutyService: DutyService,
     @Inject(BotService) private readonly botService: BotService,
     @Inject(ConfigService) private readonly config: ConfigService,
@@ -48,7 +50,7 @@ export class ReactionsService {
         this.logger.error(`Failed to get reactions for chat ${peerId}: ${e}`);
       }
 
-      reactions.forEach((reactionItem) => {
+      reactions.forEach(async (reactionItem) => {
         const { textTrigger, reaction, callDuty, dutyTag } = reactionItem;
 
         let regexp: RegExp;
@@ -67,16 +69,25 @@ export class ReactionsService {
             `Found match "${textTrigger}" for reaction "${reaction}" in chat ${peerId}`,
           );
 
-          this.botService.vk.api.messages.send({
-            peer_id: peerId,
-            message: reaction,
-            random_id: 0,
-            forward: JSON.stringify({
-              peer_id: peerId,
-              is_reply: true,
-              conversation_message_ids: conversationMessageId,
-            }),
-          });
+          try {
+            await this.vkApi.fetch(
+              'messages.send',
+              {
+                peer_id: peerId,
+                message: reaction,
+                random_id: getRandomId(),
+                group_id: 1,
+                forward: JSON.stringify({
+                  peer_id: peerId,
+                  is_reply: true,
+                  conversation_message_ids: conversationMessageId,
+                }),
+              },
+              { retries: 3 },
+            );
+          } catch (error: unknown) {
+            this.logger.error(`Reactions messages send: ${error}`);
+          }
 
           if (callDuty) {
             this.dutyService.lookForDutyAndAnnounce(peerId, dutyTag || null);

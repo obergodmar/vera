@@ -21,9 +21,12 @@ declare module 'express-session' {
 
 @Injectable()
 export class AuthService {
+  private readonly logger: DebugService;
+
   private readonly appId: number;
   private readonly serviceKey: string;
-  private readonly logger: DebugService;
+
+  private readonly accessChatId: number;
 
   public constructor(
     @Inject(LoggerService) loggerService: LoggerService,
@@ -34,6 +37,9 @@ export class AuthService {
 
     this.appId = config.get<IEnvironment['appId']>('appId');
     this.serviceKey = config.get<IEnvironment['serviceKey']>('serviceKey');
+
+    this.accessChatId =
+      config.get<IEnvironment['accessChatId']>('accessChatId');
   }
 
   public async authorize(
@@ -43,11 +49,12 @@ export class AuthService {
     const { sessionStore, session } = req;
     const { token, uuid, user } = authorizeDto.data;
 
-    this.logger.log(
-      `Auth request from id ${user.id} ${user.first_name} ${user.last_name}`,
-    );
+    const visitor = `@id${user.id} (${user.first_name} ${user.last_name})`;
+
+    this.logger.auth(`Auth attempt from ${visitor}`);
 
     let result: { response: { access_token: string } };
+    let requestedUser: UsersUser;
     try {
       result = await request(
         'https://api.vk.com/method/auth.exchangeSilentAuthToken?v=5.191',
@@ -61,31 +68,57 @@ export class AuthService {
 
       const userToken = result.response.access_token;
 
-      const userResponse = await this.vkApi.fetchWithUserToken('users.get', {
-        access_token: userToken,
-      });
-      const user = userResponse[0];
-      if (!user) {
+      const userResponse = await this.vkApi.fetchWithUserToken(
+        'users.get',
+        {
+          access_token: userToken,
+        },
+        { retries: 3 },
+      );
+      requestedUser = userResponse[0];
+      if (!requestedUser) {
         throw new Error('User not found');
       }
 
-      const createdSession = sessionStore.createSession(req, {
-        cookie: session.cookie,
-        user,
-        token: result.response.access_token,
-      });
+      const chatMembers = await this.vkApi.fetch(
+        'messages.getConversationMembers',
+        {
+          group_id: 1,
+          peer_id: this.accessChatId,
+          extended: 0,
+        },
+        {
+          retries: 3,
+        },
+      );
 
-      this.logger.debug(`Session created with id = ${createdSession.id}`);
+      if (
+        chatMembers.items.find(
+          ({ member_id: memberId }) => memberId === requestedUser.id,
+        )
+      ) {
+        const createdSession = sessionStore.createSession(req, {
+          cookie: session.cookie,
+          user: requestedUser,
+          token: result.response.access_token,
+        });
+
+        this.logger.debug(`Session created with id = ${createdSession.id}`);
+      } else {
+        throw new Error(`Visitor ${visitor} was not found in access chat`);
+      }
     } catch (err: unknown) {
-      this.logger.error(`Authorization error: ${err}`);
+      this.logger.auth(`Error: ${visitor} - ${err}`);
 
-      return { token: '', error: 'Ошибка авторизации' };
+      return { token: '', user: null, error: 'Ошибка авторизации' };
     }
-    this.logger.debug('Authenticated successfully');
+
+    this.logger.auth(`Auth for ${visitor} was successful`);
 
     return {
       success: true,
       token: result.response.access_token,
+      user: requestedUser,
     };
   }
 }

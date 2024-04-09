@@ -1,7 +1,7 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { AuthorizationMiddleware } from '../middlewares/authorization.middleware';
+import { AuthMiddleware } from '../middlewares/auth.middleware';
 import { CronsController } from './crons.controller';
 import { Cron } from './crons.entity';
 import { CronsService } from './crons.service';
@@ -13,6 +13,6 @@ import { CronsService } from './crons.service';
 })
 export class CronsModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthorizationMiddleware).forRoutes(CronsController);
+    consumer.apply(AuthMiddleware).forRoutes(CronsController);
   }
 }

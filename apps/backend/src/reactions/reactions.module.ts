@@ -2,7 +2,7 @@ import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { DutyModule } from '../duty/duty.module';
-import { AuthorizationMiddleware } from '../middlewares/authorization.middleware';
+import { AuthMiddleware } from '../middlewares/auth.middleware';
 import { ReactionsController } from './reactions.controller';
 import { Reaction } from './reactions.entity';
 import { ReactionsService } from './reactions.service';
@@ -14,6 +14,6 @@ import { ReactionsService } from './reactions.service';
 })
 export class ReactionsModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthorizationMiddleware).forRoutes(ReactionsController);
+    consumer.apply(AuthMiddleware).forRoutes(ReactionsController);
   }
 }

@@ -27,4 +27,8 @@ export class DebugService implements IDebugService {
   public error = (value: unknown): void => {
     this.logger.error(`${this.prefix} ${value}`);
   };
+
+  public auth = (value: unknown): void => {
+    this.logger.custom('auth', `${this.prefix} ${value}`);
+  };
 }

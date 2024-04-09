@@ -1,10 +1,9 @@
-import { Config, Connect, VKSilentAuthPayload } from '@vkontakte/superappkit';
+import { Config, Connect } from '@vkontakte/superappkit';
 import {
   Avatar,
   Button,
   FormLayoutGroup,
   Group,
-  Input,
   Panel,
   Placeholder,
   SplitCol,
@@ -12,7 +11,7 @@ import {
   Text,
 } from '@vkontakte/vkui';
 
-import { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -27,45 +26,40 @@ export const Login: FC = () => {
   const navigate = useNavigate();
   const snackbar = useSnackbar();
   const dispatch = useDispatch();
-  const [password, setPassword] = useState('');
 
   const [authRequest, authResult] = useAuthorizeMutation();
 
   useEffect(() => {
-    if (authResult.status === 'fulfilled' && authResult.data.token) {
+    if (
+      authResult.status === 'fulfilled' &&
+      authResult.data.token &&
+      authResult.data.user
+    ) {
       dispatch(
         authorize({
           token: authResult.data.token,
+          user: authResult.data.user,
         }),
       );
 
       navigate('/', { replace: true });
     }
-  }, [authResult, dispatch, navigate, snackbar]);
+  }, [authResult, dispatch, navigate]);
 
   const authHandler = useCallback(async () => {
     try {
       const data = await Connect.userVisibleAuth();
 
       if (data.provider === 'vk' && data.payload.auth) {
-        console.log(data);
-        return authRequest({ data: data.payload });
-
-        // return loadSuperAppToken(data.payload)
-        //   .then((result) => {
-        //     Config.setSuperAppToken(result.superapp_token);
-        //     Config.setSuperAppToken(result.superapp_token_v2, { version: 2 });
-        //
-        //     console.log('auth success! ' + result.superapp_token);
-        //   })
-        //   .catch((err) => {
-        //     console.error(err);
-        //   });
+        authRequest({ data: data.payload });
       }
     } catch (err: unknown) {
+      snackbar({
+        message: 'Что-то пошло не так',
+      });
       console.error(err);
     }
-  }, []);
+  }, [authRequest, snackbar]);
 
   useEffect(() => {
     dispatch(logOff());

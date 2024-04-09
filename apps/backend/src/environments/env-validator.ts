@@ -65,6 +65,12 @@ export class Environment implements IEnvironment {
   errorChatId: number;
   @IsNumber()
   debugChatId: number;
+  @IsNumber()
+  authChatId: number;
+  @IsNumber()
+  accessChatId: number;
+  @IsNumber()
+  adminChatId: number;
 
   /**
    * ======================

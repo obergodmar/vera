@@ -3,8 +3,6 @@ import { ConfigService } from '@nestjs/config';
 import { getRandomInt, sleep } from '@vera-reforged/common';
 
 import { IEnvironment } from '../environments/env-type';
-import { DebugService } from '../logger/debug.service';
-import { LoggerService } from '../logger/logger.service';
 import {
   API_DEFAULT_TIMEOUT,
   API_ERROR_AUTH,
@@ -23,8 +21,8 @@ import {
   API_MIN_RETRY_TIMEOUT,
   API_USER_FIELDS,
   API_VERSION,
+  RATE_LIMIT,
   RATE_LIMIT_WINDOW,
-  RATE_LINIT,
 } from './config';
 import { IVKApi } from './IVKApi';
 import { request } from './request';
@@ -64,7 +62,6 @@ class Semaphore {
 
 @Injectable()
 export class VkApiService implements IVKApi.IVKApi {
-  private readonly logger: DebugService;
   private readonly accessToken: string;
   private readonly groupId: number;
 
@@ -75,12 +72,9 @@ export class VkApiService implements IVKApi.IVKApi {
     new Map();
 
   public constructor(
-    @Inject(LoggerService) loggerService: LoggerService,
     @Inject(ConfigService) private readonly config: ConfigService,
   ) {
-    this.logger = new DebugService(loggerService, this.constructor.name);
-
-    this.semaphore = new Semaphore(RATE_LINIT, RATE_LIMIT_WINDOW);
+    this.semaphore = new Semaphore(RATE_LIMIT, RATE_LIMIT_WINDOW);
     this.rateLimitWindow = RATE_LIMIT_WINDOW;
 
     this.accessToken = this.config.get<IEnvironment['botToken']>('botToken');
@@ -336,8 +330,6 @@ export class VkApiService implements IVKApi.IVKApi {
     await this.semaphore.lock();
 
     try {
-      this.logger.debug(`[API] Request: ${method}`);
-
       const userToken = 'access_token' in params && params.access_token;
 
       const enrichedParams = {
@@ -379,8 +371,6 @@ export class VkApiService implements IVKApi.IVKApi {
           }
         });
 
-      this.logger.debug(`[API] Response:  ${method}`);
-
       if (result.error) {
         return Promise.reject(
           new IVKApi.RequestError(
@@ -397,8 +387,6 @@ export class VkApiService implements IVKApi.IVKApi {
 
       return result.response;
     } catch (err: unknown) {
-      this.logger.error(`[API] Error: ${err}`);
-
       return Promise.reject(err);
     } finally {
       this.semaphore.release();

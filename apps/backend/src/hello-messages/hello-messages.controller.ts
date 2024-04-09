@@ -1,5 +1,7 @@
-import { Body, Controller, HttpCode, Inject, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, Inject, Post, Req } from '@nestjs/common';
 import { IApi, ROUTES } from '@vera-reforged/common';
+
+import { Request } from 'express';
 
 import {
   UpdateAllHelloMessagesDto,
@@ -18,8 +20,10 @@ export class HelloMessagesController {
 
   @Post(endpoints.getHelloMessages)
   @HttpCode(200)
-  public getHelloMessages(): Promise<IApi.IHelloMessagesApi.GetHelloMessagesResponse> {
-    return this.hlService.getHelloMessages();
+  public getHelloMessages(
+    @Req() req: Request,
+  ): Promise<IApi.IHelloMessagesApi.GetHelloMessagesResponse> {
+    return this.hlService.getHelloMessages(req);
   }
 
   @Post(endpoints.updateHelloMessage)

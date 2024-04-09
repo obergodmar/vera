@@ -1,5 +1,6 @@
-export const RATE_LINIT = 20;
+export const RATE_LIMIT = 20;
 export const RATE_LIMIT_WINDOW = 3000;
+export const EXECUTE_MAX_REQUESTS = 25;
 export const API_DEFAULT_TIMEOUT = 10 * 1000;
 export const API_MIN_RETRY_TIMEOUT = 500;
 export const API_MAX_RETRY_TIMEOUT = 20 * 1000;

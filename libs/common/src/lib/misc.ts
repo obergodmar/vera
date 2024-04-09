@@ -111,3 +111,21 @@ export function isDeepEqual(a: any, b: any): boolean {
 
   throw new Error(`isDeepEqual don't know how to compare: ${a} and ${b}`);
 }
+
+export const MIN_INT_32 = -(2 ** 31);
+export const MAX_INT_32 = 2 ** 31 - 1;
+
+export function getRandomId(): number {
+  return getRandomInt(MIN_INT_32, -1);
+}
+
+export function getChunkedArray<T>(chunkSize: number, array: T[]): T[][] {
+  const chunked: T[][] = [];
+
+  for (let i = 0; i < array.length; i += chunkSize) {
+    const chunk = array.slice(i, i + chunkSize);
+    chunked.push(chunk);
+  }
+
+  return chunked;
+}
