@@ -3416,11 +3416,6 @@
     loupe "^2.3.6"
     pretty-format "^27.5.1"
 
-"@example/api-schema-typescript@1.5226.9":
-  version "1.5226.9"
-  resolved "https://internal.example.com/removed"
-  integrity sha512-5SWa4mHex3qjNHl1M7XYQmNOWJFyXZagsAjm1e1vpY3YBh7uFlTTeuxa3ybiMf1ZHFwwtEedhFHbaDlyp4VBLQ==
-
 "@vkontakte/api-schema-typescript@^1.5131.2":
   version "1.5131.2"
   resolved "https://registry.yarnpkg.com/@vkontakte/api-schema-typescript/-/api-schema-typescript-1.5131.2.tgz#ef2ce67214a064c2add40e11cb06020940381e16"

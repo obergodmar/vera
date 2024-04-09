@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IApi } from '@vera-reforged/common';
-import { UsersUser } from '@example/api-schema-typescript';
+import { UsersUser } from '@vkontakte/api-schema-typescript';
 
 import { Request } from 'express';
 
@@ -85,7 +85,7 @@ export class AuthService {
         {
           group_id: 1,
           peer_id: this.accessChatId,
-          extended: 0,
+          // extended: 0,
         },
         {
           retries: 3,

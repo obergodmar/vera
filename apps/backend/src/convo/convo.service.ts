@@ -10,7 +10,7 @@ import {
   MessagesConversation,
   MessagesGetConversationByIdExtended,
   MessagesGetConversationMembersResponse,
-} from '@example/api-schema-typescript';
+} from '@vkontakte/api-schema-typescript';
 
 import { Request } from 'express';
 import { SessionData } from 'express-session';
@@ -160,7 +160,7 @@ export class ConvoService {
         {
           group_id: 1,
           peer_id: this.adminChatId,
-          extended: 0,
+          // extended: 0,
         },
         {
           retries: 3,

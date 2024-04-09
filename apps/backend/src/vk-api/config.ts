@@ -68,7 +68,7 @@ export const API_GROUP_FIELDS = [
   'role',
 ];
 
-export const API_VERSION = '5.226';
+export const API_VERSION = '5.131';
 export const API_ERROR_AUTH = 5;
 export const API_ERROR_CAPTCHA = 14;
 export const API_ERROR_SECTION_DISABLED = 43;

@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IApi } from '@vera-reforged/common';
-import { UsersUser } from '@example/api-schema-typescript';
+import { UsersUser } from '@vkontakte/api-schema-typescript';
 
 import { getToken } from '../../utils/getToken';
 

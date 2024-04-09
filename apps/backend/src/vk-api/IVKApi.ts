@@ -9,7 +9,7 @@ import {
   MessagesSendParams,
   UsersGetParams,
   UsersGetResponse,
-} from '@example/api-schema-typescript';
+} from '@vkontakte/api-schema-typescript';
 
 import { MessagesSendResponse } from 'vk-io/lib/api/schemas/responses';
 

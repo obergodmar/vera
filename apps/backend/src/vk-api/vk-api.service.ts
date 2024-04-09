@@ -303,13 +303,13 @@ export class VkApiService implements IVKApi.IVKApi {
         break;
     }
 
-    if ('extended' in params && params.extended)
-      enrichedParams = {
-        ...enrichedParams,
-        fields: Array.from(
-          new Set([...API_USER_FIELDS, ...API_GROUP_FIELDS]),
-        ).join(','),
-      };
+    if (('extended' in params && params.extended) || 'fields' in params)
+    enrichedParams = {
+      ...enrichedParams,
+      fields: Array.from(
+        new Set([...API_USER_FIELDS, ...API_GROUP_FIELDS]),
+      ).join(','),
+    };
 
     if ('group_id' in params && params.group_id) {
       enrichedParams = {

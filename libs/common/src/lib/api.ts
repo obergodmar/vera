@@ -1,5 +1,5 @@
+import { MessagesGetConversationMembersResponse } from '@vkontakte/api-schema-typescript';
 import { VKSilentUser } from '@vkontakte/superappkit';
-import { MessagesGetConversationMembersResponse } from '@example/api-schema-typescript';
 
 import { MessagesConversation, UsersUser } from 'vk-io/lib/api/schemas/objects';
 

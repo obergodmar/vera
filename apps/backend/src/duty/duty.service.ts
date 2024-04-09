@@ -11,7 +11,7 @@ import {
   IApi,
   IDuty,
 } from '@vera-reforged/common';
-import { MessagesGetConversationMembersResponse } from '@example/api-schema-typescript';
+import { MessagesGetConversationMembersResponse } from '@vkontakte/api-schema-typescript';
 
 import { DataSource, Repository } from 'typeorm';
 import { UsersUserFull } from 'vk-io/lib/api/schemas/objects';
@@ -117,7 +117,8 @@ export class DutyService {
       response = await this.vkApi.fetch(
         'messages.getConversationMembers',
         {
-          extended: 1,
+          fields: '',
+          // extended: 1,
           peer_id: chatId,
           group_id: 1,
         },
