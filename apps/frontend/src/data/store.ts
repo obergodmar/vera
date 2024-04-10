@@ -33,7 +33,10 @@ const rtkQueryErrorLogger: ThunkMiddleware = () => (dispatch) => (action) => {
     }
 
     snackbar({
-      message: action?.payload?.data?.error || 'Произошла ошибка',
+      message:
+        action?.payload?.error ||
+        action?.payload?.data?.error ||
+        'Произошла ошибка',
     });
   }
 
