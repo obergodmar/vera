@@ -110,7 +110,11 @@ export class AuthService {
     } catch (err: unknown) {
       this.logger.auth(`Error: ${visitor} - ${err}`);
 
-      return { token: '', user: null, error: 'Ошибка авторизации' };
+      return {
+        token: '',
+        user: null,
+        error: 'Отсутствует доступ к панели управления',
+      };
     }
 
     this.logger.auth(`Auth for ${visitor} was successful`);
