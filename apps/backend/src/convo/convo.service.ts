@@ -85,8 +85,6 @@ export class ConvoService {
       this.config.get<IEnvironment['debugChatId']>('debugChatId');
     const authChatId =
       this.config.get<IEnvironment['authChatId']>('authChatId');
-    const accessChatId =
-      this.config.get<IEnvironment['accessChatId']>('accessChatId');
     const adminChatId =
       this.config.get<IEnvironment['adminChatId']>('adminChatId');
 
@@ -95,7 +93,6 @@ export class ConvoService {
       errorChatId,
       debugChatId,
       authChatId,
-      accessChatId,
       adminChatId,
     ];
 
