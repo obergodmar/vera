@@ -201,7 +201,7 @@ export class ConvoService {
               method: 'messages.getConversationMembers',
               params: {
                 group_id: 1,
-                extended: 0,
+                // extended: 0,
                 peer_id: peerId,
               },
             })),
@@ -217,7 +217,7 @@ export class ConvoService {
         if (promise.status === 'fulfilled') {
           promise.value.forEach((response, convoId) => {
             if (
-              response.items.find(
+              (response?.items || []).find(
                 ({ member_id: memberId }) => memberId === currentUser.id,
               )
             ) {

@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { getRandomInt, sleep } from '@vera-reforged/common';
 
@@ -304,12 +304,12 @@ export class VkApiService implements IVKApi.IVKApi {
     }
 
     if (('extended' in params && params.extended) || 'fields' in params)
-    enrichedParams = {
-      ...enrichedParams,
-      fields: Array.from(
-        new Set([...API_USER_FIELDS, ...API_GROUP_FIELDS]),
-      ).join(','),
-    };
+      enrichedParams = {
+        ...enrichedParams,
+        fields: Array.from(
+          new Set([...API_USER_FIELDS, ...API_GROUP_FIELDS]),
+        ).join(','),
+      };
 
     if ('group_id' in params && params.group_id) {
       enrichedParams = {
@@ -382,7 +382,21 @@ export class VkApiService implements IVKApi.IVKApi {
       }
 
       if (result.execute_errors) {
-        // Ignore execute_errors
+        const errors = new IVKApi.ExecuteErrors(
+          result.execute_errors.map(
+            (error: any) =>
+              new IVKApi.RequestError(
+                error.error_code,
+                `[API] RequestError: ${JSON.stringify(params)} ${
+                  error.error_code
+                } ${error.method} (${error.error_msg})`,
+                error,
+              ),
+          ),
+          result.response,
+        );
+
+        Logger.error(errors);
       }
 
       return result.response;
