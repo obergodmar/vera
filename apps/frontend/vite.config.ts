@@ -11,8 +11,8 @@ export default defineConfig({
     port: 80, // Для работы авторизации
     host: '0.0.0.0',
     proxy: {
-      // '/api': 'https://vera.example.com',
-      '/api': 'http://127.0.0.1:4256',
+      '/api': 'https://vera.example.com',
+      // '/api': 'http://127.0.0.1:4256',
     },
   },
 
