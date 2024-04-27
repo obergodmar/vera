@@ -159,16 +159,22 @@ export class HelloMessagesService {
     let error: string;
 
     const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.startTransaction();
 
     try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
       const upserts = data.filter(({ message }) => !!message);
-      await this.hlRepository.upsert(upserts, ['chatId']);
+      await queryRunner.manager.upsert(HelloMessage, upserts, ['chatId']);
 
       const deletions = data
         .filter(({ message }) => !message)
-        .map(({ chatId }) => this.hlRepository.delete({ chatId }));
+        .map(({ chatId }) =>
+          queryRunner.manager.delete(HelloMessage, { chatId }),
+        );
       await Promise.all(deletions);
+
+      await queryRunner.commitTransaction();
 
       this.logger.debug('Transaction successfull - changes were made');
     } catch (e) {

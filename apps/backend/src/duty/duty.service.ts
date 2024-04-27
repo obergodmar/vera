@@ -239,8 +239,8 @@ export class DutyService {
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
-      await this.dutyRepository.delete({ chatId });
-      await this.dutyRepository.insert(dutiesToInsert);
+      await queryRunner.manager.delete(Duty, { chatId });
+      await queryRunner.manager.insert(Duty, dutiesToInsert);
 
       await queryRunner.commitTransaction();
       this.logger.debug(`Changes were made in ${chatId}`);
