@@ -1,11 +1,18 @@
+const fs = require('node:fs');
+
+const cwd = '/home/deploy/vera-reforged';
+const script = `${cwd}/dist/apps/backend/main.js`;
+
+const nodeVersion = fs.readFileSync(`${cwd}/.nvmrc`, 'utf8');
+
 module.exports = {
   apps: [
     {
       name: 'vera-reforged',
-      cwd: '/home/deploy/vera-reforged',
-      script: '/home/deploy/vera-reforged/dist/apps/backend/main.js',
-      watch: ['/home/deploy/vera-reforged/dist/apps/backend/main.js'],
-      interpreter: '/home/deploy/.nvm/versions/node/v20.12.2/bin/node',
+      cwd,
+      script,
+      watch: [script],
+      interpreter: `/home/deploy/.nvm/versions/node/${nodeVersion}/bin/node`,
     },
   ],
 };
