@@ -226,6 +226,13 @@ Mysql и его настройки расположены в файле `./apps/
 5. Созданный модуль импортировать и включить в импорты к главному модулю всего приложения в `./apps/backend/src/app/app.module.ts`.
 
 ### Скрипты
+
+#### Директория scripts
+
+В директории `./scripts/` находится пара вспомогательных скриптов. `./scripts/deploy.js` реализует полуавтоматический CI. A `./scripts/backup.sh` позволит легко задампить текущее состояние админки.
+
+#### Скрипты в package.json
+
 ```json
   "scripts": {
     "dev": "concurrently -p \"[{name}]\" -n \"frontend,backend\" -c \"bgGreen.bold,bgCyan.bold\" \"npm run dev:frontend\" \"npm run dev:backend\"",
