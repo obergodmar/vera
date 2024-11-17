@@ -37,6 +37,10 @@ export interface IEnvironment {
   dbUsername: string;
   dbPassword: string;
 
+  redisUrl: string;
+
+  trustProxy: string;
+
   /**
    * ==================
    * Настройки апи бота

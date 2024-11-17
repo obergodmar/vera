@@ -101,6 +101,9 @@ sudo nano /etc/redis/redis.conf
 - `DB_NAME (string)`
 - `DB_USERNAME (string)`
 - `DB_PASSWORD (string)`
+- `TRUST_PROXY (string)`
+
+- `REDIS_URL (string)`
 
 #### Настройки апи бота
 

@@ -16,7 +16,9 @@ async function bootstrap() {
     AppModule.forRoot(env),
   );
 
-  const redisClient = createClient();
+  const redisClient = createClient({
+    url: env.redisUrl,
+  });
   try {
     redisClient.connect().catch(console.error);
   } catch (error: unknown) {
@@ -31,8 +33,8 @@ async function bootstrap() {
   Logger.log(`[Redis]: Clear all sessions`);
   redisStore.clear();
 
-  if (env.isProd) {
-    app.set('trust proxy', '127.0.0.1');
+  if (env.trustProxy) {
+    app.set('trust proxy', env.trustProxy);
   }
 
   app.use(

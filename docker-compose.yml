@@ -1,0 +1,78 @@
+services:
+  vera:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: registry.example.com:5050/example/vera-reforged:latest
+    ports:
+      - '80:${PORT}'
+    environment:
+      # Production settings
+      - IS_PROD=${IS_PROD}
+      - DISABLE_BOT_LISTENER=${DISABLE_BOT_LISTENER}
+      - ADDRESS=${ADDRESS:-0.0.0.0}
+      - SECRET=${SECRET}
+      - PORT=${PORT}
+      - DB_HOST=mysql
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_NAME=${DB_NAME:-vera}
+      - DB_USERNAME=${DB_USERNAME:-vera}
+      - DB_PASSWORD=${DB_PASSWORD:-password}
+      - REDIS_URL=redis://redis:6379
+
+
+      # Bot settings
+      - BOT_TOKEN=${BOT_TOKEN}
+      - BOT_POLLING_GROUP_ID=${BOT_POLLING_GROUP_ID}
+      - BOT_API_MODE=${BOT_API_MODE}
+
+      # Chat IDs
+      - SETTINGS_CHAT_ID=${SETTINGS_CHAT_ID}
+      - DEBUG_CHAT_ID=${DEBUG_CHAT_ID}
+      - ERROR_CHAT_ID=${ERROR_CHAT_ID}
+      - AUTH_CHAT_ID=${AUTH_CHAT_ID}
+      - ACCESS_CHAT_ID=${ACCESS_CHAT_ID}
+      - ADMIN_CHAT_ID=${ADMIN_CHAT_ID}
+
+      # External services
+      - APP_ID=${APP_ID}
+      - SERVICE_KEY=${SERVICE_KEY}
+
+      # Vite settings
+      - VITE_APP_ID=${APP_ID}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  redis:
+    image: redis:7.2-alpine
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 2s
+      timeout: 2s
+      retries: 5
+
+  mysql:
+    image: mysql:lts
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-vera}
+      MYSQL_USER: ${DB_USERNAME:-vera}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-password}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-password}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: mysql ${DB_NAME} --user=${DB_USERNAME} --password='${DB_PASSWORD}' --silent --execute "SHOW DATABASES like '${DB_NAME}';"
+      interval: 2s
+      timeout: 2s
+      retries: 5
+
+volumes:
+  mysql-data:
+  redis-data:

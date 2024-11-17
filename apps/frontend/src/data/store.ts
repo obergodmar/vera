@@ -43,7 +43,7 @@ const rtkQueryErrorLogger: ThunkMiddleware = () => (dispatch) => (action) => {
   return dispatch(action);
 };
 
-const middleware: Middleware = (api) => (dispatch) => (action) => {
+const middleware: Middleware = (_api) => (dispatch) => (action) => {
   if (!getToken()) {
     dispatch(logOff());
   }

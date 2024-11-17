@@ -86,6 +86,7 @@ export class AuthMiddleware implements NestMiddleware {
       // sessionStore.set(session.id, { token, user, cookie: session.cookie });
     } catch (error: unknown) {
       res.status(401).send({ error: 'Сессия устарела' });
+      sessionStore.destroy(session.id);
 
       this.logger.debug(`${error}`);
 

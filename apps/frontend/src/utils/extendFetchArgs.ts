@@ -28,6 +28,7 @@ export function extendFetchArgs<Request>({
     headers: {
       'Content-Type': 'application/json',
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     body: body as any,
   };
 }

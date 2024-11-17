@@ -5,25 +5,23 @@
   "private": true,
   "engines": {
     "yarn": ">=1.22.x",
-    "node": ">=16.x.x"
+    "node": ">=20.x.x"
   },
   "scripts": {
-    "dev": "concurrently -p \"[{name}]\" -n \"frontend,backend\" -c \"bgGreen.bold,bgCyan.bold\" \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev": "concurrently -p \"[{name}]\" -n \"frontend,backend\" -c \"bgGreen.bold,bgCyan.bold\" \"yarn dev:frontend\" \"yarn dev:backend\"",
     "dev:frontend": "nx serve frontend --configuration=development",
     "dev:backend": "nx serve backend --configuration=development",
     "build:frontend": "nx build frontend --source-map false --configuration=production",
     "build:backend": "nx build backend --source-map false --configuration=production",
-    "build": "concurrently -p \"[{name}]\" -n \"frontend,backend\" -c \"bgGreen.bold,bgCyan.bold\" \"npm run build:frontend\" \"npm run build:backend\"",
+    "build": "concurrently -p \"[{name}]\" -n \"frontend,backend,typeorm\" -c \"bgGreen.bold,bgCyan.bold,bgBlue.bold\" \"yarn build:frontend\" \"yarn build:backend\" \"yarn typeorm:build\"",
     "prepare": "husky install",
     "eslint:fix": "eslint --fix",
     "test:backend": "NODE_OPTIONS=\"--experimental-vm-modules\" nx test backend",
     "test:common": "nx test common",
-    "deploy": "node scripts/deploy.js",
-    "deploy:frontend": "node scripts/deploy.js frontend",
-    "deploy:backend": "node scripts/deploy.js backend",
     "tsc": "nx run-many --target=tsc --all=true --verbose",
     "typeorm:create": "typeorm migration:create ./apps/backend/src/migrations/migration",
     "typeorm:gen": "nx run backend:typeorm-generate-migrations ./migrations/",
+    "typeorm:build": "nx run backend:build-migration-config",
     "typeorm:run": "nx run backend:typeorm-run-migrations",
     "typeorm:revert": "nx run backend:typeorm-revert-migrations"
   },
@@ -46,7 +44,7 @@
     "@reduxjs/toolkit": "1.9.3",
     "@vkontakte/api-schema-typescript": "^1.5131.2",
     "@vkontakte/icons": "^2.48.1",
-    "@vkontakte/superappkit": "^1.61.2",
+    "@vkid/sdk": "^2.4.0",
     "@vkontakte/vk-bridge": "^2.7.2",
     "@vkontakte/vkui": "^5.6.0",
     "bcrypt": "^5.1.0",

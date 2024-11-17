@@ -44,7 +44,6 @@ export const MemberPicker: FC<Props> = ({ duties, members, onChange }) => {
 
           const {
             value,
-            label,
             option: { avatar },
             ...rest
           } = props;

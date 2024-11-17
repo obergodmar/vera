@@ -1,4 +1,4 @@
-import { Config, Connect } from '@vkontakte/superappkit';
+import * as VKID from '@vkid/sdk';
 import {
   Avatar,
   Button,
@@ -13,21 +13,53 @@ import {
 
 import { FC, useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { VERA_AVATAR_100 } from '../data/constants';
 import { authorize, logOff } from '../data/reducers/authorization';
 import { useAuthorizeMutation } from '../data/services/auth-api';
 import { useSnackbar } from '../hooks/useSnackbar';
 
-Config.init({ appId: parseInt(import.meta.env.VITE_APP_ID) });
+VKID.Config.init({
+  app: parseInt(import.meta.env.VITE_APP_ID),
+  redirectUrl: 'http://localhost/login',
+});
 
 export const Login: FC = () => {
   const navigate = useNavigate();
   const snackbar = useSnackbar();
   const dispatch = useDispatch();
 
+  const [searchParams] = useSearchParams();
+  const code = searchParams.get('code');
+  const deviceId = searchParams.get('device_id');
+
   const [authRequest, authResult] = useAuthorizeMutation();
+
+  useEffect(() => {
+    if (!code || !deviceId) {
+      return;
+    }
+
+    window.history.replaceState({}, document.title, window.location.pathname);
+    const makeInternalAuthRequest = async () => {
+      try {
+        const { access_token: accessToken } = await VKID.Auth.exchangeCode(
+          code,
+          deviceId,
+        );
+        authRequest({
+          data: {
+            accessToken,
+          },
+        });
+      } catch (err: unknown) {
+        console.error(err);
+      }
+    };
+
+    makeInternalAuthRequest();
+  }, [authRequest, code, deviceId, snackbar]);
 
   useEffect(() => {
     if (
@@ -46,24 +78,20 @@ export const Login: FC = () => {
     }
   }, [authResult, dispatch, navigate]);
 
+  useEffect(() => {
+    dispatch(logOff());
+  }, [dispatch]);
+
   const authHandler = useCallback(async () => {
     try {
-      const data = await Connect.userVisibleAuth();
-
-      if (data.provider === 'vk' && data.payload.auth) {
-        authRequest({ data: data.payload });
-      }
+      await VKID.Auth.login();
     } catch (err: unknown) {
       snackbar({
         message: 'Что-то пошло не так',
       });
       console.error(err);
     }
-  }, [authRequest, snackbar]);
-
-  useEffect(() => {
-    dispatch(logOff());
-  }, [dispatch]);
+  }, [snackbar]);
 
   return (
     <SplitLayout style={{ justifyContent: 'center' }}>

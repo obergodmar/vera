@@ -41,6 +41,11 @@ export class Environment implements IEnvironment {
   @IsString()
   @IsNotEmpty()
   dbPassword: string;
+  @IsString()
+  @IsNotEmpty()
+  redisUrl: string;
+  @IsString()
+  trustProxy: string;
 
   /**
    * ==================

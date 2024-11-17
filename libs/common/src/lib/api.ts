@@ -1,5 +1,4 @@
 import { MessagesGetConversationMembersResponse } from '@vkontakte/api-schema-typescript';
-import { VKSilentUser } from '@vkontakte/superappkit';
 
 import { MessagesConversation, UsersUser } from 'vk-io/lib/api/schemas/objects';
 
@@ -29,7 +28,7 @@ export namespace IApi {
 
   export namespace IAuthApi {
     export type AuthRequest = {
-      data: { token: string; uuid: string; user: VKSilentUser };
+      data: { accessToken: string };
     };
     export type AuthResponse = StatusResponse & {
       token: string;

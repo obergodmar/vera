@@ -54,6 +54,12 @@ function parseEnvVariables(): Partial<IEnvironment> {
   if (env.DB_PASSWORD) {
     envVariables.dbPassword = env.DB_PASSWORD;
   }
+  if (env.REDIS_URL) {
+    envVariables.redisUrl = env.REDIS_URL;
+  }
+  if (env.TRUST_PROXY) {
+    envVariables.trustProxy = env.TRUST_PROXY;
+  }
 
   /**
    * ==================

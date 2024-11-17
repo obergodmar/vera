@@ -33,6 +33,7 @@
           "optimization": true,
           "extractLicenses": true,
           "inspect": false,
+          "sourceMap": false,
           "fileReplacements": [
             {
               "replace": "apps/backend/src/environments/environment.ts",
@@ -80,9 +81,10 @@
       "options": {
         "target": "node",
         "compiler": "tsc",
-        "outputPath": "dist/apps/typeorm-migration",
+        "outputPath": "dist/typeorm-migration",
         "main": "apps/backend/src/migrations/typeorm.config.ts",
-        "tsConfig": "apps/backend/tsconfig.app.json"
+        "tsConfig": "apps/backend/tsconfig.app.json",
+        "sourceMap": false
       }
     },
     "typeorm-generate-migrations": {
@@ -91,7 +93,7 @@
       "options": {
         "cwd": "apps/backend/src/migrations",
         "commands": [
-          "typeorm -d ../../../../dist/apps/typeorm-migration/main.js migration:generate"
+          "typeorm -d ../../../../dist/typeorm-migration/main.js migration:generate"
         ]
       },
       "dependsOn": ["build-migration-config"]
@@ -100,7 +102,7 @@
       "executor": "nx:run-commands",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "cwd": "dist/apps/typeorm-migration",
+        "cwd": "dist/typeorm-migration",
         "commands": ["typeorm migration:run -d main.js"]
       },
       "dependsOn": ["build-migration-config"]
@@ -109,7 +111,7 @@
       "executor": "nx:run-commands",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "cwd": "dist/apps/typeorm-migration",
+        "cwd": "dist/typeorm-migration",
         "commands": ["typeorm migration:revert -d main.js"]
       },
       "dependsOn": ["build-migration-config"]

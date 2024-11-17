@@ -8,7 +8,6 @@ import { Request } from 'express';
 import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
 import { LoggerService } from '../logger/logger.service';
-import { request } from '../vk-api/request';
 import { VkApiService } from '../vk-api/vk-api.service';
 import { AuthDto } from './dto/auth.dto';
 
@@ -22,10 +21,6 @@ declare module 'express-session' {
 @Injectable()
 export class AuthService {
   private readonly logger: DebugService;
-
-  private readonly appId: number;
-  private readonly serviceKey: string;
-
   private readonly accessChatId: number;
 
   public constructor(
@@ -34,10 +29,6 @@ export class AuthService {
     @Inject(ConfigService) config: ConfigService,
   ) {
     this.logger = new DebugService(loggerService, this.constructor.name);
-
-    this.appId = config.get<IEnvironment['appId']>('appId');
-    this.serviceKey = config.get<IEnvironment['serviceKey']>('serviceKey');
-
     this.accessChatId =
       config.get<IEnvironment['accessChatId']>('accessChatId');
   }
@@ -47,31 +38,15 @@ export class AuthService {
     req: Request,
   ): Promise<IApi.IAuthApi.AuthResponse> {
     const { sessionStore, session } = req;
-    const { token, uuid, user } = authorizeDto.data;
+    const { accessToken } = authorizeDto.data;
 
-    const visitor = `@id${user.id} (${user.first_name} ${user.last_name})`;
-
-    this.logger.auth(`Auth attempt from ${visitor}`);
-
-    let result: { response: { access_token: string } };
+    let visitor = 'unknown user';
     let requestedUser: UsersUser;
     try {
-      result = await request(
-        'https://api.vk.com/method/auth.exchangeSilentAuthToken?v=5.191',
-        {
-          app_id: this.appId,
-          access_token: this.serviceKey,
-          token,
-          uuid,
-        },
-      );
-
-      const userToken = result.response.access_token;
-
       const userResponse = await this.vkApi.fetchWithUserToken(
         'users.get',
         {
-          access_token: userToken,
+          access_token: accessToken,
         },
         { retries: 3 },
       );
@@ -79,6 +54,9 @@ export class AuthService {
       if (!requestedUser) {
         throw new Error('User not found');
       }
+
+      visitor = `@id${requestedUser.id} (${requestedUser.first_name} ${requestedUser.last_name})`;
+      this.logger.auth(`Auth attempt from ${visitor}`);
 
       const chatMembers = await this.vkApi.fetch(
         'messages.getConversationMembers',
@@ -100,7 +78,7 @@ export class AuthService {
         const createdSession = sessionStore.createSession(req, {
           cookie: session.cookie,
           user: requestedUser,
-          token: result.response.access_token,
+          token: accessToken,
         });
 
         this.logger.debug(`Session created with id = ${createdSession.id}`);
@@ -121,7 +99,7 @@ export class AuthService {
 
     return {
       success: true,
-      token: result.response.access_token,
+      token: accessToken,
       user: requestedUser,
     };
   }

@@ -33,6 +33,6 @@ const WithPortal: FC<Required<SnackbarContainerProps>> = memo(
       return <Portal {...portalProps}>{children}</Portal>;
     }
 
-    return <>{children}</>;
+    return children;
   },
 );

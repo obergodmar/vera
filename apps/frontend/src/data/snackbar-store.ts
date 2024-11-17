@@ -1,5 +1,6 @@
 import { produce } from 'immer';
 import { nanoid } from 'nanoid';
+import { equals } from 'ramda';
 
 export type Opaque<Type, Token = unknown> = Type & {
   readonly __opaque__: Token;
@@ -131,7 +132,19 @@ function createStore(initialState: SnackbarState = []): SnackbarStore {
         requestClose: false,
       };
 
-      setState((prevSnackbars) => [...prevSnackbars, createdSnackbar]);
+      setState((prevSnackbars) => {
+        const { id: _id, ...snackbarObj } = snackbar;
+        if (
+          prevSnackbars.find((snackbar) => {
+            const { id: _id, ...snackbarObjPrev } = snackbar;
+            return equals(snackbarObj, snackbarObjPrev);
+          })
+        ) {
+          return prevSnackbars;
+        }
+
+        return [...prevSnackbars, createdSnackbar];
+      });
 
       return id;
     },
