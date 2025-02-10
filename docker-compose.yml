@@ -40,6 +40,7 @@ services:
 
       # Vite settings
       - VITE_APP_ID=${APP_ID}
+      - VITE_LOGIN_REDIRECT_URL=${VITE_LOGIN_REDIRECT_URL}
     depends_on:
       mysql:
         condition: service_healthy

@@ -22,7 +22,7 @@ import { useSnackbar } from '../hooks/useSnackbar';
 
 VKID.Config.init({
   app: parseInt(import.meta.env.VITE_APP_ID),
-  redirectUrl: 'http://localhost/login',
+  redirectUrl: import.meta.env.VITE_LOGIN_REDIRECT_URL,
 });
 
 export const Login: FC = () => {
