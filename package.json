@@ -44,7 +44,7 @@
     "@reduxjs/toolkit": "1.9.3",
     "@vkontakte/api-schema-typescript": "^1.5131.2",
     "@vkontakte/icons": "^2.48.1",
-    "@vkid/sdk": "^2.4.0",
+    "@vkid/sdk": "^2.4.1",
     "@vkontakte/vk-bridge": "^2.7.2",
     "@vkontakte/vkui": "^5.6.0",
     "bcrypt": "^5.1.0",

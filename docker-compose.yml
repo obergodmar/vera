@@ -36,11 +36,11 @@ services:
 
       # External services
       - APP_ID=${APP_ID}
-      - SERVICE_KEY=${SERVICE_KEY}
+      - REDIRECT_URI=${REDIRECT_URI}
 
       # Vite settings
       - VITE_APP_ID=${APP_ID}
-      - VITE_LOGIN_REDIRECT_URL=${VITE_LOGIN_REDIRECT_URL}
+      - VITE_LOGIN_REDIRECT_URL=${REDIRECT_URI}
     depends_on:
       mysql:
         condition: service_healthy

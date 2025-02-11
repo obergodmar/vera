@@ -1,3 +1,4 @@
+import { generateRandomString } from '@vera-reforged/common';
 import * as VKID from '@vkid/sdk';
 import {
   Avatar,
@@ -13,7 +14,7 @@ import {
 
 import { FC, useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { VERA_AVATAR_100 } from '../data/constants';
 import { authorize, logOff } from '../data/reducers/authorization';
@@ -23,6 +24,8 @@ import { useSnackbar } from '../hooks/useSnackbar';
 VKID.Config.init({
   app: parseInt(import.meta.env.VITE_APP_ID),
   redirectUrl: import.meta.env.VITE_LOGIN_REDIRECT_URL,
+  mode: VKID.ConfigAuthMode.InNewTab,
+  responseMode: VKID.ConfigResponseMode.Callback,
 });
 
 export const Login: FC = () => {
@@ -30,36 +33,7 @@ export const Login: FC = () => {
   const snackbar = useSnackbar();
   const dispatch = useDispatch();
 
-  const [searchParams] = useSearchParams();
-  const code = searchParams.get('code');
-  const deviceId = searchParams.get('device_id');
-
   const [authRequest, authResult] = useAuthorizeMutation();
-
-  useEffect(() => {
-    if (!code || !deviceId) {
-      return;
-    }
-
-    window.history.replaceState({}, document.title, window.location.pathname);
-    const makeInternalAuthRequest = async () => {
-      try {
-        const { access_token: accessToken } = await VKID.Auth.exchangeCode(
-          code,
-          deviceId,
-        );
-        authRequest({
-          data: {
-            accessToken,
-          },
-        });
-      } catch (err: unknown) {
-        console.error(err);
-      }
-    };
-
-    makeInternalAuthRequest();
-  }, [authRequest, code, deviceId, snackbar]);
 
   useEffect(() => {
     if (
@@ -83,15 +57,42 @@ export const Login: FC = () => {
   }, [dispatch]);
 
   const authHandler = useCallback(async () => {
+    const codeVerifier = generateRandomString();
+    VKID.Config.update({
+      codeVerifier,
+    });
+
     try {
-      await VKID.Auth.login();
+      const res = await VKID.Auth.login();
+      if (
+        !res ||
+        typeof res !== 'object' ||
+        !(
+          'code' in res &&
+          typeof res.code === 'string' &&
+          'device_id' in res &&
+          typeof res.device_id === 'string'
+        )
+      ) {
+        console.error(res);
+        throw new Error('Invalid response');
+      }
+
+      const { code, device_id } = res;
+      authRequest({
+        data: {
+          code,
+          device_id,
+          code_verifier: codeVerifier,
+        },
+      });
     } catch (err: unknown) {
       snackbar({
         message: 'Что-то пошло не так',
       });
       console.error(err);
     }
-  }, [snackbar]);
+  }, [authRequest, snackbar]);
 
   return (
     <SplitLayout style={{ justifyContent: 'center' }}>

@@ -42,5 +42,5 @@ export const environment: IEnvironment = {
    * Данные для авторизации
    */
   appId: 0,
-  serviceKey: '',
+  redirectUri: '',
 };

@@ -84,7 +84,7 @@ export class Environment implements IEnvironment {
   @IsNumber()
   appId: number;
   @IsString()
-  serviceKey: string;
+  redirectUri: string;
 }
 
 export function envValidation(): IEnvironment {

@@ -28,7 +28,7 @@ export namespace IApi {
 
   export namespace IAuthApi {
     export type AuthRequest = {
-      data: { accessToken: string };
+      data: { code: string; code_verifier: string; device_id: string };
     };
     export type AuthResponse = StatusResponse & {
       token: string;

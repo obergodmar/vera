@@ -3416,10 +3416,10 @@
     loupe "^2.3.6"
     pretty-format "^27.5.1"
 
-"@vkid/sdk@^2.4.0":
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/@vkid/sdk/-/sdk-2.4.0.tgz#ee9ceb8c67b89113abab8aa84cda18fa31c5ecca"
-  integrity sha512-P5LEQ6O5/vUYelTjXP8F6GSXoQEICXJY0vtHL29y8Sq8K1TmK1oLdjEC8HxifAOHI9cSCltFG3jZbYnXcQyMsw==
+"@vkid/sdk@^2.4.1":
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/@vkid/sdk/-/sdk-2.4.1.tgz#54400143950912225b76e27d7d08462ccc392c7b"
+  integrity sha512-4CYE+caFt/s+gZOT1Mt7jfn/uXuxdkXpLK8fpW34qyBw0qc96p53yxshnjbHDMWLffte8Krq0AHw68b8Wu8Fpw==
   dependencies:
     crypto-js "^4.1.1"
 

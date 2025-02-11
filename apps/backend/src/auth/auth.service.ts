@@ -8,6 +8,7 @@ import { Request } from 'express';
 import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
 import { LoggerService } from '../logger/logger.service';
+import { request } from '../vk-api/request';
 import { VkApiService } from '../vk-api/vk-api.service';
 import { AuthDto } from './dto/auth.dto';
 
@@ -23,6 +24,9 @@ export class AuthService {
   private readonly logger: DebugService;
   private readonly accessChatId: number;
 
+  private readonly appId: number;
+  private readonly redirectUri: string;
+
   public constructor(
     @Inject(LoggerService) loggerService: LoggerService,
     @Inject(VkApiService) private readonly vkApi: VkApiService,
@@ -31,6 +35,9 @@ export class AuthService {
     this.logger = new DebugService(loggerService, this.constructor.name);
     this.accessChatId =
       config.get<IEnvironment['accessChatId']>('accessChatId');
+
+    this.appId = config.get<IEnvironment['appId']>('appId');
+    this.redirectUri = config.get<IEnvironment['redirectUri']>('redirectUri');
   }
 
   public async authorize(
@@ -38,11 +45,23 @@ export class AuthService {
     req: Request,
   ): Promise<IApi.IAuthApi.AuthResponse> {
     const { sessionStore, session } = req;
-    const { accessToken } = authorizeDto.data;
+    const { code, code_verifier, device_id } = authorizeDto.data;
 
+    let accessToken = '';
     let visitor = 'unknown user';
     let requestedUser: UsersUser;
     try {
+      const res = await request('https://id.vk.com/oauth2/auth', {
+        client_id: this.appId,
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: this.redirectUri,
+        code_verifier,
+        device_id,
+      });
+
+      accessToken = res.access_token;
+
       const userResponse = await this.vkApi.fetchWithUserToken(
         'users.get',
         {

@@ -128,8 +128,10 @@ sudo nano /etc/redis/redis.conf
 
 #### Данные для авторизации
 
+Более подробно про авториазцию и схему данных: https://id.vk.com/about/business/go/docs/ru/vkid/latest/vk-id/connection/start-integration/how-auth-works/auth-flow-web#Bez-SDK-s-obmenom-koda-na-bekende
+
 - `APP_ID (string/number)` - Айди приложения панели управления ботом. Ссылка есть в разделе [Полезная информация и ссылки](#%D0%BF%D0%BE%D0%BB%D0%B5%D0%B7%D0%BD%D0%B0%D1%8F-%D0%B8%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F-%D0%B8-%D1%81%D1%81%D1%8B%D0%BB%D0%BA%D0%B8).
-- `SERVICE_KEY (string)` - Сервисный ключ. Можно взять по ссылке выше.
+- `REDIRECT_URI (string)` - Веб-страница, куда нужно перенаправить пользователя после того, как он разрешил приложению доступ.
 
 #### Для фронтенда на этапе сборки
 

@@ -105,8 +105,9 @@ function parseEnvVariables(): Partial<IEnvironment> {
   if (env.APP_ID) {
     envVariables.appId = parseInt(env.APP_ID);
   }
-  if (env.SERVICE_KEY) {
-    envVariables.serviceKey = env.SERVICE_KEY;
+
+  if (env.REDIRECT_URI) {
+    envVariables.redirectUri = env.REDIRECT_URI;
   }
 
   return envVariables;

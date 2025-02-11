@@ -87,5 +87,5 @@ export interface IEnvironment {
    * Данные для авторизации
    */
   appId: number;
-  serviceKey: string;
+  redirectUri: string;
 }
