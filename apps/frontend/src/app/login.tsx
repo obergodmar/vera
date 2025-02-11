@@ -12,7 +12,7 @@ import {
   Text,
 } from '@vkontakte/vkui';
 
-import { FC, useCallback, useEffect } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -33,6 +33,7 @@ export const Login: FC = () => {
   const snackbar = useSnackbar();
   const dispatch = useDispatch();
 
+  const [isVKAuthLoading, setVKAuthLoading] = useState(false)
   const [authRequest, authResult] = useAuthorizeMutation();
 
   useEffect(() => {
@@ -57,6 +58,7 @@ export const Login: FC = () => {
   }, [dispatch]);
 
   const authHandler = useCallback(async () => {
+    setVKAuthLoading(true)
     const codeVerifier = generateRandomString();
     VKID.Config.update({
       codeVerifier,
@@ -91,6 +93,8 @@ export const Login: FC = () => {
         message: 'Что-то пошло не так',
       });
       console.error(err);
+    } finally {
+      setVKAuthLoading(false)
     }
   }, [authRequest, snackbar]);
 
@@ -109,6 +113,7 @@ export const Login: FC = () => {
                     size="m"
                     stretched
                     onClick={authHandler}
+                    loading={isVKAuthLoading || authResult.isLoading}
                   >
                     Авторизоваться
                   </Button>
