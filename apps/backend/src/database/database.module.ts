@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 
+import { Command, RollCommand } from '../commands/commands.entity';
 import { Cron } from '../crons/crons.entity';
 import { Duty } from '../duty/duty.entity';
 import { IEnvironment } from '../environments/env-type';
@@ -27,6 +28,8 @@ export function getOrmConfig(env: IEnvironment): MysqlConnectionOptions {
       HelloMessage,
       Reaction,
       Cron,
+      Command,
+      RollCommand,
     ],
     bigNumberStrings: false,
   };

@@ -1,17 +1,16 @@
 import { IDuty, TAG_MAX_WIDTH } from '@vera-reforged/common';
 import { Icon12Delete, Icon16Hashtag } from '@vkontakte/icons';
-import { FormItem, IconButton, Input, Text } from '@vkontakte/vkui';
-import { TextTooltip } from '@vkontakte/vkui/dist/components/TextTooltip/TextTooltip';
+import { FormItem, IconButton, Input, Text, Tooltip } from '@vkontakte/vkui';
 
 import { FC, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { editShift, removeShift } from '../../data/reducers/duty';
-import { Member } from '../../data/services/duty-api';
+import { Member } from '../../data/types';
 import { useChatMembers } from '../../hooks/useChatMembers';
 import { truthy } from '../../utils/truthy';
+import { MemberPicker } from '../member-picker';
 import { TimePicker } from '../time-picker';
-import { MemberPicker } from './member-picker';
 
 type Props = {
   duty: IDuty.Schedule;
@@ -50,7 +49,7 @@ export const Shift: FC<Props> = ({ duty, shiftNumber, dayNumber }) => {
         top={
           <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
             <Text>Смена {shiftNumber + 1}</Text>
-            <TextTooltip text="Удалить смену">
+            <Tooltip text="Удалить смену">
               <IconButton
                 style={{
                   maxHeight: '20px',
@@ -65,7 +64,7 @@ export const Shift: FC<Props> = ({ duty, shiftNumber, dayNumber }) => {
               >
                 <Icon12Delete />
               </IconButton>
-            </TextTooltip>
+            </Tooltip>
           </div>
         }
         style={{
@@ -75,29 +74,46 @@ export const Shift: FC<Props> = ({ duty, shiftNumber, dayNumber }) => {
           paddingBottom: 0,
         }}
       >
-        <MemberPicker
-          duties={duties}
-          members={members}
-          onChange={(values) => {
-            const [member, nextMember] = values;
-
-            const {
-              userId = shiftNumber,
-              firstName = '',
-              lastName = '',
-              avatar = '',
-              screenName = '',
-            } = nextMember || member || {};
-            handleEditShift({
-              userId,
-              firstName,
-              lastName,
-              avatar,
-              screenName,
-            });
-            rerender({});
+        <div
+          style={{
+            width: '100%',
+            height: '36px',
+            position: 'relative',
           }}
-        />
+        >
+          <MemberPicker
+            chipsSelectStyle={{
+              zIndex: 1,
+              top: 0,
+              left: 0,
+              position: 'absolute',
+              width: '100%',
+            }}
+            chipsStyle={{ maxWidth: '70%' }}
+            selectedMembers={duties}
+            members={members}
+            placeholder="Дежурный"
+            onChange={(values) => {
+              const [member, nextMember] = values;
+
+              const {
+                userId = shiftNumber,
+                firstName = '',
+                lastName = '',
+                avatar = '',
+                screenName = '',
+              } = nextMember || member || {};
+              handleEditShift({
+                userId,
+                firstName,
+                lastName,
+                avatar,
+                screenName,
+              });
+              rerender({});
+            }}
+          />
+        </div>
       </FormItem>
       <FormItem top="Начало" style={{ padding: 0 }}>
         <TimePicker

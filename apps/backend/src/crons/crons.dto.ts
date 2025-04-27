@@ -1,11 +1,14 @@
-import { IApi, ICrons } from '@vera-reforged/common';
+import { IApi } from '@vera-reforged/common';
 
 import { Transform, TransformFnParams } from 'class-transformer';
 import { IsBoolean, IsNumber, IsString } from 'class-validator';
 
 import { TokenDto } from '../auth/dto/token.dto';
 
-class BasicCronsDto extends TokenDto implements Omit<ICrons.ChatCron, 'id'> {
+class BasicCronsDto
+  extends TokenDto
+  implements IApi.ICronsApi.CreateCronForChatRequest
+{
   @IsNumber()
   chatId: number;
 

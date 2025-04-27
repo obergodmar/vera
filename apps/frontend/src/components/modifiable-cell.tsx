@@ -20,6 +20,7 @@ type Props = PropsWithChildren<
     isLoading: boolean;
     enabled: boolean;
     setEnabled: Dispatch<SetStateAction<boolean>>;
+    error?: string;
   } & RichCellProps
 >;
 
@@ -34,6 +35,7 @@ export const ModifiableCell: FC<Props> = ({
   isLoading,
   enabled,
   setEnabled,
+  error,
   ...richCellProps
 }) => {
   return (
@@ -41,7 +43,9 @@ export const ModifiableCell: FC<Props> = ({
       style={{
         transition: 'box-shadow 0.3s ease',
         boxShadow: modified
-          ? '0 0 0 5px var(--vkui--color_background_accent_tint--active)'
+          ? `0 0 0 5px var(--vkui--color_background_${
+              error ? 'negative' : 'accent_tint'
+            }--active)`
           : '0 0 0 5px transparent',
       }}
       disabled
@@ -67,32 +71,48 @@ export const ModifiableCell: FC<Props> = ({
       }
       afterCaption={enabled ? 'Включено' : 'Отключено'}
       actions={
-        <ButtonGroup stretched>
-          <Button
-            mode="primary"
-            stretched
-            disabled={!modified}
-            onClick={onSave}
-          >
-            Сохранить
-          </Button>
+        <>
+          <ButtonGroup stretched>
+            <Button
+              mode="primary"
+              stretched
+              disabled={!modified || !!error}
+              onClick={onSave}
+              loading={isLoading}
+            >
+              Сохранить
+            </Button>
 
-          <Button appearance="neutral" disabled={!modified} onClick={onReset}>
-            Сбросить
-          </Button>
+            <Button appearance="neutral" disabled={!modified} onClick={onReset}>
+              Сбросить
+            </Button>
 
-          <Button
-            appearance="negative"
-            mode={removeConfirmed ? 'primary' : 'secondary'}
-            size="s"
-            loading={isLoading}
-            onClick={onRemove}
-          >
-            {removeConfirmed
-              ? `Подвердить (${confirmationTimer + 1}...)`
-              : 'Убрать'}
-          </Button>
-        </ButtonGroup>
+            <Button
+              appearance="negative"
+              mode={removeConfirmed ? 'primary' : 'secondary'}
+              size="s"
+              loading={isLoading}
+              disabled={isLoading}
+              onClick={isLoading ? undefined : onRemove}
+            >
+              {removeConfirmed
+                ? `Подвердить (${confirmationTimer + 1}...)`
+                : 'Убрать'}
+            </Button>
+          </ButtonGroup>
+
+          {error && (
+            <Text
+              style={{
+                color: 'var(--vkui--color_background_negative--active)',
+                fontSize: '13px',
+                marginTop: '4px',
+              }}
+            >
+              {error}
+            </Text>
+          )}
+        </>
       }
       {...richCellProps}
     >

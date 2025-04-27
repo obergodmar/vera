@@ -3,7 +3,6 @@ export const ROUTES = {
     prefix: 'duty',
     baseUrl: '/api/duty',
     endpoints: {
-      getMembersForChat: 'getMembersForChat',
       getScheduleForChat: 'getScheduleForChat',
       updateChatSchedule: 'updateChatSchedule',
     },
@@ -13,6 +12,7 @@ export const ROUTES = {
     baseUrl: '/api/convo',
     endpoints: {
       getChats: 'getChats',
+      getMembersForChat: 'getMembersForChat',
     },
   },
   auth: {
@@ -54,6 +54,21 @@ export const ROUTES = {
       updateCronForChat: 'updateCronForChat',
       disableCronsForChat: 'disableCronsForChat',
       disableAllCrons: 'disableAllCrons',
+    },
+  },
+  commands: {
+    prefix: 'commands',
+    baseUrl: '/api/commands',
+    endpoints: {
+      getCommandsForChat: 'getCommandsForChat',
+      getCommandsChats: 'getCommandsChats',
+
+      createRollCommandForChat: 'createRollCommandForChat',
+      updateRollCommandForChat: 'updateRollCommandForChat',
+      deleteRollCommandForChat: 'deleteRollCommandForChat',
+
+      disableCommandsForChat: 'disableCommandsForChat',
+      disableAllCommands: 'disableAllCommands',
     },
   },
 } as const;

@@ -6,14 +6,10 @@ WORKDIR /app
 
 COPY . .
 
-RUN apk add --update --no-cache python3 make gcc g++ && ln -sf python3 /usr/bin/python
-
 RUN yarn install --frozen-lockfile
 RUN yarn build
 
 FROM base AS installer
-
-RUN apk add --no-cache curl bash
 
 WORKDIR /app
 
@@ -26,9 +22,6 @@ COPY --from=builder /app/dist/libs/common /app/dist/libs/common
 # Copy root package files
 COPY --from=builder /app/package.json /app/package.json
 COPY --from=builder /app/yarn.lock /app/yarn.lock
-
-
-RUN apk add --update --no-cache python3 make gcc g++ && ln -sf python3 /usr/bin/python
 
 RUN chown -R node:node /app
 

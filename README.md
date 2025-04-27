@@ -261,7 +261,7 @@ Mysql и его настройки расположены в файле `./apps/
     "deploy:frontend": "node scripts/deploy.js frontend",
     "deploy:backend": "node scripts/deploy.js backend",
     "tsc": "nx run-many --target=tsc --all=true --verbose",
-    "typeorm:create": "typeorm migration:create ./apps/backend/src/migrations/migration",
+    "typeorm:create": "typeorm migration:create ./apps/backend/src/database/migrations/migration",
     "typeorm:gen": "nx run backend:typeorm-generate-migrations ./migrations/",
     "typeorm:run": "nx run backend:typeorm-run-migrations",
     "typeorm:revert": "nx run backend:typeorm-revert-migrations"

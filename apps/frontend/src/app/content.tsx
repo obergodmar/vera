@@ -95,7 +95,7 @@ export const Content: FC = () => {
     <ModalProvider open={(id) => setActiveModal(id)}>
       <SplitLayout
         style={{ justifyContent: 'center' }}
-        header={<PanelHeader separator={false} shadow />}
+        header={<PanelHeader delimiter="none" shadow />}
         modal={modal}
       >
         {viewWidth.tabletPlus && (

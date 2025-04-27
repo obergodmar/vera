@@ -85,13 +85,13 @@ export class CronsService {
     }
   }
 
-  public async getCronsChatsResponse(): Promise<IApi.ICronsApi.GetCronsChatsResponse> {
+  public async getCronsChats(): Promise<IApi.ICronsApi.GetCronsChatsResponse> {
     this.logger.debug('Crons chats were requested');
 
     try {
       const cronsChats = await this.cronsRepository.find();
 
-      this.logger.debug('Crons chats were sucessfully sent');
+      this.logger.debug('Crons chats were successfully sent');
 
       return {
         count: cronsChats.length,
@@ -296,7 +296,7 @@ export class CronsService {
     try {
       const res = await this.cronsRepository.update({}, { enabled: false });
 
-      this.logger.debug('Successfully disabled all crons ');
+      this.logger.debug('Successfully disabled all crons');
 
       this.cronJobs.forEach((job, id) => {
         job.stop();

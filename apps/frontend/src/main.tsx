@@ -1,42 +1,8 @@
-import {
-  AdaptivityProvider,
-  AppRoot,
-  ConfigProvider,
-  SizeType,
-  WebviewType,
-} from '@vkontakte/vkui';
-
-import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { HelmetProvider } from 'react-helmet-async';
-import { Provider } from 'react-redux';
-import { BrowserRouter } from 'react-router-dom';
 
-import '@vkontakte/vkui/dist/vkui.css';
-import 'reflect-metadata';
-import './styles.css';
-
-import App from './app/app';
-import { store } from './data/store';
-import { SnackbarProvider } from './hooks/useSnackbar';
+import { enableMapSet } from 'immer';
 
 const root = createRoot(document.getElementById('root') as HTMLElement);
+enableMapSet();
 
-root.render(
-  <StrictMode>
-    <Provider store={store}>
-      <HelmetProvider>
-        <ConfigProvider webviewType={WebviewType.INTERNAL}>
-          <AdaptivityProvider sizeY={SizeType.COMPACT}>
-            <BrowserRouter>
-              <AppRoot>
-                <App />
-                <SnackbarProvider />
-              </AppRoot>
-            </BrowserRouter>
-          </AdaptivityProvider>
-        </ConfigProvider>
-      </HelmetProvider>
-    </Provider>
-  </StrictMode>,
-);
+import('./app').then(({ default: App }) => root.render(<App />));

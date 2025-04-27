@@ -15,3 +15,7 @@ export class WithChatIdDto
 export class GetChatsDto
   extends TokenDto
   implements IApi.IConvoApi.GetChatsRequest {}
+
+export class GetMembersForChatDto
+  extends WithChatIdDto
+  implements IApi.IConvoApi.GetMembersForChatRequest {}

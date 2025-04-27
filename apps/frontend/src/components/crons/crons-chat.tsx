@@ -3,7 +3,6 @@ import { Icon24ErrorCircle } from '@vkontakte/icons';
 import {
   Button,
   FormItem,
-  FormLayout,
   FormLayoutGroup,
   Group,
   Header,
@@ -50,7 +49,7 @@ export const CronsChat: FC<Props> = ({ chatTitle, chatId }) => {
   return (
     <Group mode="plain">
       <Header>Создание нового крона</Header>
-      <FormLayout>
+      <div>
         <FormLayoutGroup mode="vertical">
           <CronEditing
             time={time}
@@ -96,7 +95,7 @@ export const CronsChat: FC<Props> = ({ chatTitle, chatId }) => {
             </Button>
           </FormItem>
         </FormLayoutGroup>
-      </FormLayout>
+      </div>
     </Group>
   );
 };

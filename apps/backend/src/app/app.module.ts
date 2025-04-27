@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 
 import { AuthModule } from '../auth/auth.module';
 import { BotModule } from '../bot/bot.module';
+import { CommandsModule } from '../commands/commands.module';
 import { CronsModule } from '../crons/crons.module';
 import { DatabaseModule } from '../database/database.module';
 import { DutyModule } from '../duty/duty.module';
@@ -34,6 +35,7 @@ export class AppModule {
         HelloMessagesModule,
         ReactionsModule,
         CronsModule,
+        CommandsModule,
         /**
          * Core
          */

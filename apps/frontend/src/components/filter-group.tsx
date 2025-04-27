@@ -1,6 +1,5 @@
 import { Icon20RefreshOutline } from '@vkontakte/icons';
-import { IconButton, SimpleCell, Switch, Text } from '@vkontakte/vkui';
-import { TextTooltip } from '@vkontakte/vkui/dist/components/TextTooltip/TextTooltip';
+import { IconButton, SimpleCell, Switch, Text, Tooltip } from '@vkontakte/vkui';
 
 import { FC } from 'react';
 
@@ -28,7 +27,7 @@ export const FilterGroup: FC<Props> = ({
       <SimpleCell
         after={
           refetch && (
-            <TextTooltip text={refetchText || 'Обновить'}>
+            <Tooltip text={refetchText || 'Обновить'}>
               <IconButton
                 aria-label={refetchText || 'Обновить'}
                 onClick={refetch}
@@ -42,7 +41,7 @@ export const FilterGroup: FC<Props> = ({
               >
                 <Icon20RefreshOutline />
               </IconButton>
-            </TextTooltip>
+            </Tooltip>
           )
         }
       >

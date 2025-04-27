@@ -1,5 +1,4 @@
-import { PanelHeaderSubmit } from '@vkontakte/vkui';
-import { TextTooltip } from '@vkontakte/vkui/dist/components/TextTooltip/TextTooltip';
+import { PanelHeaderSubmit, Tooltip } from '@vkontakte/vkui';
 
 import { FC } from 'react';
 
@@ -10,8 +9,8 @@ type Props = {
 
 export const PanelSubmit: FC<Props> = ({ disabled = false, onSubmit }) => {
   return (
-    <TextTooltip text="Сохранить изменения">
+    <Tooltip text="Сохранить изменения">
       <PanelHeaderSubmit disabled={disabled} onClick={onSubmit} />
-    </TextTooltip>
+    </Tooltip>
   );
 };

@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 
+import { CommandsPanel } from './commands/commands-panel';
 import { CronsPanel } from './crons/crons-panel';
 import { DutyCancel } from './duty/duty-cancel';
 import { DutyPanel } from './duty/duty-panel';
@@ -7,7 +8,6 @@ import { DutySubmit } from './duty/duty-submit';
 import { HelloMessagesCancel } from './hello-messages/hello-messages-cancel';
 import { HelloMessagesPanel } from './hello-messages/hello-messages-panel';
 import { HelloMessagesSubmit } from './hello-messages/hello-messages-submit';
-import { NotImplementedPanel } from './not-implemented-panel';
 import { ReactionsPanel } from './reactions/reactions-panel';
 
 export const panels: PanelItem[] = [
@@ -38,7 +38,7 @@ export const panels: PanelItem[] = [
   {
     value: 'commands',
     label: 'Команды',
-    content: <NotImplementedPanel />,
+    content: <CommandsPanel />,
   },
 ];
 

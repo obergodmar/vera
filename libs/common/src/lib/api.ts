@@ -2,6 +2,7 @@ import { MessagesGetConversationMembersResponse } from '@vkontakte/api-schema-ty
 
 import { MessagesConversation, UsersUser } from 'vk-io/lib/api/schemas/objects';
 
+import { ICommands } from './commands';
 import { ICrons } from './crons';
 import { IDuty } from './duty';
 import { IHelloMessages } from './hello-messages';
@@ -39,13 +40,13 @@ export namespace IApi {
   export namespace IConvoApi {
     export type GetChatsRequest = TokenRequest;
     export type GetChatsResponse = ConversationsList;
-  }
 
-  export namespace IDutyApi {
     export type GetMembersForChatRequest = TokenRequest<WithChatId>;
     export type GetMembersForChatResponse = StatusResponse &
       MessagesGetConversationMembersResponse;
+  }
 
+  export namespace IDutyApi {
     export type GetDaysRequest = TokenRequest;
     export type GetDaysResponse = IDuty.Day[];
 
@@ -103,8 +104,6 @@ export namespace IApi {
   }
 
   export namespace ICronsApi {
-    export type Requests = '';
-
     export type GetCronsForChatRequest = TokenRequest<WithChatId>;
     export type GetCronsForChatResponse = {
       count: number;
@@ -132,6 +131,48 @@ export namespace IApi {
 
     export type DisableAllCronsRequest = TokenRequest;
     export type DisableAllCronsResponse = StatusResponse & {
+      count?: number;
+    };
+  }
+
+  export namespace ICommandsApi {
+    export type GetCommandsForChatRequest = TokenRequest<WithChatId>;
+    export type GetCommandsForChatResponse = {
+      count: number;
+      items: ICommands.ChatCommand[];
+    };
+
+    export type GetCommandsChatsRequest = TokenRequest;
+    export type GetCommandsChatsResponse = {
+      count: number;
+      items: number[];
+    };
+
+    export type CreateRollCommandForChatRequest = TokenRequest<
+      Omit<
+        ICommands.RollCommand & Pick<ICommands.Command, 'name' | 'enabled'>,
+        'id'
+      >
+    >;
+    export type CreateRollCommandForChatResponse = StatusResponse;
+
+    export type UpdateRollCommandForChatRequest = TokenRequest<
+      ICommands.RollCommand & Pick<ICommands.Command, 'name' | 'enabled'>
+    >;
+    export type UpdateRollCommandForChatResponse = StatusResponse;
+
+    export type DeleteRollCommandForChatRequest = TokenRequest<
+      Pick<ICommands.RollCommand, 'id' | 'chatId'>
+    >;
+    export type DeleteRollCommandForChatResponse = StatusResponse;
+
+    export type DisableCommandsForChatRequest = TokenRequest<WithChatId>;
+    export type DisableCommandsForChatResponse = StatusResponse & {
+      count?: number;
+    };
+
+    export type DisableAllCommandsRequest = TokenRequest;
+    export type DisableAllCommandsResponse = StatusResponse & {
       count?: number;
     };
   }
