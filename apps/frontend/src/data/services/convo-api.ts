@@ -4,6 +4,7 @@ import { CustomSelectOptionInterface } from '@vkontakte/vkui';
 
 import { extendFetchArgs } from '../../utils/extendFetchArgs';
 import { transformConvosToSelectOptions } from '../../utils/transformConvosToSelectOptions';
+import { Member } from '../types';
 
 const { endpoints, baseUrl } = ROUTES.convo;
 
@@ -20,7 +21,44 @@ export const convoApi = createApi({
       },
       transformResponse: transformConvosToSelectOptions,
     }),
+    [endpoints.getMembersForChat]: builder.query<Member[], number>({
+      query(chatId) {
+        return extendFetchArgs<IApi.IConvoApi.GetMembersForChatRequest>({
+          url: endpoints.getMembersForChat,
+          body: {
+            chatId,
+          },
+        });
+      },
+      transformResponse(data: IApi.IConvoApi.GetMembersForChatResponse) {
+        const { profiles } = data;
+
+        if (!profiles) {
+          return [];
+        }
+
+        return profiles
+          .map(
+            ({
+              id: userId,
+              photo_100: avatar = '',
+              screen_name: screenName = '',
+              first_name: firstName = '',
+              last_name: lastName = '',
+            }) => ({
+              label: `${firstName} ${lastName}`,
+              value: userId,
+              avatar,
+              screenName,
+              userId,
+              firstName,
+              lastName,
+            }),
+          )
+          .sort((a, b) => a.label.localeCompare(b.label));
+      },
+    }),
   }),
 });
 
-export const { useGetChatsQuery } = convoApi;
+export const { useGetChatsQuery, useGetMembersForChatQuery } = convoApi;

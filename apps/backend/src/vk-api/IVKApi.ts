@@ -130,6 +130,7 @@ export namespace IVKApi {
     timeout?: number;
     retries?: number;
     trackId?: TrackId<Method>;
+    omitExecuteLogs?: boolean;
   };
 
   export type TrackId<Method extends keyof Request> = Opaque<

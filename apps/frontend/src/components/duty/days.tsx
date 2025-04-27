@@ -4,10 +4,8 @@ import { FC, memo, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { setCurrentSchedule } from '../../data/reducers/duty';
-import {
-  useGetMembersForChatQuery,
-  useGetScheduleForChatQuery,
-} from '../../data/services/duty-api';
+import { useGetMembersForChatQuery } from '../../data/services/convo-api';
+import { useGetScheduleForChatQuery } from '../../data/services/duty-api';
 import { RootState } from '../../data/store';
 import { ChatMembersProvider } from '../../hooks/useChatMembers';
 import { GroupSpinner } from '../group-spinner';
@@ -53,7 +51,7 @@ const days: IDuty.Day[] = [
 export const Days: FC<Props> = memo(({ chatId }) => {
   const dispatch = useDispatch();
 
-  const { isLoading: isMembersLoading, data: members = [] } =
+  const { isFetching: isMembersListFetching, data: members = [] } =
     useGetMembersForChatQuery(chatId);
   const { data: schedule, isFetching } = useGetScheduleForChatQuery(chatId);
 
@@ -65,7 +63,7 @@ export const Days: FC<Props> = memo(({ chatId }) => {
     }
   }, [dispatch, isFetching, schedule]);
 
-  if (isMembersLoading || isFetching) {
+  if (isMembersListFetching || isFetching) {
     return <GroupSpinner />;
   }
 

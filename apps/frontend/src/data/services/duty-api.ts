@@ -1,16 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { IApi, ROUTES } from '@vera-reforged/common';
-import { ChipOption } from '@vkontakte/vkui/dist/components/Chip/Chip';
 
 import { extendFetchArgs } from '../../utils/extendFetchArgs';
-
-export type Member = ChipOption & {
-  userId: number;
-  firstName: string;
-  lastName: string;
-  avatar: string;
-  screenName: string;
-};
 
 const { baseUrl, endpoints } = ROUTES.duty;
 const tag = 'Schedule' as const;
@@ -20,43 +11,6 @@ export const dutyApi = createApi({
   reducerPath: 'dutyApi',
   tagTypes: [tag],
   endpoints: (builder) => ({
-    [endpoints.getMembersForChat]: builder.query<Member[], number>({
-      query(chatId) {
-        return extendFetchArgs<IApi.IDutyApi.GetMembersForChatRequest>({
-          url: endpoints.getMembersForChat,
-          body: {
-            chatId,
-          },
-        });
-      },
-      transformResponse(data: IApi.IDutyApi.GetMembersForChatResponse) {
-        const { profiles } = data;
-
-        if (!profiles) {
-          return [];
-        }
-
-        return profiles
-          .map(
-            ({
-              id: userId,
-              photo_100: avatar = '',
-              screen_name: screenName = '',
-              first_name: firstName = '',
-              last_name: lastName = '',
-            }) => ({
-              label: `${firstName} ${lastName}`,
-              value: userId,
-              avatar,
-              screenName,
-              userId,
-              firstName,
-              lastName,
-            }),
-          )
-          .sort((a, b) => a.label.localeCompare(b.label));
-      },
-    }),
     [endpoints.getScheduleForChat]: builder.query<
       IApi.IDutyApi.GetScheduleForChatResponse,
       number
@@ -95,8 +49,5 @@ export const dutyApi = createApi({
   }),
 });
 
-export const {
-  useGetMembersForChatQuery,
-  useGetScheduleForChatQuery,
-  useUpdateChatScheduleMutation,
-} = dutyApi;
+export const { useGetScheduleForChatQuery, useUpdateChatScheduleMutation } =
+  dutyApi;

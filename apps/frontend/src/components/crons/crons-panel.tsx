@@ -130,6 +130,7 @@ export const CronsPanel: FC = () => {
             updatedConvosIds={cronsChats?.items}
             onChange={(id) => dispatch(setCurrentChatId(id))}
             refetchConvos={refetchChats}
+            disableUpdatedConvosSwitch={false}
           />
 
           {!!chatId && selectedChat && (

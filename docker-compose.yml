@@ -50,6 +50,8 @@ services:
   redis:
     image: redis:7.2-alpine
     restart: unless-stopped
+    ports:
+      - 6379:6379
     volumes:
       - redis-data:/data
     healthcheck:
@@ -61,6 +63,8 @@ services:
   mysql:
     image: mysql:lts
     restart: unless-stopped
+    ports:
+      - 3306:3306
     environment:
       MYSQL_DATABASE: ${DB_NAME:-vera}
       MYSQL_USER: ${DB_USERNAME:-vera}

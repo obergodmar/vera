@@ -11,7 +11,6 @@ import {
   IApi,
   IDuty,
 } from '@vera-reforged/common';
-import { MessagesGetConversationMembersResponse } from '@vkontakte/api-schema-typescript';
 
 import { DataSource, Repository } from 'typeorm';
 import { UsersUserFull } from 'vk-io/lib/api/schemas/objects';
@@ -48,7 +47,6 @@ export class DutyService {
       const { peerId, text } = msg;
 
       const regexp = /duty(\s#?(?<tag>\w+))?/;
-
       if (!regexp.test(text)) {
         return next();
       }
@@ -109,36 +107,6 @@ export class DutyService {
     );
   }
 
-  public async getMembersForChat(
-    chatId: number,
-  ): Promise<IApi.IDutyApi.GetMembersForChatResponse> {
-    let response: MessagesGetConversationMembersResponse;
-    try {
-      response = await this.vkApi.fetch(
-        'messages.getConversationMembers',
-        {
-          fields: '',
-          // extended: 1,
-          peer_id: chatId,
-          group_id: 1,
-        },
-        {
-          retries: 3,
-        },
-      );
-    } catch (error: unknown) {
-      this.logger.error(`getMembersForChat: ${error}`);
-
-      return {
-        items: [],
-        count: 0,
-        error: 'Что-то пошло не так',
-      };
-    }
-
-    return response;
-  }
-
   public async getScheduleForChat(
     chatId: number,
   ): Promise<IApi.IDutyApi.GetScheduleForChatResponse> {
@@ -175,7 +143,7 @@ export class DutyService {
         { retries: 3 },
       );
 
-      this.logger.debug('Fetch successfull');
+      this.logger.debug('Fetch successful');
     } catch (e) {
       this.logger.error(`Couldn't fetch users, ${e}`);
 
@@ -255,7 +223,7 @@ export class DutyService {
 
     if (error) {
       return {
-        error,
+        error: 'Ошибка обновления',
         success: false,
       };
     }

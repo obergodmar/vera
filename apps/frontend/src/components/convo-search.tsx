@@ -9,8 +9,8 @@ import {
   Select,
   SimpleCell,
   Switch,
+  Tooltip,
 } from '@vkontakte/vkui';
-import { TextTooltip } from '@vkontakte/vkui/dist/components/TextTooltip/TextTooltip';
 
 import { FC, useMemo, useState } from 'react';
 
@@ -29,7 +29,7 @@ export const ConvoSearch: FC<Props> = ({
   updatedConvosIds,
   onChange,
   refetchConvos,
-  disableUpdatedConvosSwitch,
+  disableUpdatedConvosSwitch = true,
 }) => {
   const [showUpdatedOnly, setShowUpdatedOnly] = useState(false);
 
@@ -53,6 +53,15 @@ export const ConvoSearch: FC<Props> = ({
             searchable
             style={{ flexGrow: 1 }}
             value={value}
+            before={
+              options.find(({ value: val }) => val === value)?.avatar && (
+                <Avatar
+                  size={24}
+                  src={options.find(({ value: val }) => val === value)?.avatar}
+                  fallbackIcon={<Icon16Users />}
+                />
+              )
+            }
             onChange={(e) => {
               const id = Number(e.target.value);
 
@@ -86,7 +95,7 @@ export const ConvoSearch: FC<Props> = ({
           />
 
           {refetchConvos && (
-            <TextTooltip text="Обновить список чатов">
+            <Tooltip text="Обновить список чатов">
               <IconButton
                 aria-label="Обновить список чатов"
                 onClick={refetchConvos}
@@ -100,13 +109,16 @@ export const ConvoSearch: FC<Props> = ({
               >
                 <Icon20RefreshOutline />
               </IconButton>
-            </TextTooltip>
+            </Tooltip>
           )}
         </div>
       </FormItem>
 
       {!disableUpdatedConvosSwitch && (
-        <FormItem bottom="Показывает только те чаты, в которые уже добавлены установки из текущего раздела">
+        <FormItem
+          bottom="Показывает только те чаты, в которые уже добавлены установки из текущего раздела"
+          style={{ paddingTop: 0 }}
+        >
           <SimpleCell
             Component="label"
             after={

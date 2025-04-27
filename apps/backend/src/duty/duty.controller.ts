@@ -2,7 +2,6 @@ import { Body, Controller, HttpCode, Inject, Post } from '@nestjs/common';
 import { IApi, ROUTES } from '@vera-reforged/common';
 
 import {
-  GetMembersFotChatDto,
   GetScheduleForChatDto,
   UpdateChatScheduleDto,
 } from './duty.dto';
@@ -15,14 +14,6 @@ export class DutyController {
   public constructor(
     @Inject(DutyService) private readonly dutyService: DutyService,
   ) {}
-
-  @Post(endpoints.getMembersForChat)
-  @HttpCode(200)
-  public async getMembersForChat(
-    @Body() data: GetMembersFotChatDto,
-  ): Promise<IApi.IDutyApi.GetMembersForChatResponse> {
-    return this.dutyService.getMembersForChat(data.chatId);
-  }
 
   @Post(endpoints.getScheduleForChat)
   @HttpCode(200)

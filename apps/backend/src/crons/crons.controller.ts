@@ -25,7 +25,7 @@ export class CronsController {
   @Post(endpoints.getCronsChats)
   @HttpCode(200)
   public getCronsChatsResponse(): Promise<IApi.ICronsApi.GetCronsChatsResponse> {
-    return this.cronsService.getCronsChatsResponse();
+    return this.cronsService.getCronsChats();
   }
 
   @Post(endpoints.createCronForChat)

@@ -82,7 +82,7 @@
         "target": "node",
         "compiler": "tsc",
         "outputPath": "dist/typeorm-migration",
-        "main": "apps/backend/src/migrations/typeorm.config.ts",
+        "main": "apps/backend/src/database/migrations/typeorm.config.ts",
         "tsConfig": "apps/backend/tsconfig.app.json",
         "sourceMap": false
       }
@@ -91,7 +91,7 @@
       "executor": "nx:run-commands",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "cwd": "apps/backend/src/migrations",
+        "cwd": "apps/backend/src/database/migrations",
         "commands": [
           "typeorm -d ../../../../dist/typeorm-migration/main.js migration:generate"
         ]

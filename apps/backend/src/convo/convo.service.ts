@@ -119,6 +119,10 @@ export class ConvoService {
                   peer_ids: `${peerId}`,
                 },
               })),
+              /** Так как мы получим какое-то число чатов из запрошенных,
+               * остальные придут ошибкой, что чата нет, игнорируем такую ошибку
+               */
+              { omitExecuteLogs: true },
             ),
           ];
         },
@@ -244,5 +248,35 @@ export class ConvoService {
         items: [],
       };
     }
+  }
+
+  public async getMembersForChat(
+    chatId: number,
+  ): Promise<IApi.IConvoApi.GetMembersForChatResponse> {
+    let response: MessagesGetConversationMembersResponse;
+    try {
+      response = await this.vkApi.fetch(
+        'messages.getConversationMembers',
+        {
+          fields: '',
+          // extended: 1,
+          peer_id: chatId,
+          group_id: 1,
+        },
+        {
+          retries: 3,
+        },
+      );
+    } catch (error: unknown) {
+      this.logger.error(`getMembersForChat: ${error}`);
+
+      return {
+        items: [],
+        count: 0,
+        error: 'Что-то пошло не так',
+      };
+    }
+
+    return response;
   }
 }

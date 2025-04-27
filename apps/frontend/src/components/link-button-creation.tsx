@@ -6,8 +6,8 @@ import {
   Header,
   IconButton,
   Input,
+  Tooltip,
 } from '@vkontakte/vkui';
-import { TextTooltip } from '@vkontakte/vkui/dist/components/TextTooltip/TextTooltip';
 
 import { FC, ReactNode } from 'react';
 
@@ -31,13 +31,22 @@ export const LinkButtonCreation: FC<Props> = ({
       header={
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <Header mode="secondary">{header}</Header>
-          <TextTooltip text="Удалить кнопку">
-            <IconButton aria-label="Удалить кнопку" onClick={onRemove}>
+          <Tooltip text="Удалить кнопку">
+            <IconButton
+              aria-label="Удалить кнопку"
+              onClick={onRemove}
+              style={{
+                minWidth: '44px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
               <Icon16Delete
                 style={{ color: 'var(--vkui--color_icon_secondary)' }}
               />
             </IconButton>
-          </TextTooltip>
+          </Tooltip>
         </div>
       }
     >

@@ -112,6 +112,7 @@ export class VkApiService implements IVKApi.IVKApi {
           params,
           opts.timeout || API_DEFAULT_TIMEOUT,
           opts.trackId,
+          opts.omitExecuteLogs,
         );
         return res;
       } catch (err: unknown) {
@@ -326,6 +327,7 @@ export class VkApiService implements IVKApi.IVKApi {
     params: IVKApi.Request[Method]['params'],
     timeout: number,
     trackId?: IVKApi.TrackId<Method>,
+    omitExecuteLogs?: boolean,
   ): Promise<IVKApi.Request[Method]['response']> => {
     await this.semaphore.lock();
 
@@ -396,7 +398,9 @@ export class VkApiService implements IVKApi.IVKApi {
           result.response,
         );
 
-        Logger.error(errors);
+        if (!omitExecuteLogs) {
+          Logger.error(errors);
+        }
       }
 
       return result.response;
