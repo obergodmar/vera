@@ -3,7 +3,7 @@ import { createWriteStream } from 'node:fs';
 /**
  * Запись будет производиться в директорию, откуда запущен бот.
  */
-const filePath = `${process.cwd()}/vera.log`;
+const filePath = `${process.cwd()}/logs/vera.log`;
 
 export function logFS(message: string): void {
   try {

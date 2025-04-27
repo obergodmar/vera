@@ -6,6 +6,8 @@ services:
     image: registry.example.com:5050/example/vera-reforged:latest
     ports:
       - '80:${PORT}'
+    volumes:
+      - ./logs:/app/logs
     environment:
       # Production settings
       - IS_PROD=${IS_PROD}

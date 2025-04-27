@@ -16,7 +16,7 @@ COPY --from=builder /app/dist /app/dist
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile --production && yarn cache clean
 
-RUN chown -R node:node /app
+RUN mkdir -p /app/logs && chown -R node:node /app/logs
 
 USER node
 
