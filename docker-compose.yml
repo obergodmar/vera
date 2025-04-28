@@ -23,7 +23,6 @@ services:
       - DB_PASSWORD=${DB_PASSWORD:-password}
       - REDIS_URL=redis://redis:6379
 
-
       # Bot settings
       - BOT_TOKEN=${BOT_TOKEN}
       - BOT_POLLING_GROUP_ID=${BOT_POLLING_GROUP_ID}
