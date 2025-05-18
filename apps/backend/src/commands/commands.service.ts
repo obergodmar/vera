@@ -59,7 +59,10 @@ export class CommandsService {
         ...text.matchAll(/\/(?<command>\w+)(\s(?<name>\w+))?/g),
       ].map((m) => m.groups || { command: null, name: null });
 
-      this.lookForCommandAndAnnounce.call(this, peerId, matches);
+      if (matches.length > 0) {
+        this.lookForCommandAndAnnounce.call(this, peerId, matches);
+      }
+
       return next();
     });
   }
