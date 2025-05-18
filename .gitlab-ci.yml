@@ -1,0 +1,34 @@
+image: docker:24.0.5
+
+services:
+  - docker:24.0.5-dind
+
+variables:
+  CI_REGISTRY: registry.example.com:5050
+  CI_PROJECT_PATH: "/example/vera-reforged"
+  CI_REGISTRY_IMAGE: "$CI_REGISTRY$CI_PROJECT_PATH"
+
+stages:
+  - build
+
+before_script:
+  - export SANITIZED_TAG=$(echo "$CI_COMMIT_REF_NAME" | sed 's/[^a-zA-Z0-9_.-]/-/g')
+  - echo "Using tag $SANITIZED_TAG"
+
+build_image:
+  stage: build
+  variables:
+    DOCKER_HOST: tcp://docker:2375  # Connect to Docker via TCP
+    DOCKER_DRIVER: overlay2         # Optional, improves performance
+    DOCKER_TLS_CERTDIR: ""
+  tags:
+    - example-docker-runner
+  script:
+    - docker info
+    - echo "CI_REGISTRY is $CI_REGISTRY"
+    - echo "CI_REGISTRY_USER is $CI_REGISTRY_USER"
+    - echo "CI_REGISTRY_IMAGE is $CI_REGISTRY_IMAGE"
+    - echo "CI_COMMIT_REF_NAME is $CI_COMMIT_REF_NAME"
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin
+    - docker build -t "$CI_REGISTRY_IMAGE:$SANITIZED_TAG" .
+    - docker push "$CI_REGISTRY_IMAGE:$SANITIZED_TAG"
