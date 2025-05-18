@@ -8,6 +8,7 @@ import { CronsModule } from '../crons/crons.module';
 import { DatabaseModule } from '../database/database.module';
 import { DutyModule } from '../duty/duty.module';
 import { IEnvironment } from '../environments/env-type';
+import { HealthModule } from '../health/health.module';
 import { HelloMessagesModule } from '../hello-messages/hello-messages.module';
 import { LoggerModule } from '../logger/logger.module';
 import { ReactionsModule } from '../reactions/reactions.module';
@@ -46,6 +47,7 @@ export class AppModule {
           isGlobal: true,
           cache: true,
         }),
+        HealthModule,
       ],
     };
   }

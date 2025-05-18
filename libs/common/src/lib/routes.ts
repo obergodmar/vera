@@ -71,4 +71,9 @@ export const ROUTES = {
       disableAllCommands: 'disableAllCommands',
     },
   },
+
+  health: {
+    prefix: 'health',
+    baseUrl: '/api/health',
+  },
 } as const;

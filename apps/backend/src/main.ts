@@ -53,6 +53,8 @@ async function bootstrap() {
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
 
+  app.enableShutdownHooks();
+
   await app.listen(env.port, env.address);
 
   Logger.log(
