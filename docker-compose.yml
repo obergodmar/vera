@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: registry.example.com:5050/example/vera-reforged:latest
+    image: registry.example.com:5050/example/vera-reforged:master
     ports:
       - '80:${PORT}'
     # TODO: finish logs mountpoint
