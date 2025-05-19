@@ -45,8 +45,10 @@ async function bootstrap() {
       secret: env.secret,
       resave: false,
       saveUninitialized: false,
+      proxy: !!env.trustProxy,
       cookie: {
-        secure: env.isProd,
+        secure: env.isProd || undefined,
+        sameSite: env.isProd ? 'lax' : undefined,
       },
     }),
   );
