@@ -1,10 +1,3 @@
-import CacheableLookup from 'cacheable-lookup';
-import * as https from 'node:https';
-import fetch, { Headers } from 'node-fetch';
-
-const cacheable = new CacheableLookup()
-cacheable.install(https.globalAgent);
-
 export async function request(
   url: string,
   params: Record<string, any>,
@@ -25,7 +18,6 @@ export async function request(
     headers,
     signal: abortSignal,
     body: formData,
-    agent: https.globalAgent,
   });
 
   if (!res.ok) {

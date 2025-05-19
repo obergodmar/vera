@@ -1,3 +1,4 @@
+import type { HealthCheckResult } from '@nestjs/terminus';
 import { MessagesGetConversationMembersResponse } from '@vkontakte/api-schema-typescript';
 
 import { MessagesConversation, UsersUser } from 'vk-io/lib/api/schemas/objects';
@@ -175,5 +176,13 @@ export namespace IApi {
     export type DisableAllCommandsResponse = StatusResponse & {
       count?: number;
     };
+  }
+
+  export namespace IHealthApi {
+    export type GetHealthRequest = void;
+    export type GetHealthResponse = HealthCheckResult;
+  }
+
+  export namespace IConfiApi {
   }
 }

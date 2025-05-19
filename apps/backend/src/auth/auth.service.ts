@@ -24,8 +24,8 @@ export class AuthService {
   private readonly logger: DebugService;
   private readonly accessChatId: number;
 
-  private readonly appId: number;
-  private readonly redirectUri: string;
+  private readonly appId: IEnvironment['appId'];
+  private readonly redirectUri: IEnvironment['redisUrl'];
 
   public constructor(
     @Inject(LoggerService) loggerService: LoggerService,

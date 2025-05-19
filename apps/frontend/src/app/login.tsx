@@ -21,9 +21,18 @@ import { authorize, logOff } from '../data/reducers/authorization';
 import { useAuthorizeMutation } from '../data/services/auth-api';
 import { useSnackbar } from '../hooks/useSnackbar';
 
+declare global {
+  interface Window {
+    __ENV__: {
+      appId: string;
+      redirectUri: string;
+    };
+  }
+}
+
 VKID.Config.init({
-  app: parseInt(import.meta.env.VITE_APP_ID),
-  redirectUrl: import.meta.env.VITE_LOGIN_REDIRECT_URL,
+  app: parseInt(window.__ENV__.appId),
+  redirectUrl: window.__ENV__.redirectUri,
   mode: VKID.ConfigAuthMode.InNewTab,
   responseMode: VKID.ConfigResponseMode.Callback,
 });
@@ -33,7 +42,7 @@ export const Login: FC = () => {
   const snackbar = useSnackbar();
   const dispatch = useDispatch();
 
-  const [isVKAuthLoading, setVKAuthLoading] = useState(false)
+  const [isVKAuthLoading, setVKAuthLoading] = useState(false);
   const [authRequest, authResult] = useAuthorizeMutation();
 
   useEffect(() => {
@@ -58,7 +67,7 @@ export const Login: FC = () => {
   }, [dispatch]);
 
   const authHandler = useCallback(async () => {
-    setVKAuthLoading(true)
+    setVKAuthLoading(true);
     const codeVerifier = generateRandomString();
     VKID.Config.update({
       codeVerifier,
@@ -94,7 +103,7 @@ export const Login: FC = () => {
       });
       console.error(err);
     } finally {
-      setVKAuthLoading(false)
+      setVKAuthLoading(false);
     }
   }, [authRequest, snackbar]);
 

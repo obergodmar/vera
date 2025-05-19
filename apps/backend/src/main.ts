@@ -4,9 +4,11 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 
 import RedisStore from 'connect-redis';
 import * as session from 'express-session';
+import { join } from 'path';
 import { createClient } from 'redis';
 
 import { AppModule } from './app/app.module';
+import { injectEnvIntoIndexHtml } from './app/inject-env';
 import { envValidation } from './environments/env-validator';
 
 async function bootstrap() {
@@ -54,6 +56,10 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix);
 
   app.enableShutdownHooks();
+
+  const indexPath = join(__dirname, '..', 'frontend', 'index.html');
+
+  injectEnvIntoIndexHtml(env, indexPath);
 
   await app.listen(env.port, env.address);
 

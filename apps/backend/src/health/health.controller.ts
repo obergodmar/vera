@@ -6,25 +6,39 @@ import {
   MemoryHealthIndicator,
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
-import { ROUTES } from '@vera-reforged/common';
+import { IApi, ROUTES } from '@vera-reforged/common';
+
+import { DebugService } from '../logger/debug.service';
+import { LoggerService } from '../logger/logger.service';
 
 const { prefix } = ROUTES.health;
 
 @Controller(prefix)
 export class HealthController {
+  private readonly logger: DebugService;
+
   constructor(
     private health: HealthCheckService,
     private db: TypeOrmHealthIndicator,
     private memory: MemoryHealthIndicator,
+    @Inject(LoggerService) loggerService: LoggerService,
     @Inject(ConfigService) private readonly config: ConfigService,
-  ) {}
+  ) {
+    this.logger = new DebugService(loggerService, this.constructor.name);
+  }
 
   @Get()
   @HealthCheck()
-  check() {
-    return this.health.check([
+  public async check(): Promise<IApi.IHealthApi.GetHealthResponse> {
+    this.logger.debug('Health check run');
+
+    const result = await this.health.check([
       () => this.db.pingCheck(this.config.get('dbName')),
       () => this.memory.checkHeap('memory_heap', 501 * 1024 * 1024),
     ]);
+
+    this.logger.debug(JSON.stringify(result));
+
+    return result;
   }
 }

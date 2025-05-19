@@ -97,6 +97,7 @@ sudo nano /etc/redis/redis.conf
 - `ADDRESS (string)` - Адрес для app.listen
 - `PORT (string/number)` - Порт для app.listen
 - `SECRET (string)` - Уникальная строка для сессий
+- `TRUST_PROXY (string)` - Для секурных кук
 
 #### Настройки подключения к базе данных
 
@@ -105,7 +106,6 @@ sudo nano /etc/redis/redis.conf
 - `DB_NAME (string)`
 - `DB_USERNAME (string)`
 - `DB_PASSWORD (string)`
-- `TRUST_PROXY (string)`
 
 - `REDIS_URL (string)`
 
@@ -132,11 +132,6 @@ sudo nano /etc/redis/redis.conf
 
 - `APP_ID (string/number)` - Айди приложения панели управления ботом. Ссылка есть в разделе [Полезная информация и ссылки](#%D0%BF%D0%BE%D0%BB%D0%B5%D0%B7%D0%BD%D0%B0%D1%8F-%D0%B8%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F-%D0%B8-%D1%81%D1%81%D1%8B%D0%BB%D0%BA%D0%B8).
 - `REDIRECT_URI (string)` - Веб-страница, куда нужно перенаправить пользователя после того, как он разрешил приложению доступ.
-
-#### Для фронтенда на этапе сборки
-
-- `VITE_APP_ID (string/number)` - Это `APP_ID`. Но прокидывается на фронтенд для приложения `@vkid/sdk` для работы авторизации. **Нужно на этапе сборки фронтенда**.
-- `VITE_LOGIN_REDIRECT_URL (string)` - Это `redirectUrl` передаваемый в `VKID.Config` для авторизации. После успешной авторизации будет произведен редирект на эту ссылку. Для локалхоста - это, как известно, http://localhost/login для другого домена - домен. " **Нужно на этапе сборки фронтенда**.
 
 ### Сборка приложений
 
