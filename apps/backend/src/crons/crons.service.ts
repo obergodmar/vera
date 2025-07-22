@@ -2,29 +2,28 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IApi, ICrons, shouldCallCron } from '@vera-reforged/common';
+import { MessagesSendParams } from '@vkontakte/api-schema-typescript';
 
 import { CronJob } from 'cron';
 import { Repository } from 'typeorm';
-import { APIMessages } from 'vk-io/lib/api/schemas/methods';
-import { MessagesSendParams } from 'vk-io/lib/api/schemas/params';
 
-import { BotService } from '../bot/bot.service';
 import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
 import { LoggerService } from '../logger/logger.service';
+import { VkApiService } from '../vk-api/vk-api.service';
 import { CreateCronForChatDto, UpdateCronForChatDto } from './crons.dto';
 import { Cron } from './crons.entity';
 
 @Injectable()
 export class CronsService {
   private cronJobs: Map<number, CronJob> = new Map();
-  private readonly sendMessage: APIMessages['send'];
+  private readonly sendMessage: (params: MessagesSendParams) => Promise<void>;
   private readonly logger: DebugService;
 
   public constructor(
     @InjectRepository(Cron)
     private readonly cronsRepository: Repository<Cron>,
-    @Inject(BotService) private readonly botService: BotService,
+    @Inject(VkApiService) private readonly vkApi: VkApiService,
     @Inject(ConfigService) private readonly config: ConfigService,
     @Inject(LoggerService) loggerService: LoggerService,
   ) {
@@ -33,12 +32,16 @@ export class CronsService {
     const isListenerOff =
       this.config.get<IEnvironment['disableBotListener']>('disableBotListener');
 
-    this.sendMessage = (params: MessagesSendParams) => {
+    this.sendMessage = async (params: MessagesSendParams) => {
       if (isListenerOff) {
         return;
       }
 
-      return this.botService.vk.api.messages.send(params);
+      await this.vkApi.fetch(
+        'messages.send',
+        { ...params, group_id: 1 },
+        { retries: 3 },
+      );
     };
 
     this.logger.debug('Crons initial load started');
@@ -320,7 +323,7 @@ export class CronsService {
 
 function createCronJob(
   cron: ICrons.ChatCron,
-  sendMessage: APIMessages['send'],
+  sendMessage: (params: MessagesSendParams) => Promise<void>,
   logger: DebugService,
 ): CronJob {
   const { timeAt, chatId, daysRange, message, buttons, repeat, startDate } =
@@ -359,7 +362,7 @@ function createCronJob(
 
   return new CronJob(
     `00 ${minutes} ${hours} * * ${daysRange}`,
-    () => {
+    async () => {
       try {
         if (!shouldCallCron(startDate, Date.now(), repeat)) {
           logger.debug(`Cron Job JUST CANNCELED for cron ${logMeta}`);
@@ -371,7 +374,7 @@ function createCronJob(
       }
 
       try {
-        sendMessage({
+        await sendMessage({
           peer_id: chatId,
           message,
           keyboard,
