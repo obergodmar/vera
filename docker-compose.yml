@@ -41,6 +41,9 @@ services:
       - APP_ID=${APP_ID}
       - REDIRECT_URI=${REDIRECT_URI}
     restart: unless-stopped
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     healthcheck:
       test: ["CMD", "node", "-e", 'fetch(`http://127.0.0.1:${PORT}/api/health`).then((res)=>res.json()).then((res)=>{console.log(res);process.exitCode=res.status===`ok`?0:1}).catch(()=>process.exit(1))']
       interval: 15s
@@ -77,6 +80,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-password}
     volumes:
       - mysql-data:/var/lib/mysql
+    command: --default-time-zone='Europe/Moscow'
     healthcheck:
       test: mysql ${DB_NAME} --user=${DB_USERNAME} --password='${DB_PASSWORD}' --silent --execute "SHOW DATABASES like '${DB_NAME}';"
       interval: 15s
