@@ -6,70 +6,23 @@ export type Opaque<Type, Token = unknown> = Type & {
   readonly __opaque__: Token;
 };
 
-/**
- * Тип пропсов ниже урезан ввиду ограниченной возможности
- * передачи чего-либо в рамках вызовов из стора.
- *
- * Из компонентов снэкбар вызывается с SnackbarExtendedProps
- * (см. Snackbar.tsx)
- */
 export type SnackbarProps = {
-  /**
-   * Название кнопки действия в уведомлении
-   */
   action?: string;
-
-  /**
-   * Будет вызвано при клике на кнопку действия
-   */
   onActionClick?: () => void;
-  /**
-   * Варианты расположения кнопки действия.
-   * Игнорируется на десктопах и при наличии элементов `after`
-   */
   layout?: 'vertical' | 'horizontal';
-  /**
-   * Время в миллисекундах, через которое плашка скроется
-   */
   duration?: number;
-  /**
-   * Обработчик закрытия уведомления
-   */
   onClose?: () => void;
-  /**
-   * Задает стиль снэкбара
-   */
   mode?: 'default' | 'dark';
-  /**
-   * Показывать ли кнопку закрытия уведомления
-   */
   isManuallyClosable?: boolean;
-  /**
-   * Снэкбар закрывается сам после истечения таймера
-   */
   autoClose?: boolean;
-  /**
-   * Снэкбар не закроется, пока на него наведена мышка
-   */
   stopOnHover?: boolean;
-  /**
-   * Сообщение снэкбара
-   */
   message: string;
   className?: string;
 };
 
 export type SnackbarHelpersProps = {
   id: SnackbarId;
-  /**
-   * Удаление снэкбара из снэкбар стора
-   */
   onRequestRemove: () => void;
-  /**
-   * Весь стейт хранится в сторе, и, когда извне
-   * поступает сигнал об удалении снэкбара, он
-   * обрабатывается через этот индикатор
-   */
   requestClose: boolean;
 };
 
@@ -95,11 +48,6 @@ type SnackbarListener = (state: SnackbarState) => void;
 
 export type SnackbarState = SnackbarItem[];
 
-/**
- * Так как есть необходимость во внешнем (от реакта) контексте, где
- * хочется использовать снэкбары, создаем стор, который будет
- * хранить в себе все снэкбары
- */
 export const snackbarStore = createStore();
 
 function createStore(initialState: SnackbarState = []): SnackbarStore {
@@ -205,10 +153,6 @@ function createStore(initialState: SnackbarState = []): SnackbarStore {
 export type CreateSnackbar<Props extends SnackbarProps = SnackbarProps> =
   SnackbarMethods<Props>['create'] & Omit<SnackbarMethods<Props>, 'create'>;
 
-/**
- * Создать снэкбар внутри MEApp, но не из комопнентов реакта
- * (например из стора)
- */
 export function createSnackbar<
   Props extends SnackbarProps = SnackbarProps,
 >(): CreateSnackbar<Props> {
