@@ -121,7 +121,7 @@ export const Command: FC<Props> = ({ chatId, idx, existingCommand }) => {
   const modified =
     enabled !== existingCommand.enabled ||
     phrase !== existingCommand.command.phrase ||
-    membersIds !== existingCommand.command.membersIds ||
+    !isSameMemberIdsList(membersIds, existingCommand.command.membersIds) ||
     name !== existingCommand.nameExtra;
 
   if (isMembersListFetching) {
@@ -182,3 +182,27 @@ export const Command: FC<Props> = ({ chatId, idx, existingCommand }) => {
     </ModifiableCell>
   );
 };
+
+function isSameMemberIdsList(a: string, b: string): boolean {
+  const arrA = a.split(',');
+  const arrB = b.split(',');
+
+  if (arrA.length !== arrB.length) {
+    return false;
+  }
+
+  const setA = new Set(arrA);
+  const setB = new Set(arrB);
+
+  if (setA.size !== setB.size) {
+    return false;
+  }
+
+  for (const val of setA) {
+    if (!setB.has(val)) {
+      return false;
+    }
+  }
+
+  return true;
+}

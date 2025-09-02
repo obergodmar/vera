@@ -56,7 +56,7 @@ export class CommandsService {
       }
 
       const matches = [
-        ...text.matchAll(/\/(?<command>\p{L}+)(\s(?<name>\p{L}+))?/gu),
+        ...text.matchAll(/\/(?<command>\S+)(\s(?<name>\S+))?/gu),
       ].map((m) => m.groups || { command: null, name: null });
 
       if (matches.length > 0) {
