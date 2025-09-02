@@ -51,7 +51,7 @@ export class AuthService {
     let visitor = 'unknown user';
     let requestedUser: UsersUser;
     try {
-      const res = await request('https://id.vk.com/oauth2/auth', {
+      const res = await request('https://id.vk.ru/oauth2/auth', {
         client_id: this.appId,
         grant_type: 'authorization_code',
         code,

@@ -340,7 +340,7 @@ export class VkApiService implements IVKApi.IVKApi {
       };
       const version = API_VERSION;
 
-      const url = `https://api.vk.com/method/${method}?v=${version}`;
+      const url = `https://api.vk.ru/method/${method}?v=${version}`;
       const ctrl = new AbortController();
 
       if (trackId) {

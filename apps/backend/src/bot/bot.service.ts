@@ -23,6 +23,7 @@ export class BotService {
       token,
       pollingGroupId,
       apiMode,
+      apiBaseUrl: 'https://api.vk.ru/method',
     });
 
     const debugChatId =
