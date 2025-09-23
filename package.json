@@ -44,7 +44,7 @@
     "@nestjs/terminus": "^11.0.0",
     "@nestjs/typeorm": "^10.0.0",
     "@reduxjs/toolkit": "1.9.3",
-    "@vkid/sdk": "^2.4.1",
+    "@vkid/sdk": "^2.6.1",
     "@vkontakte/api-schema-typescript": "^1.5131.2",
     "@vkontakte/icons": "^2.48.1",
     "@vkontakte/vk-bridge": "^2.7.2",
