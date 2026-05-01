@@ -68,5 +68,4 @@ export class CommandsController {
   public disableAllCommands(): Promise<IApi.ICommandsApi.DisableAllCommandsResponse> {
     return this.commandsService.disableAllCommands();
   }
-
 }

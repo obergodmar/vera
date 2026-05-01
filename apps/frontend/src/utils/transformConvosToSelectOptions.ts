@@ -6,21 +6,18 @@ export function transformConvosToSelectOptions(
 ): CustomSelectOptionInterface[] {
   return (
     data.items.reduce((acc: CustomSelectOptionInterface[], item) => {
-      const {
-        chat_settings,
-        peer: { id },
-      } = item;
+      const { chat_settings, peer } = item;
 
-      if (!chat_settings) {
+      if (!chat_settings || !peer?.id) {
         return acc;
       }
       const { title, photo } = chat_settings;
 
       acc.push({
-        label: title,
-        value: id,
+        label: title ?? '',
+        value: peer.id,
         avatar: photo?.photo_100,
-        description: id,
+        description: peer.id,
       });
 
       return acc;

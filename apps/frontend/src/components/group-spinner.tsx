@@ -12,7 +12,7 @@ export const GroupSpinner: FC = () => {
         paddingBottom: '16px',
       }}
     >
-      <Spinner size="regular" />
+      <Spinner size="m" />
     </div>
   );
 };

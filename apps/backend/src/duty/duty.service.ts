@@ -11,11 +11,11 @@ import {
   IApi,
   IDuty,
 } from '@vera-reforged/common';
+import { UsersUserFull } from '@vkontakte/api-schema-typescript';
 
 import { DataSource, Repository } from 'typeorm';
-import { UsersUserFull } from 'vk-io/lib/api/schemas/objects';
 
-import { BotService } from '../bot/bot.service';
+import { BotEventBusService } from '../bot-core/bot-event-bus.service';
 import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
 import { LoggerService } from '../logger/logger.service';
@@ -29,7 +29,8 @@ export class DutyService {
   public constructor(
     private dataSource: DataSource,
     @InjectRepository(Duty) private readonly dutyRepository: Repository<Duty>,
-    @Inject(BotService) private readonly botService: BotService,
+    @Inject(BotEventBusService)
+    private readonly botEventBus: BotEventBusService,
     @Inject(VkApiService) private readonly vkApi: VkApiService,
     @Inject(ConfigService) private readonly config: ConfigService,
     @Inject(LoggerService) loggerService: LoggerService,
@@ -39,23 +40,24 @@ export class DutyService {
     const isListenerOff =
       this.config.get<IEnvironment['disableBotListener']>('disableBotListener');
 
-    this.botService.vk.updates.on('message_new', async (msg, next) => {
+    this.botEventBus.onMessage(async (event) => {
       if (isListenerOff) {
-        return next();
+        return;
       }
 
-      const { peerId, text } = msg;
+      const { peerId, text } = event;
+      if (!text) {
+        return;
+      }
 
       const regexp = /duty(\s#?(?<tag>\w+))?/;
       if (!regexp.test(text)) {
-        return next();
+        return;
       }
 
       const { tag } = regexp.exec(text).groups || { tag: null };
 
       this.lookForDutyAndAnnounce.call(this, peerId, tag);
-
-      return next();
     });
   }
 

@@ -1,15 +1,7 @@
 import { Icon12Cancel } from '@vkontakte/icons';
-import { Button, Paragraph } from '@vkontakte/vkui';
-import { AdaptivityContext } from '@vkontakte/vkui/dist/components/AdaptivityProvider/AdaptivityContext';
+import { Button, Paragraph, useAdaptivity } from '@vkontakte/vkui';
 
-import React, {
-  FC,
-  memo,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { FC, memo, useEffect, useRef, useState } from 'react';
 
 import './snackbar.css';
 import cx from 'classnames';
@@ -174,11 +166,7 @@ type DeviceData = {
 };
 
 export function useDeviceData(): DeviceData {
-  const adaptivityData = useContext(AdaptivityContext);
-
-  if (!adaptivityData) {
-    throw new Error('AdaptivityContext не добавлен в дерево Реакта!');
-  }
+  const adaptivityData = useAdaptivity();
 
   return {
     isTouchOnly: !adaptivityData.hasHover,

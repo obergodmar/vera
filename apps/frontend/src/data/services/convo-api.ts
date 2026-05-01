@@ -1,4 +1,4 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/dist/query/react';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { IApi, ROUTES } from '@vera-reforged/common';
 import { CustomSelectOptionInterface } from '@vkontakte/vkui';
 
@@ -38,6 +38,7 @@ export const convoApi = createApi({
         }
 
         return profiles
+          .filter(({ id }) => id !== undefined)
           .map(
             ({
               id: userId,
@@ -47,10 +48,10 @@ export const convoApi = createApi({
               last_name: lastName = '',
             }) => ({
               label: `${firstName} ${lastName}`,
-              value: userId,
+              value: userId as number,
               avatar,
               screenName,
-              userId,
+              userId: userId as number,
               firstName,
               lastName,
             }),

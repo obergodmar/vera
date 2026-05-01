@@ -31,11 +31,11 @@ export type PortalProps = {
  * Отправляет `children` в отдельный `div` в конце `body`.
  * При анмаунте, удаляет за собой созданный `div`
  */
-export const Portal = forwardRef<HTMLDivElement | null, PortalProps>(
+export const Portal = forwardRef<HTMLDivElement, PortalProps>(
   function WithPortal(
     { children, portalClassName, portalTarget, ...props },
     ref,
-  ) {
+  ): React.ReactNode {
     const [renderNode, setRenderNode] = useState<HTMLDivElement | null>(null);
     const prevClassName = usePrevious<string | undefined>(portalClassName);
 
@@ -86,7 +86,7 @@ export const Portal = forwardRef<HTMLDivElement | null, PortalProps>(
         {children}
       </div>,
       renderNode,
-    );
+    ) as React.ReactNode;
   },
 );
 

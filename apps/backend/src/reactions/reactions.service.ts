@@ -1,16 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getRandomId, IApi, IReactions } from '@vera-reforged/common';
+import { IApi, IReactions } from '@vera-reforged/common';
 
 import { Repository } from 'typeorm';
 
-import { BotService } from '../bot/bot.service';
+import { BotEventBusService } from '../bot-core/bot-event-bus.service';
+import { BotSenderService } from '../bot-core/bot-sender.service';
 import { DutyService } from '../duty/duty.service';
 import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
 import { LoggerService } from '../logger/logger.service';
-import { VkApiService } from '../vk-api/vk-api.service';
 import {
   CreateReactionForChatDto,
   UpdateReactionForChatDto,
@@ -24,9 +24,10 @@ export class ReactionsService {
   public constructor(
     @InjectRepository(Reaction)
     private readonly reactionsRepository: Repository<Reaction>,
-    @Inject(VkApiService) private readonly vkApi: VkApiService,
     @Inject(DutyService) private readonly dutyService: DutyService,
-    @Inject(BotService) private readonly botService: BotService,
+    @Inject(BotEventBusService)
+    private readonly botEventBus: BotEventBusService,
+    @Inject(BotSenderService) private readonly botSender: BotSenderService,
     @Inject(ConfigService) private readonly config: ConfigService,
     @Inject(LoggerService) loggerService: LoggerService,
   ) {
@@ -35,12 +36,16 @@ export class ReactionsService {
     const isListenerOff =
       this.config.get<IEnvironment['disableBotListener']>('disableBotListener');
 
-    this.botService.vk.updates.on('message_new', async (msg, next) => {
+    this.botEventBus.onMessage(async (event) => {
       if (isListenerOff) {
-        return next();
+        return;
       }
 
-      const { peerId, conversationMessageId, text } = msg;
+      const { peerId, conversationMessageId, text, backend } = event;
+      if (!text) {
+        return;
+      }
+
       let reactions: IReactions.ChatReaction[] = [];
       try {
         reactions = await this.reactionsRepository.find({
@@ -50,18 +55,18 @@ export class ReactionsService {
         this.logger.error(`Failed to get reactions for chat ${peerId}: ${e}`);
       }
 
-      reactions.forEach(async (reactionItem) => {
+      for (const reactionItem of reactions) {
         const { textTrigger, reaction, callDuty, dutyTag } = reactionItem;
 
         let regexp: RegExp;
         try {
-          const [text, trigger, flags] = textTrigger.split('/');
+          const [plain, trigger, flags] = textTrigger.split('/');
 
-          regexp = text ? new RegExp(text) : new RegExp(trigger, flags);
+          regexp = plain ? new RegExp(plain) : new RegExp(trigger, flags);
         } catch (e: unknown) {
           this.logger.error(`Error parsing textTrigger ${textTrigger}: ${e}`);
 
-          return next();
+          continue;
         }
 
         if (regexp.test(text)) {
@@ -70,21 +75,9 @@ export class ReactionsService {
           );
 
           try {
-            await this.vkApi.fetch(
-              'messages.send',
-              {
-                peer_id: peerId,
-                message: reaction,
-                random_id: getRandomId(),
-                group_id: 1,
-                forward: JSON.stringify({
-                  peer_id: peerId,
-                  is_reply: true,
-                  conversation_message_ids: conversationMessageId,
-                }),
-              },
-              { retries: 3 },
-            );
+            await this.botSender.send(backend, peerId, reaction, {
+              replyToConversationMessageId: conversationMessageId,
+            });
           } catch (error: unknown) {
             this.logger.error(`Reactions messages send: ${error}`);
           }
@@ -95,9 +88,7 @@ export class ReactionsService {
 
           this.logger.debug(`Sent reaction "${reaction}" for chat ${peerId}`);
         }
-      });
-
-      return next();
+      }
     });
   }
 

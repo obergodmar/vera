@@ -9,7 +9,7 @@ type Props = {
 
 export const PanelCancel: FC<Props> = ({ disabled = false, onCancel }) => {
   return (
-    <Tooltip text="Сбросить изменения">
+    <Tooltip description="Сбросить изменения">
       <PanelHeaderClose disabled={disabled} onClick={onCancel} />
     </Tooltip>
   );

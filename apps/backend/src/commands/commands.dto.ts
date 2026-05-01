@@ -18,7 +18,9 @@ export class CreateRollCommandDto
 
   @IsOptional()
   @IsString()
-  @Transform(({ value }: TransformFnParams) => value?.replaceAll(' ', '')?.trim())
+  @Transform(({ value }: TransformFnParams) =>
+    value?.replaceAll(' ', '')?.trim(),
+  )
   name?: string;
 
   @IsString()

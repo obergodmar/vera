@@ -30,8 +30,8 @@ export const LinkButtonCreation: FC<Props> = ({
     <Group
       header={
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Header mode="secondary">{header}</Header>
-          <Tooltip text="Удалить кнопку">
+          <Header size="s">{header}</Header>
+          <Tooltip description="Удалить кнопку">
             <IconButton
               aria-label="Удалить кнопку"
               onClick={onRemove}

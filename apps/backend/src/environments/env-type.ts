@@ -1,5 +1,3 @@
-import { IAPIOptions, IUpdatesOptions } from 'vk-io';
-
 export interface IEnvironment {
   /**
    * ===================
@@ -49,9 +47,15 @@ export interface IEnvironment {
   /**
    * Токен апи бота
    */
-  botToken: IAPIOptions['token'];
-  botPollingGroupId: IUpdatesOptions['pollingGroupId'];
-  botApiMode: IAPIOptions['apiMode'];
+  botToken: string;
+  botPollingGroupId: number;
+
+  /**
+   * =====================
+   * Настройки Telegram бота
+   */
+  telegramBotToken: string;
+  telegramEnabled: boolean;
 
   /**
    * =================

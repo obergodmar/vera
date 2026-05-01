@@ -5,8 +5,6 @@ import {
 } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
 
-import { ThunkMiddleware } from 'redux-thunk/es/types';
-
 import { getToken } from '../utils/getToken';
 import { authorization, logOff } from './reducers/authorization';
 import { commands } from './reducers/commands';
@@ -28,7 +26,8 @@ const isDev = MODE !== 'production';
 
 const snackbar = createSnackbar();
 
-const rtkQueryErrorLogger: ThunkMiddleware = () => (dispatch) => (action) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const rtkQueryErrorLogger: Middleware = () => (dispatch) => (action: any) => {
   if (isRejectedWithValue(action) || action?.payload?.error) {
     if (action?.payload.status === 401) {
       dispatch(logOff());

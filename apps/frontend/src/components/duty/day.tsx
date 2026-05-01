@@ -28,7 +28,7 @@ export const Day: FC<Props> = ({ day, duties }) => {
     <Group>
       <RichCell
         disabled
-        subhead={duties?.length ? `Дежурства ${nameWhen}` : undefined}
+        overTitle={duties?.length ? `Дежурства ${nameWhen}` : undefined}
         name={name}
         before={
           <Avatar

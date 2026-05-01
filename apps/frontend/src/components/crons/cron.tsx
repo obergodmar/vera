@@ -105,7 +105,7 @@ export const Cron: FC<Props> = ({
   return (
     <ModifiableCell
       modified={modified}
-      subhead="Крон"
+      overTitle="Крон"
       enabled={currentEnabled}
       setEnabled={setCurrentEnabled}
       onSave={() => {

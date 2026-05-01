@@ -49,7 +49,7 @@ export const Shift: FC<Props> = ({ duty, shiftNumber, dayNumber }) => {
         top={
           <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
             <Text>Смена {shiftNumber + 1}</Text>
-            <Tooltip text="Удалить смену">
+            <Tooltip description="Удалить смену">
               <IconButton
                 style={{
                   maxHeight: '20px',

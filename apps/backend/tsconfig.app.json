@@ -7,7 +7,9 @@
     "emitDecoratorMetadata": true,
     "target": "es2021",
     "resolveJsonModule": true,
-    "strictBindCallApply": true
+    "strictBindCallApply": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   },
   "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts"],
   "include": ["**/*.ts"]

@@ -37,16 +37,18 @@ export const HelloMessagesPanel: FC = () => {
   const message = useSelector(chatMessageSelector(chatId));
   const currentMessage = useMemo(
     () =>
-      helloMessages?.items.find(({ peer: { id } }) => id === chatId)
+      helloMessages?.items.find(({ peer }) => peer?.id === chatId)
         ?.helloMessage,
     [chatId, helloMessages?.items],
   );
 
   useEffect(() => {
-    const items = helloMessages?.items.map(({ peer, helloMessage }) => ({
-      chatId: peer.id,
-      message: helloMessage,
-    }));
+    const items = helloMessages?.items
+      .filter(({ peer }) => peer?.id !== undefined)
+      .map(({ peer, helloMessage }) => ({
+        chatId: peer!.id as number,
+        message: helloMessage,
+      }));
 
     if (items?.length) {
       dispatch(setCurrentMessages(items));
@@ -80,7 +82,7 @@ export const HelloMessagesPanel: FC = () => {
       </Group>
 
       {helloMessages?.items.map((chat) => (
-        <Group key={chat.peer.id}>
+        <Group key={chat.peer?.id}>
           <Message chat={chat} />
         </Group>
       ))}

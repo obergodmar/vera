@@ -27,7 +27,7 @@ export const FilterGroup: FC<Props> = ({
       <SimpleCell
         after={
           refetch && (
-            <Tooltip text={refetchText || 'Обновить'}>
+            <Tooltip description={refetchText || 'Обновить'}>
               <IconButton
                 aria-label={refetchText || 'Обновить'}
                 onClick={refetch}

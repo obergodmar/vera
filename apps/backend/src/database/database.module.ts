@@ -1,7 +1,7 @@
 import { DynamicModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
+import { DataSourceOptions } from 'typeorm';
 
 import { Command, RollCommand } from '../commands/commands.entity';
 import { Cron } from '../crons/crons.entity';
@@ -11,7 +11,7 @@ import { HelloMessage } from '../hello-messages/hello-messages.entity';
 import { Reaction } from '../reactions/reactions.entity';
 import { Setting } from '../settings/settings.entity';
 
-export function getOrmConfig(env: IEnvironment): MysqlConnectionOptions {
+export function getOrmConfig(env: IEnvironment): DataSourceOptions {
   return {
     type: 'mysql',
     host: env.dbHost,

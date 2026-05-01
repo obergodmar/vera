@@ -1,6 +1,10 @@
-import { ResponseHandler } from '@reduxjs/toolkit/dist/query/fetchBaseQuery';
-
 import { getToken } from './getToken';
+
+type ResponseHandler =
+  | 'content-type'
+  | 'json'
+  | 'text'
+  | ((response: Response) => Promise<unknown>);
 
 type ExtendFetchArgs<Request> = {
   url: string;

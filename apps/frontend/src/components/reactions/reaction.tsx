@@ -73,8 +73,8 @@ export const Reaction: FC<Props> = ({
   return (
     <ModifiableCell
       modified={modified}
-      caption="Реакция"
-      text={
+      overTitle="Реакция"
+      subtitle={
         <Div>
           <Input
             disabled={isLoading}

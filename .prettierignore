@@ -1,5 +1,8 @@
-# Add files here to ignore them from prettier formatting
-
-/dist
-/coverage
-polyfills.ts
+node_modules
+dist
+build
+coverage
+.nx
+*.lock
+yarn.lock
+package-lock.json

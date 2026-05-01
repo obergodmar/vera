@@ -36,7 +36,7 @@ export const MemberPicker: FC<Props> = ({
           return;
         }
 
-        const { value, label, ...rest } = props;
+        const { value, label: _label, ...rest } = props;
 
         return (
           <Chip

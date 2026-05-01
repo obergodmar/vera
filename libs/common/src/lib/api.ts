@@ -1,7 +1,9 @@
 import type { HealthCheckResult } from '@nestjs/terminus';
 import { MessagesGetConversationMembersResponse } from '@vkontakte/api-schema-typescript';
-
-import { MessagesConversation, UsersUser } from 'vk-io/lib/api/schemas/objects';
+import {
+  MessagesConversation,
+  UsersUser,
+} from '@vkontakte/api-schema-typescript';
 
 import { ICommands } from './commands';
 import { ICrons } from './crons';
@@ -183,6 +185,5 @@ export namespace IApi {
     export type GetHealthResponse = HealthCheckResult;
   }
 
-  export namespace IConfiApi {
-  }
+  export namespace IConfiApi {}
 }

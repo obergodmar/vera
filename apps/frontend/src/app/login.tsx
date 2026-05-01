@@ -114,7 +114,7 @@ export const Login: FC = () => {
           <Group>
             <Placeholder
               icon={<Avatar src={VERA_AVATAR_100} size={100} />}
-              header="Вера"
+              title="Вера"
               action={
                 <FormLayoutGroup mode="vertical">
                   <Button

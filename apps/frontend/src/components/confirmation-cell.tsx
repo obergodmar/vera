@@ -27,7 +27,7 @@ export const ConfirmationCell: FC<Props> = ({
 
   return (
     <CellButton
-      mode="danger"
+      appearance="negative"
       onClick={() => setConfirmed(true)}
       after={
         confirmed && (

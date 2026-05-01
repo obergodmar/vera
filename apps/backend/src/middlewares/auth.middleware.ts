@@ -67,7 +67,7 @@ export class AuthMiddleware implements NestMiddleware {
         {
           group_id: 1,
           peer_id: this.accessChatId,
-          // extended: 0,
+          extended: 0,
         },
         {
           retries: 3,

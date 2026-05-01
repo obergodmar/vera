@@ -24,7 +24,8 @@ export const environment: IEnvironment = {
    */
   botToken: '',
   botPollingGroupId: 0,
-  botApiMode: 'parallel',
+  telegramBotToken: '',
+  telegramEnabled: false,
 
   /**
    * =================

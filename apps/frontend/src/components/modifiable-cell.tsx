@@ -49,7 +49,7 @@ export const ModifiableCell: FC<Props> = ({
           : '0 0 0 5px transparent',
       }}
       disabled
-      subhead={
+      overTitle={
         modified ? (
           <Text
             style={{

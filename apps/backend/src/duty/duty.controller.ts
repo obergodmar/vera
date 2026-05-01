@@ -1,10 +1,7 @@
 import { Body, Controller, HttpCode, Inject, Post } from '@nestjs/common';
 import { IApi, ROUTES } from '@vera-reforged/common';
 
-import {
-  GetScheduleForChatDto,
-  UpdateChatScheduleDto,
-} from './duty.dto';
+import { GetScheduleForChatDto, UpdateChatScheduleDto } from './duty.dto';
 import { DutyService } from './duty.service';
 
 const { prefix, endpoints } = ROUTES.duty;

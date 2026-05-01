@@ -23,7 +23,7 @@ import {
   SetStateAction,
 } from 'react';
 
-import format from 'date-fns/format';
+import { format } from 'date-fns/format';
 
 import { LinkButtonCreation } from '../link-button-creation';
 import { TimePicker } from '../time-picker';

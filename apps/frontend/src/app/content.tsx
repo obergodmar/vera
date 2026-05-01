@@ -143,7 +143,7 @@ export const Content: FC = () => {
               >
                 <PanelHeaderContent
                   before={<Avatar size={36} src={user?.photo_100} />}
-                  status={`Пользователь: ${user?.first_name} ${user?.last_name}`}
+                  subtitle={`Пользователь: ${user?.first_name} ${user?.last_name}`}
                 >
                   {label}
                 </PanelHeaderContent>

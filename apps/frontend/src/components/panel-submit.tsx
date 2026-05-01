@@ -9,7 +9,7 @@ type Props = {
 
 export const PanelSubmit: FC<Props> = ({ disabled = false, onSubmit }) => {
   return (
-    <Tooltip text="Сохранить изменения">
+    <Tooltip description="Сохранить изменения">
       <PanelHeaderSubmit disabled={disabled} onClick={onSubmit} />
     </Tooltip>
   );

@@ -50,7 +50,7 @@ function recoverUser() {
     }
 
     return JSON.parse(userString);
-  } catch (e) {
+  } catch (_e) {
     return null;
   }
 }

@@ -95,7 +95,7 @@ export const ConvoSearch: FC<Props> = ({
           />
 
           {refetchConvos && (
-            <Tooltip text="Обновить список чатов">
+            <Tooltip description="Обновить список чатов">
               <IconButton
                 aria-label="Обновить список чатов"
                 onClick={refetchConvos}

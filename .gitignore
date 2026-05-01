@@ -42,3 +42,22 @@ Thumbs.db
 
 .env
 backups/*.sql
+
+# Devenv
+.devenv*
+devenv.local.nix
+devenv.local.yaml
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
+
+.nx/cache
+.nx/workspace-data
+vite.config.*.timestamp*
+vitest.config.*.timestamp*
+.claude/worktrees
+.nx/polygraph
+.nx/self-healing

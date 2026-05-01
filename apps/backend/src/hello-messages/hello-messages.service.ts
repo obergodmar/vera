@@ -6,7 +6,7 @@ import { getRandomId, IApi, IHelloMessages } from '@vera-reforged/common';
 import { Request } from 'express';
 import { DataSource, Repository } from 'typeorm';
 
-import { BotService } from '../bot/bot.service';
+import { BotEventBusService } from '../bot-core/bot-event-bus.service';
 import { ConvoService } from '../convo/convo.service';
 import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
@@ -25,7 +25,8 @@ export class HelloMessagesService {
     private readonly dataSource: DataSource,
     @InjectRepository(HelloMessage)
     private readonly hlRepository: Repository<HelloMessage>,
-    @Inject(BotService) private readonly botService: BotService,
+    @Inject(BotEventBusService)
+    private readonly botEventBus: BotEventBusService,
     @Inject(VkApiService) private readonly vkApi: VkApiService,
     @Inject(LoggerService) loggerService: LoggerService,
     @Inject(ConvoService) private readonly convoService: ConvoService,
@@ -36,14 +37,14 @@ export class HelloMessagesService {
     const isListenerOff =
       this.config.get<IEnvironment['disableBotListener']>('disableBotListener');
 
-    this.botService.vk.updates.on('chat_invite_user', async (context, next) => {
+    this.botEventBus.onInvite(async (event) => {
       if (isListenerOff) {
-        return next();
+        return;
       }
 
-      const { peerId } = context;
+      const { peerId } = event;
 
-      this.logger.debug(`chat_invite_user update in ${peerId}`);
+      this.logger.debug(`invite event in ${peerId}`);
 
       try {
         const helloMessage = await this.hlRepository.findOneBy({

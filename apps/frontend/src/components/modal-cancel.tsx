@@ -17,8 +17,8 @@ export const ModalCancel: FC<Props> = ({ id, closeModal, onCancel }) => {
       id={id}
       onClose={closeModal}
       icon={<Icon56DeleteOutline />}
-      header="Подтверждение удаления изменений"
-      subheader="В текущей сессии для выбранного чата все изменения будут сброшены. Продолжить?"
+      title="Подтверждение удаления изменений"
+      description="В текущей сессии для выбранного чата все изменения будут сброшены. Продолжить?"
       actions={
         <ButtonGroup stretched>
           <Button

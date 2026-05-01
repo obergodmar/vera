@@ -56,9 +56,15 @@ export class Environment implements IEnvironment {
   botToken: string;
   @IsNumber()
   botPollingGroupId: number;
+
+  /**
+   * =====================
+   * Настройки Telegram бота
+   */
   @IsString()
-  @IsNotEmpty()
-  botApiMode: 'sequential' | 'parallel' | 'parallel_selected';
+  telegramBotToken: string;
+  @IsBoolean()
+  telegramEnabled: boolean;
 
   /**
    * =================

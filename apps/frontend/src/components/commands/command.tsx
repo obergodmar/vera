@@ -133,7 +133,7 @@ export const Command: FC<Props> = ({ chatId, idx, existingCommand }) => {
   return (
     <ModifiableCell
       modified={modified}
-      subhead={`Команда №${idx + 1}`}
+      overTitle={`Команда №${idx + 1}`}
       enabled={enabled}
       setEnabled={() => {
         dispatch(

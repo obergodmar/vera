@@ -1,10 +1,19 @@
 /// <reference types="vitest" />
+import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
+import { replaceFiles } from '@nx/vite/plugins/rollup-replace-files.plugin';
 import react from '@vitejs/plugin-react';
 
 import { defineConfig } from 'vite';
-import viteTsConfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
+  root: __dirname,
+  build: {
+    outDir: '../../dist/apps/frontend',
+    reportCompressedSize: true,
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
+  },
   cacheDir: '../../node_modules/.vite/frontend',
 
   server: {
@@ -17,9 +26,13 @@ export default defineConfig({
   },
 
   plugins: [
+    replaceFiles([
+      {
+        replace: 'apps/frontend/src/environments/environment.ts',
+        with: 'apps/frontend/src/environments/environment.prod.ts',
+      },
+    ]),
     react(),
-    viteTsConfigPaths({
-      root: '../../',
-    }),
+    nxViteTsPaths(),
   ],
 });

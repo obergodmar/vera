@@ -35,11 +35,8 @@ export const chatMessageSelector = (chatId: number | undefined) =>
   );
 
 export const Message: FC<Props> = ({ chat }) => {
-  const {
-    helloMessage,
-    peer: { id: chatId },
-    chat_settings = {},
-  } = chat;
+  const { helloMessage, peer, chat_settings = {} } = chat;
+  const chatId = peer?.id ?? 0;
 
   const { title, photo = {} } = chat_settings;
   const avatar = photo?.photo_100;
@@ -89,7 +86,7 @@ export const Message: FC<Props> = ({ chat }) => {
           : undefined
       }
       disabled
-      caption={chatId}
+      extraSubtitle={chatId}
       bottom={
         <Textarea
           value={message}
@@ -98,7 +95,7 @@ export const Message: FC<Props> = ({ chat }) => {
           }
         />
       }
-      before={<Avatar initials={title[0]} src={avatar} />}
+      before={<Avatar initials={title?.[0]} src={avatar} />}
       actions={
         modified && (
           <ButtonGroup mode="horizontal" gap="s" stretched>
@@ -140,7 +137,7 @@ export const Message: FC<Props> = ({ chat }) => {
         </Button>
       }
     >
-      {title}
+      {title ?? ''}
     </RichCell>
   );
 };

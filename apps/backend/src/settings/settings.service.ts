@@ -32,7 +32,7 @@ export class SettingsService {
         default:
           return defaultSettings[opt];
       }
-    } catch (error: unknown) {
+    } catch (_error: unknown) {
       return defaultSettings[opt];
     }
   }

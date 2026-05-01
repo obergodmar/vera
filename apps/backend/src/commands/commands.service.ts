@@ -11,7 +11,7 @@ import { UsersUserFull } from '@vkontakte/api-schema-typescript';
 
 import { DataSource, Repository } from 'typeorm';
 
-import { BotService } from '../bot/bot.service';
+import { BotEventBusService } from '../bot-core/bot-event-bus.service';
 import { ConvoService } from '../convo/convo.service';
 import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
@@ -35,7 +35,8 @@ export class CommandsService {
     @InjectRepository(RollCommand)
     private readonly rollCommandRepository: Repository<RollCommand>,
     @Inject(VkApiService) private readonly vkApi: VkApiService,
-    @Inject(BotService) private readonly botService: BotService,
+    @Inject(BotEventBusService)
+    private readonly botEventBus: BotEventBusService,
     @Inject(ConfigService) private readonly config: ConfigService,
     @Inject(ConvoService) private readonly convoService: ConvoService,
     @Inject(LoggerService) loggerService: LoggerService,
@@ -45,14 +46,14 @@ export class CommandsService {
     const isListenerOff =
       this.config.get<IEnvironment['disableBotListener']>('disableBotListener');
 
-    this.botService.vk.updates.on('message_new', async (msg, next) => {
+    this.botEventBus.onMessage(async (event) => {
       if (isListenerOff) {
-        return next();
+        return;
       }
 
-      const { peerId, text } = msg;
+      const { peerId, text } = event;
       if (!text) {
-        return next();
+        return;
       }
 
       const matches = [
@@ -62,8 +63,6 @@ export class CommandsService {
       if (matches.length > 0) {
         this.lookForCommandAndAnnounce.call(this, peerId, matches);
       }
-
-      return next();
     });
   }
 

@@ -11,10 +11,10 @@ import {
   MessagesGetConversationByIdExtended,
   MessagesGetConversationMembersResponse,
 } from '@vkontakte/api-schema-typescript';
+import { UsersUser } from '@vkontakte/api-schema-typescript';
 
 import { Request } from 'express';
 import { SessionData } from 'express-session';
-import { UsersUser } from 'vk-io/lib/api/schemas/objects';
 
 import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
@@ -161,7 +161,7 @@ export class ConvoService {
         {
           group_id: 1,
           peer_id: this.adminChatId,
-          // extended: 0,
+          extended: 0,
         },
         {
           retries: 3,
@@ -202,7 +202,7 @@ export class ConvoService {
               method: 'messages.getConversationMembers',
               params: {
                 group_id: 1,
-                // extended: 0,
+                extended: 0,
                 peer_id: peerId,
               },
             })),
@@ -258,8 +258,7 @@ export class ConvoService {
       response = await this.vkApi.fetch(
         'messages.getConversationMembers',
         {
-          fields: '',
-          // extended: 1,
+          extended: 0,
           peer_id: chatId,
           group_id: 1,
         },

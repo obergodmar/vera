@@ -11,8 +11,6 @@ import {
   UsersGetResponse,
 } from '@vkontakte/api-schema-typescript';
 
-import { MessagesSendResponse } from 'vk-io/lib/api/schemas/responses';
-
 export namespace IVKApi {
   export interface IVKApi {
     fetch<Method extends keyof Request, TrackIdMethod extends Method = Method>(
@@ -67,7 +65,7 @@ export namespace IVKApi {
 
     'messages.send': {
       params: MessagesSendParams;
-      response: MessagesSendResponse;
+      response: number;
     };
 
     'messages.getConversationsById': {
@@ -89,6 +87,11 @@ export namespace IVKApi {
     'groups.getById': {
       params: GroupsGetByIdParams;
       response: GroupsGetByIdResponse;
+    };
+
+    'groups.getLongPollServer': {
+      params: { group_id: number };
+      response: { server: string; key: string; ts: string };
     };
   };
 

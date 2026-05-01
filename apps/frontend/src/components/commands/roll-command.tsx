@@ -1,4 +1,4 @@
-import { FormItem, Input, Radio, Text, Textarea } from '@vkontakte/vkui';
+import { FormItem, Radio, Text, Textarea } from '@vkontakte/vkui';
 
 import { ChangeEventHandler, FC, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -31,8 +31,8 @@ export const RollCommand: FC<CommandComponentProps> = ({ id }) => {
                 ? 'members'
                 : 'custom'
               : target === 'custom'
-              ? 'members'
-              : 'custom',
+                ? 'members'
+                : 'custom',
           }),
         );
       },
@@ -82,8 +82,11 @@ export const RollCommand: FC<CommandComponentProps> = ({ id }) => {
       </FormItem>
 
       {isValid && (
-        <FormItem topMultiline top={`Результат при запуске /roll${name ? ` ${name}` : ''}`}>
-          <Text style={{ wordWrap: "normal", whiteSpace: "pre-wrap" }}>
+        <FormItem
+          topMultiline
+          top={`Результат при запуске /roll${name ? ` ${name}` : ''}`}
+        >
+          <Text style={{ wordWrap: 'normal', whiteSpace: 'pre-wrap' }}>
             {phrase}{' '}
             <Text
               style={{

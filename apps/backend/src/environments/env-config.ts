@@ -71,8 +71,11 @@ function parseEnvVariables(): Partial<IEnvironment> {
   if (env.BOT_POLLING_GROUP_ID) {
     envVariables.botPollingGroupId = parseInt(env.BOT_POLLING_GROUP_ID, 10);
   }
-  if (env.BOT_API_MODE) {
-    envVariables.botApiMode = parseBotApiMode(env.BOT_API_MODE);
+  if (env.TELEGRAM_BOT_TOKEN) {
+    envVariables.telegramBotToken = env.TELEGRAM_BOT_TOKEN;
+  }
+  if (env.TELEGRAM_ENABLED) {
+    envVariables.telegramEnabled = env.TELEGRAM_ENABLED === 'true';
   }
 
   /**
@@ -111,15 +114,4 @@ function parseEnvVariables(): Partial<IEnvironment> {
   }
 
   return envVariables;
-}
-
-function parseBotApiMode(opt: string): IEnvironment['botApiMode'] {
-  switch (opt) {
-    case 'sequential':
-    case 'parallel':
-    case 'parallel_selected':
-      return opt;
-    default:
-      return 'parallel';
-  }
 }

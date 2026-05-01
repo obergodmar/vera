@@ -2,8 +2,8 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
-import RedisStore from 'connect-redis';
-import * as session from 'express-session';
+import { RedisStore } from 'connect-redis';
+import session from 'express-session';
 import { join } from 'path';
 import { createClient } from 'redis';
 

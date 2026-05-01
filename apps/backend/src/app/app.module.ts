@@ -2,7 +2,7 @@ import { DynamicModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 import { AuthModule } from '../auth/auth.module';
-import { BotModule } from '../bot/bot.module';
+import { BotCoreModule } from '../bot-core/bot-core.module';
 import { CommandsModule } from '../commands/commands.module';
 import { CronsModule } from '../crons/crons.module';
 import { DatabaseModule } from '../database/database.module';
@@ -14,7 +14,9 @@ import { LoggerModule } from '../logger/logger.module';
 import { ReactionsModule } from '../reactions/reactions.module';
 import { SettingsModule } from '../settings/settings.module';
 import { StaticModule } from '../static/static.module';
+import { TelegramPollingModule } from '../telegram-polling/telegram-polling.module';
 import { VkApiModule } from '../vk-api/vk-api.module';
+import { VkPollingModule } from '../vk-polling/vk-polling.module';
 
 export class AppModule {
   public static forRoot(environment: IEnvironment): DynamicModule {
@@ -26,7 +28,9 @@ export class AppModule {
          */
         SettingsModule,
         VkApiModule,
-        BotModule,
+        BotCoreModule,
+        VkPollingModule,
+        TelegramPollingModule,
         LoggerModule,
         /**
          * Functionality

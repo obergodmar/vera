@@ -24,7 +24,8 @@ export const environment: IEnvironment = {
    */
   botToken: '',
   botPollingGroupId: 0,
-  botApiMode: 'parallel',
+  telegramBotToken: '',
+  telegramEnabled: false,
 
   /**
    * =================
@@ -42,5 +43,5 @@ export const environment: IEnvironment = {
    * Данные для авторизации
    */
   appId: 0,
-  redirectUri: "http://localhost/login",
+  redirectUri: 'http://localhost/login',
 };

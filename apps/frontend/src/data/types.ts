@@ -1,4 +1,4 @@
-import { ChipOption } from "@vkontakte/vkui";
+import { ChipOption } from '@vkontakte/vkui';
 
 export type Member = ChipOption & {
   userId: number;
@@ -7,4 +7,3 @@ export type Member = ChipOption & {
   avatar: string;
   screenName: string;
 };
-
