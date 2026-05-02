@@ -1,4 +1,4 @@
-import { generateRandomString } from '@vera-reforged/common';
+import { generateRandomString, IApi } from '@vera-reforged/common';
 import * as VKID from '@vkid/sdk';
 import {
   Avatar,
@@ -12,7 +12,7 @@ import {
   Text,
 } from '@vkontakte/vkui';
 
-import { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -21,21 +21,59 @@ import { authorize, logOff } from '../data/reducers/authorization';
 import { useAuthorizeMutation } from '../data/services/auth-api';
 import { useSnackbar } from '../hooks/useSnackbar';
 
+type TelegramAuthData = IApi.IAuthApi.TelegramAuthData;
+
 declare global {
   interface Window {
     __ENV__: {
       appId: string;
       redirectUri: string;
+      botPlatform: 'vk' | 'telegram';
+      telegramBotName: string;
     };
+    TelegramLoginCallback: (user: TelegramAuthData) => void;
   }
 }
 
-VKID.Config.init({
-  app: parseInt(window.__ENV__.appId),
-  redirectUrl: window.__ENV__.redirectUri,
-  mode: VKID.ConfigAuthMode.InNewTab,
-  responseMode: VKID.ConfigResponseMode.Callback,
-});
+const isTelegram = window.__ENV__?.botPlatform === 'telegram';
+
+if (!isTelegram) {
+  VKID.Config.init({
+    app: parseInt(window.__ENV__.appId),
+    redirectUrl: window.__ENV__.redirectUri,
+    mode: VKID.ConfigAuthMode.InNewTab,
+    responseMode: VKID.ConfigResponseMode.Callback,
+  });
+}
+
+const TelegramLoginButton: FC<{ onAuth: (data: TelegramAuthData) => void }> = ({
+  onAuth,
+}) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    window.TelegramLoginCallback = onAuth;
+
+    const script = document.createElement('script');
+    script.src = 'https://telegram.org/js/telegram-widget.js?22';
+    script.setAttribute('data-telegram-login', window.__ENV__.telegramBotName);
+    script.setAttribute('data-size', 'large');
+    script.setAttribute('data-onauth', 'TelegramLoginCallback(user)');
+    script.setAttribute('data-request-access', 'write');
+    script.async = true;
+    container.appendChild(script);
+
+    return () => {
+      delete (window as Partial<Window>).TelegramLoginCallback;
+      container.innerHTML = '';
+    };
+  }, [onAuth]);
+
+  return <div ref={containerRef} />;
+};
 
 export const Login: FC = () => {
   const navigate = useNavigate();
@@ -107,6 +145,13 @@ export const Login: FC = () => {
     }
   }, [authRequest, snackbar]);
 
+  const telegramAuthHandler = useCallback(
+    (data: TelegramAuthData) => {
+      authRequest({ data });
+    },
+    [authRequest],
+  );
+
   return (
     <SplitLayout style={{ justifyContent: 'center' }}>
       <SplitCol fixed width={280} maxWidth={280}>
@@ -117,15 +162,19 @@ export const Login: FC = () => {
               title="Вера"
               action={
                 <FormLayoutGroup mode="vertical">
-                  <Button
-                    style={{ top: '10px' }}
-                    size="m"
-                    stretched
-                    onClick={authHandler}
-                    loading={isVKAuthLoading || authResult.isLoading}
-                  >
-                    Авторизоваться
-                  </Button>
+                  {isTelegram ? (
+                    <TelegramLoginButton onAuth={telegramAuthHandler} />
+                  ) : (
+                    <Button
+                      style={{ top: '10px' }}
+                      size="m"
+                      stretched
+                      onClick={authHandler}
+                      loading={isVKAuthLoading || authResult.isLoading}
+                    >
+                      Авторизоваться
+                    </Button>
+                  )}
                 </FormLayoutGroup>
               }
             >

@@ -1,12 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { IApi } from '@vera-reforged/common';
-import { UsersUser } from '@vkontakte/api-schema-typescript';
+import { BotUser, IApi } from '@vera-reforged/common';
 
 import { getToken } from '../../utils/getToken';
 
 type Authorization = {
   authorized: boolean;
-  user: UsersUser | null;
+  user: BotUser | null;
 };
 
 const initialState: Authorization = {

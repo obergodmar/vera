@@ -28,6 +28,8 @@ export const Shift: FC<Props> = ({ duty, shiftNumber, dayNumber }) => {
       value: duty.userId,
       label: `${duty.firstName} ${duty.lastName}`,
       ...duty,
+      avatar: duty.photo ?? '',
+      username: duty.username ?? '',
     },
   ].filter(truthy);
 
@@ -101,14 +103,14 @@ export const Shift: FC<Props> = ({ duty, shiftNumber, dayNumber }) => {
                 firstName = '',
                 lastName = '',
                 avatar = '',
-                screenName = '',
+                username = '',
               } = nextMember || member || {};
               handleEditShift({
                 userId,
                 firstName,
                 lastName,
-                avatar,
-                screenName,
+                photo: avatar,
+                username,
               });
               rerender({});
             }}

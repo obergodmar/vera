@@ -41,6 +41,13 @@ export class VkPollingService
   }
 
   public onApplicationBootstrap(): void {
+    const botPlatform =
+      this.config.get<IEnvironment['botPlatform']>('botPlatform') ?? 'vk';
+    if (botPlatform !== 'vk') {
+      this.logger.log('VK polling disabled (botPlatform != vk)');
+      return;
+    }
+
     const launchMessage = 'VkPollingService: VK bot polling started';
     const logMsg = createLog(launchMessage, { type: 'log' });
     logFS(logMsg);

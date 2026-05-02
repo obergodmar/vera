@@ -74,8 +74,15 @@ function parseEnvVariables(): Partial<IEnvironment> {
   if (env.TELEGRAM_BOT_TOKEN) {
     envVariables.telegramBotToken = env.TELEGRAM_BOT_TOKEN;
   }
+  if (env.TELEGRAM_BOT_NAME) {
+    envVariables.telegramBotName = env.TELEGRAM_BOT_NAME;
+  }
   if (env.TELEGRAM_ENABLED) {
     envVariables.telegramEnabled = env.TELEGRAM_ENABLED === 'true';
+  }
+  if (env.BOT_PLATFORM) {
+    const platform = env.BOT_PLATFORM as 'vk' | 'telegram';
+    envVariables.botPlatform = platform;
   }
 
   /**

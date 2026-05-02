@@ -6,7 +6,7 @@ import { IApi, IReactions } from '@vera-reforged/common';
 import { Repository } from 'typeorm';
 
 import { BotEventBusService } from '../bot-core/bot-event-bus.service';
-import { BotSenderService } from '../bot-core/bot-sender.service';
+import { BOT_PLATFORM_TOKEN, IBotPlatform } from '../bot-platform/IBotPlatform';
 import { DutyService } from '../duty/duty.service';
 import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
@@ -27,7 +27,7 @@ export class ReactionsService {
     @Inject(DutyService) private readonly dutyService: DutyService,
     @Inject(BotEventBusService)
     private readonly botEventBus: BotEventBusService,
-    @Inject(BotSenderService) private readonly botSender: BotSenderService,
+    @Inject(BOT_PLATFORM_TOKEN) private readonly bot: IBotPlatform,
     @Inject(ConfigService) private readonly config: ConfigService,
     @Inject(LoggerService) loggerService: LoggerService,
   ) {
@@ -41,7 +41,7 @@ export class ReactionsService {
         return;
       }
 
-      const { peerId, conversationMessageId, text, backend } = event;
+      const { peerId, conversationMessageId, text } = event;
       if (!text) {
         return;
       }
@@ -75,8 +75,8 @@ export class ReactionsService {
           );
 
           try {
-            await this.botSender.send(backend, peerId, reaction, {
-              replyToConversationMessageId: conversationMessageId,
+            await this.bot.sendMessage(peerId, reaction, {
+              replyToMessageId: conversationMessageId,
             });
           } catch (error: unknown) {
             this.logger.error(`Reactions messages send: ${error}`);

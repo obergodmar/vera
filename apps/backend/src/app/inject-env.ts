@@ -6,12 +6,12 @@ export function injectEnvIntoIndexHtml(env: IEnvironment, indexPath: string) {
   // ATTENTION!!!!
   // This function injects environment variables into the index.html file for the frontend.
   // Be careful with the variables you expose here, as they will be accessible in the browser.
-  const { appId, redirectUri } = env;
+  const { appId, redirectUri, botPlatform, telegramBotName } = env;
 
   const rawHtml = readFileSync(indexPath, 'utf8');
 
   const envScript = `<script id="env-script">
-    window.__ENV__ = ${JSON.stringify({ appId, redirectUri })};
+    window.__ENV__ = ${JSON.stringify({ appId, redirectUri, botPlatform, telegramBotName })};
   </script>`;
 
   const startMarker = '<!-- ENV_INJECT_START -->';

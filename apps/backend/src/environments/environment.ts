@@ -25,7 +25,9 @@ export const environment: IEnvironment = {
   botToken: '',
   botPollingGroupId: 0,
   telegramBotToken: '',
+  telegramBotName: '',
   telegramEnabled: false,
+  botPlatform: 'vk',
 
   /**
    * =================

@@ -19,8 +19,9 @@ export namespace IDuty {
     userId: number;
     firstName: string;
     lastName: string;
-    avatar: string;
-    screenName: string;
+    photo?: string;
+    username?: string;
+    mention?: string;
     dayNumber: number | undefined;
     timeFrom: string;
     timeTo: string;
@@ -40,12 +41,6 @@ export class ScheduleModel implements IDuty.Schedule {
 
   @IsString()
   lastName!: string;
-
-  @IsString()
-  avatar!: string;
-
-  @IsString()
-  screenName!: string;
 
   @IsOptional()
   @IsNumber()

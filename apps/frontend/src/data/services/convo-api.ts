@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { IApi, ROUTES } from '@vera-reforged/common';
+import { BotUser, IApi, ROUTES } from '@vera-reforged/common';
 import { CustomSelectOptionInterface } from '@vkontakte/vkui';
 
 import { extendFetchArgs } from '../../utils/extendFetchArgs';
@@ -31,26 +31,26 @@ export const convoApi = createApi({
         });
       },
       transformResponse(data: IApi.IConvoApi.GetMembersForChatResponse) {
-        const { profiles } = data;
+        const { items } = data;
 
-        if (!profiles) {
+        if (!items) {
           return [];
         }
 
-        return profiles
+        return items
           .filter(({ id }) => id !== undefined)
           .map(
             ({
               id: userId,
-              photo_100: avatar = '',
-              screen_name: screenName = '',
-              first_name: firstName = '',
-              last_name: lastName = '',
-            }) => ({
+              photo: avatar = '',
+              username = '',
+              firstName = '',
+              lastName = '',
+            }: BotUser) => ({
               label: `${firstName} ${lastName}`,
               value: userId as number,
               avatar,
-              screenName,
+              username,
               userId: userId as number,
               firstName,
               lastName,

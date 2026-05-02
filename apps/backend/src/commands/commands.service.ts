@@ -1,22 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  getRandomElement,
-  getRandomId,
-  IApi,
-  ICommands,
-} from '@vera-reforged/common';
-import { UsersUserFull } from '@vkontakte/api-schema-typescript';
+import { getRandomElement, IApi, ICommands } from '@vera-reforged/common';
 
 import { DataSource, Repository } from 'typeorm';
 
 import { BotEventBusService } from '../bot-core/bot-event-bus.service';
-import { ConvoService } from '../convo/convo.service';
+import { BOT_PLATFORM_TOKEN, IBotPlatform } from '../bot-platform/IBotPlatform';
 import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
 import { LoggerService } from '../logger/logger.service';
-import { VkApiService } from '../vk-api/vk-api.service';
 import {
   CreateRollCommandDto,
   DeleteRollCommandDto,
@@ -34,11 +27,10 @@ export class CommandsService {
     private readonly commandRepository: Repository<Command>,
     @InjectRepository(RollCommand)
     private readonly rollCommandRepository: Repository<RollCommand>,
-    @Inject(VkApiService) private readonly vkApi: VkApiService,
+    @Inject(BOT_PLATFORM_TOKEN) private readonly bot: IBotPlatform,
     @Inject(BotEventBusService)
     private readonly botEventBus: BotEventBusService,
     @Inject(ConfigService) private readonly config: ConfigService,
-    @Inject(ConvoService) private readonly convoService: ConvoService,
     @Inject(LoggerService) loggerService: LoggerService,
   ) {
     this.logger = new DebugService(loggerService, this.constructor.name);
@@ -73,23 +65,17 @@ export class CommandsService {
       name: string | null;
     }[],
   ) {
-    const chatMembers = await this.convoService.getMembersForChat(peerId);
+    const chatMembersResult = await this.bot.getChatMembers(peerId);
     const res = await this.getCommandsForChat(peerId, { enabled: true });
-    if (res.count === 0 || chatMembers.error) {
+    if (res.count === 0 || chatMembersResult.count === 0) {
       this.logger.debug(
         `for chat ${peerId} there are no commands or there are no members`,
       );
-
       return;
     }
 
-    const members = chatMembers.profiles.reduce<Map<number, UsersUserFull>>(
-      (acc, item) => {
-        acc.set(item.id, item);
-
-        return acc;
-      },
-      new Map(),
+    const members = new Map(
+      chatMembersResult.items.map((member) => [member.id, member]),
     );
 
     try {
@@ -119,29 +105,16 @@ export class CommandsService {
           const profile = members.get(randomTarget);
           if (!profile) {
             this.logger.error(
-              `No profile for the radnom target id: ${randomTarget}`,
+              `No profile for the random target id: ${randomTarget}`,
             );
-
             continue;
           }
 
-          const screenNameOrName = profile.screen_name
-            ? `@${profile.screen_name}`
-            : `@id${randomTarget} (${profile.first_name})`;
-
-          const message = `${phrase} ${screenNameOrName}`;
+          const mention = profile.mention ?? profile.firstName;
+          const message = `${phrase} ${mention}`;
           this.logger.debug(`Sending command to ${peerId}: ${message}`);
 
-          await this.vkApi.fetch(
-            'messages.send',
-            {
-              peer_id: peerId,
-              message,
-              random_id: getRandomId(),
-              group_id: 1,
-            },
-            { retries: 3 },
-          );
+          await this.bot.sendMessage(peerId, message);
         }
       }
     } catch (e) {
@@ -195,15 +168,10 @@ export class CommandsService {
     }
 
     if (error) {
-      return {
-        error: 'Ошибка создания команды',
-        success: false,
-      };
+      return { error: 'Ошибка создания команды', success: false };
     }
 
-    return {
-      success: true,
-    };
+    return { success: true };
   }
 
   public async updateRollCommandForChat(
@@ -226,18 +194,12 @@ export class CommandsService {
       await queryRunner.manager.update(
         RollCommand,
         { chatId, id },
-        {
-          phrase,
-          membersIds: membersIds === '' ? null : membersIds,
-        },
+        { phrase, membersIds: membersIds === '' ? null : membersIds },
       );
       await queryRunner.manager.update(
         Command,
         { chatId, id },
-        {
-          enabled,
-          name: name || null,
-        },
+        { enabled, name: name || null },
       );
 
       await queryRunner.commitTransaction();
@@ -256,15 +218,10 @@ export class CommandsService {
     }
 
     if (error) {
-      return {
-        error: 'Ошибка обновления команды',
-        success: false,
-      };
+      return { error: 'Ошибка обновления команды', success: false };
     }
 
-    return {
-      success: true,
-    };
+    return { success: true };
   }
 
   public async deleteRollCommandForChat(
@@ -279,16 +236,10 @@ export class CommandsService {
         where: { id, chatId },
       });
     } catch (e) {
-      error = JSON.stringify(e);
-
       this.logger.error(
         `Delete transaction failed - roll command doesn't exist: ${e}`,
       );
-
-      return {
-        error: 'Нельзя удалить команды, которой нет',
-        success: false,
-      };
+      return { error: 'Нельзя удалить команды, которой нет', success: false };
     }
 
     const logMeta = getRollCommandLogMeta(rollCommand);
@@ -320,15 +271,10 @@ export class CommandsService {
     }
 
     if (error) {
-      return {
-        error: 'Ошибка удаления команды',
-        success: false,
-      };
+      return { error: 'Ошибка удаления команды', success: false };
     }
 
-    return {
-      success: true,
-    };
+    return { success: true };
   }
 
   public async getCommandsChats(): Promise<IApi.ICommandsApi.GetCommandsChatsResponse> {
@@ -336,20 +282,14 @@ export class CommandsService {
 
     try {
       const commandsChats = await this.commandRepository.find();
-
       this.logger.debug('Commands chats were successfully sent');
-
       return {
         count: commandsChats.length,
         items: commandsChats.map(({ chatId }) => chatId),
       };
     } catch (e) {
       this.logger.error(`Couldn't get commands chats: ${e}`);
-
-      return {
-        count: 0,
-        items: [],
-      };
+      return { count: 0, items: [] };
     }
   }
 
@@ -369,7 +309,7 @@ export class CommandsService {
           accPromise: Promise<IApi.ICommandsApi.GetCommandsForChatResponse>,
           command,
         ) => {
-          const acc = await accPromise; // Resolve the accumulator promise
+          const acc = await accPromise;
           switch (command.command) {
             case 'roll': {
               const rollCommands = await this.rollCommandRepository.find({
@@ -417,11 +357,7 @@ export class CommandsService {
       return accumulatedCommands;
     } catch (e) {
       this.logger.error(`Couldn't get commands for chat ${chatId}: ${e}`);
-
-      return {
-        count: 0,
-        items: [],
-      };
+      return { count: 0, items: [] };
     }
   }
 
@@ -440,17 +376,10 @@ export class CommandsService {
         `Successfully disabled all commands for chat: ${chatId}`,
       );
 
-      return {
-        success: true,
-        count: res.affected,
-      };
+      return { success: true, count: res.affected };
     } catch (e) {
       this.logger.error(`Couldn't disable commands for chat: ${chatId}: ${e}`);
-
-      return {
-        success: false,
-        error: 'Ошибка записи в базу данных',
-      };
+      return { success: false, error: 'Ошибка записи в базу данных' };
     }
   }
 
@@ -462,17 +391,10 @@ export class CommandsService {
 
       this.logger.debug('Successfully disabled all commands');
 
-      return {
-        success: true,
-        count: res.affected,
-      };
+      return { success: true, count: res.affected };
     } catch (e) {
       this.logger.error(`Couldn't disable all commands: ${e}`);
-
-      return {
-        success: false,
-        error: 'Ошибка записи в базу данных',
-      };
+      return { success: false, error: 'Ошибка записи в базу данных' };
     }
   }
 }

@@ -59,9 +59,7 @@ export const duty = createSlice({
         timeTo: '23:59',
         timeFrom: '00:00',
         userId: length,
-        avatar: '',
         firstName: '',
-        screenName: '',
         lastName: '',
       });
     },

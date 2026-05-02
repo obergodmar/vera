@@ -5,13 +5,20 @@ import {
   OnApplicationBootstrap,
   OnApplicationShutdown,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
 import { sleep } from '@vera-reforged/common';
+
+import { Repository } from 'typeorm';
 
 import { BotEventBusService } from '../bot-core/bot-event-bus.service';
 import {
   TelegramApiService,
   TelegramUpdate,
 } from '../bot-core/telegram-api.service';
+import { TelegramChat } from '../bot-platform/entities/telegram-chat.entity';
+import { TelegramChatMember } from '../bot-platform/entities/telegram-chat-member.entity';
+import { IEnvironment } from '../environments/env-type';
 
 const ERROR_RETRY_DELAY = 5_000;
 
@@ -28,11 +35,19 @@ export class TelegramPollingService
     private readonly telegramApi: TelegramApiService,
     @Inject(BotEventBusService)
     private readonly botEventBus: BotEventBusService,
+    @Inject(ConfigService)
+    private readonly config: ConfigService,
+    @InjectRepository(TelegramChat)
+    private readonly chatRepo: Repository<TelegramChat>,
+    @InjectRepository(TelegramChatMember)
+    private readonly memberRepo: Repository<TelegramChatMember>,
   ) {}
 
   public onApplicationBootstrap(): void {
-    if (!this.telegramApi.isEnabled) {
-      this.logger.log('Telegram polling is disabled (telegramEnabled=false)');
+    const botPlatform =
+      this.config.get<IEnvironment['botPlatform']>('botPlatform') ?? 'vk';
+    if (botPlatform !== 'telegram') {
+      this.logger.log('Telegram polling disabled (botPlatform != telegram)');
       return;
     }
 
@@ -81,6 +96,8 @@ export class TelegramPollingService
     if (update.message) {
       const { message } = update;
 
+      await this.upsertChatAndMember(message);
+
       if (message.new_chat_members && message.new_chat_members.length > 0) {
         for (const member of message.new_chat_members) {
           await this.botEventBus.emitInvite({
@@ -99,6 +116,44 @@ export class TelegramPollingService
         conversationMessageId: message.message_id,
         backend: 'telegram',
       });
+    }
+  }
+
+  private async upsertChatAndMember(
+    message: NonNullable<TelegramUpdate['message']>,
+  ): Promise<void> {
+    try {
+      await this.chatRepo.upsert(
+        [
+          {
+            id: message.chat.id,
+            title: message.chat.title ?? 'Unknown',
+            isActive: true,
+          },
+        ],
+        ['id'],
+      );
+    } catch (e) {
+      this.logger.error(`upsert chat ${message.chat.id}: ${e}`);
+    }
+
+    if (message.from && !message.from.is_bot) {
+      try {
+        await this.memberRepo.upsert(
+          [
+            {
+              chatId: message.chat.id,
+              userId: message.from.id,
+              firstName: message.from.first_name,
+              username: message.from.username,
+              isActive: true,
+            },
+          ],
+          ['chatId', 'userId'],
+        );
+      } catch (e) {
+        this.logger.error(`upsert member ${message.from.id}: ${e}`);
+      }
     }
   }
 }

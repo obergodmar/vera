@@ -49,11 +49,11 @@ export const MemberPicker: FC<Props> = ({
           </Chip>
         );
       }}
-      renderOption={(props, { avatar, screenName, userId }) => {
+      renderOption={(props, { avatar, username, userId }) => {
         return (
           <CustomSelectOption
             before={<Avatar size={20} src={avatar} />}
-            description={`${screenName} (${userId})`}
+            description={`${username} (${userId})`}
             {...props}
           />
         );
@@ -65,10 +65,10 @@ export const MemberPicker: FC<Props> = ({
 
         input = input.toLowerCase();
 
-        const { screenName, userId, label } = option;
+        const { username, userId, label } = option;
 
         return !!(
-          screenName.toLowerCase().includes(input) ||
+          (username ?? '').toLowerCase().includes(input) ||
           userId.toString().includes(input) ||
           `${label}`.toLowerCase().includes(input)
         );

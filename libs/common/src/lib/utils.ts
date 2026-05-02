@@ -133,10 +133,10 @@ export function getNextDayMonth() {
 
 export function getDutyMessage(
   schedule: IDuty.Schedule[],
-  mention = true,
+  withMention = true,
 ): string {
   return schedule.reduce(
-    (acc, { firstName, lastName, timeFrom, timeTo, tag, userId }) => {
+    (acc, { firstName, lastName, timeFrom, timeTo, tag, userId, mention }) => {
       const withTimeFrom = timeFrom ? ` с ${timeFrom}` : '';
       const withTimeTo = timeTo ? ` до ${timeTo}` : '';
       const withTag = tag ? `#${tag} ` : '';
@@ -153,8 +153,8 @@ export function getDutyMessage(
         ? `${addLeadingZero(tomorrowDay)}.${addLeadingZero(tomorrowMonth)}`
         : withDayMonthFrom;
 
-      const dutyName = mention
-        ? `@id${userId} (${firstName})`
+      const dutyName = withMention
+        ? (mention ?? `@id${userId} (${firstName})`)
         : `${firstName} ${lastName}`;
 
       return `${withPrev}${withTag}${dutyName}${withTimeFrom} ${withDayMonthFrom}${withTimeTo} ${withDayMonthTo}`;

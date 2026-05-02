@@ -22,4 +22,4 @@ USER node
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "yarn typeorm migration:run -d ./dist/typeorm-migration/main.js && node ./dist/apps/backend/main.js"]
+CMD ["node", "./dist/apps/backend/main.js"]

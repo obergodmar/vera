@@ -5,5 +5,5 @@ export type Member = ChipOption & {
   firstName: string;
   lastName: string;
   avatar: string;
-  screenName: string;
+  username: string;
 };

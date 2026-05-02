@@ -55,7 +55,16 @@ export interface IEnvironment {
    * Настройки Telegram бота
    */
   telegramBotToken: string;
+  telegramBotName: string;
   telegramEnabled: boolean;
+
+  /**
+   * ========================
+   * Платформа авторизации
+   * Определяет платформу авторизации в панели управления.
+   * Возможные значения: 'vk' | 'telegram'
+   */
+  botPlatform: 'vk' | 'telegram';
 
   /**
    * =================

@@ -7,19 +7,17 @@ import {
   filterScheduleByDayAndTime,
   getAnnounceDutyMessage,
   getDayMonthTime,
-  getRandomId,
   IApi,
   IDuty,
 } from '@vera-reforged/common';
-import { UsersUserFull } from '@vkontakte/api-schema-typescript';
 
 import { DataSource, Repository } from 'typeorm';
 
 import { BotEventBusService } from '../bot-core/bot-event-bus.service';
+import { BOT_PLATFORM_TOKEN, IBotPlatform } from '../bot-platform/IBotPlatform';
 import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
 import { LoggerService } from '../logger/logger.service';
-import { VkApiService } from '../vk-api/vk-api.service';
 import { Duty } from './duty.entity';
 
 @Injectable()
@@ -31,7 +29,7 @@ export class DutyService {
     @InjectRepository(Duty) private readonly dutyRepository: Repository<Duty>,
     @Inject(BotEventBusService)
     private readonly botEventBus: BotEventBusService,
-    @Inject(VkApiService) private readonly vkApi: VkApiService,
+    @Inject(BOT_PLATFORM_TOKEN) private readonly bot: IBotPlatform,
     @Inject(ConfigService) private readonly config: ConfigService,
     @Inject(LoggerService) loggerService: LoggerService,
   ) {
@@ -89,17 +87,7 @@ export class DutyService {
     let message: string;
     try {
       message = getAnnounceDutyMessage(schedule, tag, noDutyAtCurrentTime);
-
-      await this.vkApi.fetch(
-        'messages.send',
-        {
-          peer_id: peerId,
-          message,
-          random_id: getRandomId(),
-          group_id: 1,
-        },
-        { retries: 3 },
-      );
+      await this.bot.sendMessage(peerId, message);
     } catch (error: unknown) {
       this.logger.error(`announceDuty: ${error}`);
     }
@@ -123,7 +111,6 @@ export class DutyService {
       this.logger.error(
         `Duty repository error when selecting for chat ${chatId}: ${e}`,
       );
-
       return [];
     }
 
@@ -134,47 +121,32 @@ export class DutyService {
     this.logger.debug('Fetching users');
 
     const userIds = dutyArray.map((duty) => duty.userId);
-    let users: UsersUserFull[] = [];
+    const users = await this.bot.getUsers(userIds);
 
-    try {
-      users = await this.vkApi.fetch(
-        'users.get',
-        {
-          user_ids: userIds.join(','),
-        },
-        { retries: 3 },
-      );
-
-      this.logger.debug('Fetch successful');
-    } catch (e) {
-      this.logger.error(`Couldn't fetch users, ${e}`);
-
+    if (!users.length) {
+      this.logger.error('Fetch users returned empty result');
       return [];
     }
 
+    const userMap = new Map(users.map((u) => [u.id, u]));
+
     return dutyArray.reduce(
       (acc, { chatId, userId, dayNumber, timeFrom, timeTo, tag }) => {
-        const user = users.find(({ id }) => id === userId);
+        const user = userMap.get(userId);
         if (!user) {
           return acc;
         }
-
-        const {
-          first_name: firstName,
-          last_name: lastName,
-          screen_name: screenName,
-          photo_50: avatar,
-        } = user;
 
         return [
           ...acc,
           {
             chatId,
             userId,
-            firstName,
-            lastName,
-            avatar,
-            screenName,
+            firstName: user.firstName,
+            lastName: user.lastName ?? '',
+            photo: user.photo,
+            username: user.username,
+            mention: user.mention,
             dayNumber,
             timeFrom,
             timeTo,

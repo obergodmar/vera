@@ -1,17 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getRandomId, IApi, IHelloMessages } from '@vera-reforged/common';
+import { IApi, IHelloMessages } from '@vera-reforged/common';
 
 import { Request } from 'express';
 import { DataSource, Repository } from 'typeorm';
 
 import { BotEventBusService } from '../bot-core/bot-event-bus.service';
+import { BOT_PLATFORM_TOKEN, IBotPlatform } from '../bot-platform/IBotPlatform';
 import { ConvoService } from '../convo/convo.service';
 import { IEnvironment } from '../environments/env-type';
 import { DebugService } from '../logger/debug.service';
 import { LoggerService } from '../logger/logger.service';
-import { VkApiService } from '../vk-api/vk-api.service';
 import { HelloMessage } from './hello-messages.entity';
 
 const SPAM_TIMEOUT = 1000;
@@ -27,7 +27,7 @@ export class HelloMessagesService {
     private readonly hlRepository: Repository<HelloMessage>,
     @Inject(BotEventBusService)
     private readonly botEventBus: BotEventBusService,
-    @Inject(VkApiService) private readonly vkApi: VkApiService,
+    @Inject(BOT_PLATFORM_TOKEN) private readonly bot: IBotPlatform,
     @Inject(LoggerService) loggerService: LoggerService,
     @Inject(ConvoService) private readonly convoService: ConvoService,
     @Inject(ConfigService) private readonly config: ConfigService,
@@ -59,16 +59,7 @@ export class HelloMessagesService {
         }, SPAM_TIMEOUT);
 
         try {
-          await this.vkApi.fetch(
-            'messages.send',
-            {
-              peer_id: peerId,
-              message: helloMessage.message,
-              random_id: getRandomId(),
-              group_id: 1,
-            },
-            { retries: 3 },
-          );
+          await this.bot.sendMessage(peerId, helloMessage.message);
         } catch (error: unknown) {
           this.logger.error(`Could not send message: ${error}`);
         }
@@ -96,7 +87,7 @@ export class HelloMessagesService {
           chats: IApi.IHelloMessagesApi.ConvoListWithMessages[],
           { chatId, message },
         ) => {
-          const chat = convos.items.find((chat) => chat.peer.id === chatId);
+          const chat = convos.items.find((chat) => chat.id === chatId);
 
           if (chat) {
             chats.push({

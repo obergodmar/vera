@@ -1,4 +1,5 @@
 export * from './lib/settings';
+export * from './lib/bot-types';
 export * from './lib/duty';
 export * from './lib/hello-messages';
 export * from './lib/reactions';

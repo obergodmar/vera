@@ -35,11 +35,7 @@ export const chatMessageSelector = (chatId: number | undefined) =>
   );
 
 export const Message: FC<Props> = ({ chat }) => {
-  const { helloMessage, peer, chat_settings = {} } = chat;
-  const chatId = peer?.id ?? 0;
-
-  const { title, photo = {} } = chat_settings;
-  const avatar = photo?.photo_100;
+  const { helloMessage, id: chatId, title, photo: avatar } = chat;
 
   const dispatch = useDispatch();
 

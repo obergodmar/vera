@@ -1,6 +1,7 @@
 import { plainToClass } from 'class-transformer';
 import {
   IsBoolean,
+  IsIn,
   IsNotEmpty,
   IsNumber,
   IsString,
@@ -63,8 +64,17 @@ export class Environment implements IEnvironment {
    */
   @IsString()
   telegramBotToken: string;
+  @IsString()
+  telegramBotName: string;
   @IsBoolean()
   telegramEnabled: boolean;
+
+  /**
+   * ========================
+   * Платформа авторизации
+   */
+  @IsIn(['vk', 'telegram'])
+  botPlatform: 'vk' | 'telegram';
 
   /**
    * =================

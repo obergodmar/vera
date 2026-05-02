@@ -26,6 +26,7 @@ export interface TelegramChatMemberUpdated {
 
 export interface TelegramSendOptions {
   replyToMessageId?: number;
+  inlineKeyboard?: { text: string; url: string }[][];
 }
 
 @Injectable()
@@ -103,6 +104,9 @@ export class TelegramApiService {
         text,
         ...(opts?.replyToMessageId
           ? { reply_to_message_id: opts.replyToMessageId }
+          : {}),
+        ...(opts?.inlineKeyboard
+          ? { reply_markup: { inline_keyboard: opts.inlineKeyboard } }
           : {}),
       });
     } catch (e) {

@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 
 import { AuthModule } from '../auth/auth.module';
 import { BotCoreModule } from '../bot-core/bot-core.module';
+import { BotPlatformModule } from '../bot-platform/bot-platform.module';
 import { CommandsModule } from '../commands/commands.module';
 import { CronsModule } from '../crons/crons.module';
 import { DatabaseModule } from '../database/database.module';
@@ -29,6 +30,7 @@ export class AppModule {
         SettingsModule,
         VkApiModule,
         BotCoreModule,
+        BotPlatformModule,
         VkPollingModule,
         TelegramPollingModule,
         LoggerModule,

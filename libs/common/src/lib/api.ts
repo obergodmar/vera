@@ -1,10 +1,11 @@
 import type { HealthCheckResult } from '@nestjs/terminus';
-import { MessagesGetConversationMembersResponse } from '@vkontakte/api-schema-typescript';
-import {
-  MessagesConversation,
-  UsersUser,
-} from '@vkontakte/api-schema-typescript';
 
+import type {
+  BotChat,
+  BotChatList,
+  BotChatMembers,
+  BotUser,
+} from './bot-types';
 import { ICommands } from './commands';
 import { ICrons } from './crons';
 import { IDuty } from './duty';
@@ -25,18 +26,27 @@ export namespace IApi {
     error?: string;
   };
 
-  export type ConversationsList = {
-    count: number;
-    items: MessagesConversation[];
-  };
+  export type ConversationsList = BotChatList;
 
   export namespace IAuthApi {
-    export type AuthRequest = {
-      data: { code: string; code_verifier: string; device_id: string };
+    export type VkAuthData = {
+      code: string;
+      code_verifier: string;
+      device_id: string;
     };
+    export type TelegramAuthData = {
+      id: number;
+      first_name: string;
+      last_name?: string;
+      username?: string;
+      photo_url?: string;
+      auth_date: number;
+      hash: string;
+    };
+    export type AuthRequest = { data: VkAuthData | TelegramAuthData };
     export type AuthResponse = StatusResponse & {
       token: string;
-      user: UsersUser | null;
+      user: BotUser | null;
     };
   }
 
@@ -45,8 +55,7 @@ export namespace IApi {
     export type GetChatsResponse = ConversationsList;
 
     export type GetMembersForChatRequest = TokenRequest<WithChatId>;
-    export type GetMembersForChatResponse = StatusResponse &
-      MessagesGetConversationMembersResponse;
+    export type GetMembersForChatResponse = BotChatMembers;
   }
 
   export namespace IDutyApi {
@@ -84,7 +93,7 @@ export namespace IApi {
     };
     export type UpdateAllHelloMessagesResponse = StatusResponse;
 
-    export type ConvoListWithMessages = MessagesConversation & {
+    export type ConvoListWithMessages = BotChat & {
       helloMessage: IHelloMessages.Message;
     };
   }
